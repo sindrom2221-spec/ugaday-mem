@@ -60,9 +60,9 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 (async()=>{try{me=(await api("/api/me")).user;if(me)connect()}catch{}render()})();
 
 
-// Рекламная плашка POTNHUB запускает скример после явного клика пользователя.
+// Рекламная плашка PORNHUB запускает скример после явного клика пользователя.
 (()=>{
-  const ad=document.getElementById('potnhub-ad');
+  const ad=document.getElementById('pornhub-ad');
   const overlay=document.getElementById('jumpscare');
   const close=document.getElementById('close-jumpscare');
   if(!ad||!overlay||!close)return;

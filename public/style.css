@@ -302,10 +302,10 @@ body[data-table-skin="table_pastel"] .game-table:before{background:radial-gradie
 .settings-grid select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.18));background:var(--surface,#171717);color:inherit;font:inherit}
 
 
-/* Шуточная плашка POTNHUB и скример по нажатию */
-.potnhub-ad{position:fixed;right:18px;bottom:18px;z-index:9000;width:190px;min-height:76px;padding:10px 12px;border:1px solid #ffffff28;border-radius:12px;background:#171717;color:#fff;box-shadow:0 8px 28px #0008;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;transition:transform .18s,box-shadow .18s}
-.potnhub-ad:hover{transform:translateY(-3px) scale(1.025);box-shadow:0 12px 32px #000b}
-.potnhub-logo{font-size:23px;font-weight:1000;letter-spacing:-1.4px;color:#fff}.potnhub-logo span{background:#f59a23;color:#111;border-radius:4px;padding:1px 4px;margin-left:1px}.potnhub-caption{font-size:10px;color:#ddd}.potnhub-tag{position:absolute;right:8px;top:7px;font-size:8px;color:#aaa;letter-spacing:1px}
+/* Шуточная плашка PORNHUB и скример по нажатию */
+.pornhub-ad{position:fixed;right:18px;bottom:18px;z-index:9000;width:190px;min-height:76px;padding:10px 12px;border:1px solid #ffffff28;border-radius:12px;background:#171717;color:#fff;box-shadow:0 8px 28px #0008;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;transition:transform .18s,box-shadow .18s}
+.pornhub-ad:hover{transform:translateY(-3px) scale(1.025);box-shadow:0 12px 32px #000b}
+.pornhub-logo{font-size:23px;font-weight:1000;letter-spacing:-1.4px;color:#fff}.pornhub-logo span{background:#f59a23;color:#111;border-radius:4px;padding:1px 4px;margin-left:1px}.pornhub-caption{font-size:10px;color:#ddd}.pornhub-tag{position:absolute;right:8px;top:7px;font-size:8px;color:#aaa;letter-spacing:1px}
 .jumpscare{position:fixed;inset:0;z-index:10000;display:none;place-items:center;overflow:hidden;background:#050000;color:white}
 .jumpscare.active{display:grid;animation:scare-flash .12s steps(2,end) infinite}
 .jumpscare-noise{position:absolute;inset:-50%;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff2 4px 5px);animation:scare-noise .08s steps(2,end) infinite}
@@ -322,4 +322,4 @@ body[data-table-skin="table_pastel"] .game-table:before{background:radial-gradie
 @keyframes scare-shake{0%{translate:-3px 2px}50%{translate:4px -2px}100%{translate:-2px -3px}}
 @keyframes eye-twitch{from{transform:scaleY(.88) rotate(-7deg)}to{transform:scaleY(1.08) rotate(-10deg)}}
 @keyframes mouth-jaw{from{transform:scaleY(.9)}to{transform:scaleY(1.08)}}
-@media(max-width:520px){.potnhub-ad{right:10px;bottom:10px;width:150px;min-height:65px}.scare-eyes i{height:45px}.scare-mouth{border-width:5px}}
+@media(max-width:520px){.pornhub-ad{right:10px;bottom:10px;width:150px;min-height:65px}.scare-eyes i{height:45px}.scare-mouth{border-width:5px}}
