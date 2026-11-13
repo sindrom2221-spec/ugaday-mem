@@ -16,7 +16,10 @@ app.set("trust proxy", 1);
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = Number(process.env.PORT || 3000);
-const dataDir = path.join(__dirname, "data");
+// Render's filesystem is temporary unless a Persistent Disk is attached.
+// Set DATA_DIR to the disk mount path (recommended: /var/data) in Render.
+// Locally, keep data inside the project folder.
+const dataDir = process.env.DATA_DIR || (process.env.RENDER ? "/var/data" : path.join(__dirname, "data"));
 fs.mkdirSync(dataDir, { recursive: true });
 const db = new Database(path.join(dataDir, "game.db"));
 db.pragma("journal_mode = WAL");
