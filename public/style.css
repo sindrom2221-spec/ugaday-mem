@@ -300,3 +300,23 @@ body[data-table-skin="table_pastel"] .game-table:before{background:radial-gradie
 .room-settings h3{margin:0 0 14px}.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
 .settings-grid label{display:grid;gap:7px;font-size:13px;color:var(--muted,#888)}
 .settings-grid select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line,rgba(255,255,255,.18));background:var(--surface,#171717);color:inherit;font:inherit}
+
+
+/* Шуточная плашка POTNHUB и скример по нажатию */
+.potnhub-ad{position:fixed;right:18px;bottom:18px;z-index:9000;width:190px;min-height:76px;padding:10px 12px;border:1px solid #ffffff28;border-radius:12px;background:#171717;color:#fff;box-shadow:0 8px 28px #0008;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:4px;transition:transform .18s,box-shadow .18s}
+.potnhub-ad:hover{transform:translateY(-3px) scale(1.025);box-shadow:0 12px 32px #000b}
+.potnhub-logo{font-size:23px;font-weight:1000;letter-spacing:-1.4px;color:#fff}.potnhub-logo span{background:#f59a23;color:#111;border-radius:4px;padding:1px 4px;margin-left:1px}.potnhub-caption{font-size:10px;color:#ddd}.potnhub-tag{position:absolute;right:8px;top:7px;font-size:8px;color:#aaa;letter-spacing:1px}
+.jumpscare{position:fixed;inset:0;z-index:10000;display:none;place-items:center;overflow:hidden;background:#050000;color:white}
+.jumpscare.active{display:grid;animation:scare-flash .12s steps(2,end) infinite}
+.jumpscare-noise{position:absolute;inset:-50%;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff2 4px 5px);animation:scare-noise .08s steps(2,end) infinite}
+.scare-face{position:relative;width:min(72vw,520px);height:min(72vw,520px);border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 40%,#e8d8c8 0 17%,#9e7770 45%,#210d12 75%);box-shadow:0 0 90px 35px #b00018;transform:scale(1.12);animation:scare-zoom .28s cubic-bezier(.1,.8,.2,1) both}
+.scare-eyes{position:absolute;top:29%;left:16%;right:16%;display:flex;justify-content:space-between}.scare-eyes i{display:block;width:29%;height:72px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 15px #16090b,0 0 24px #ff001e;transform:rotate(-8deg)}.scare-eyes i+ i{transform:rotate(8deg)}
+.scare-nose{position:absolute;top:48%;left:43%;width:14%;height:13%;background:#38151a;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.scare-mouth{position:absolute;left:25%;right:25%;bottom:12%;height:28%;border-radius:10% 10% 50% 50%;background:#090204;border:8px solid #4c151a;display:flex;justify-content:space-around;align-items:flex-start;overflow:hidden;padding:0 5px}.scare-mouth b{width:16%;height:30%;background:#eee;clip-path:polygon(0 0,100% 0,50% 100%)}
+.scare-word{position:absolute;bottom:8%;font-size:clamp(38px,9vw,100px);font-weight:1000;color:#ff1b35;text-shadow:0 4px 0 #39000a,0 0 30px #f00;letter-spacing:4px;animation:scare-word .16s infinite alternate}
+.scare-close{position:absolute;top:18px;right:18px;border:1px solid #fff8;border-radius:9px;background:#17080b;color:#fff;padding:10px 15px;cursor:pointer;font-weight:700}
+@keyframes scare-flash{0%{background:#050000}50%{background:#4b0008}}
+@keyframes scare-noise{0%{transform:translate(0,0)}50%{transform:translate(2%, -1%)}100%{transform:translate(-1%,2%)}}
+@keyframes scare-zoom{from{transform:scale(.18) rotate(-8deg)}to{transform:scale(1.12) rotate(0)}}
+@keyframes scare-word{from{transform:scale(.94) rotate(-2deg)}to{transform:scale(1.06) rotate(2deg)}}
+@media(max-width:520px){.potnhub-ad{right:10px;bottom:10px;width:150px;min-height:65px}.scare-eyes i{height:45px}.scare-mouth{border-width:5px}}

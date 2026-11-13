@@ -58,3 +58,22 @@ async function leaderboard(){const d=await api("/api/leaderboard");app.innerHTML
 async function adminPage(){try{const d=await api("/api/admin/overview");app.innerHTML=`<div class="page-head"><div><div class="eyebrow">Управление проектом</div><h1>Админ-панель</h1></div></div><h2>Игроки</h2><div class="card table-wrap"><table><thead><tr><th>ID</th><th>Игрок</th><th>Монеты</th><th>Очки</th><th>Статус</th><th>Действия</th></tr></thead><tbody>${d.users.map(u=>`<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${u.coins}</td><td>${u.total_score}</td><td>${u.is_banned?"Заблокирован":"Активен"}</td><td>${u.is_admin?`Админ`:`${u.is_banned?"Заблокирован":""}`} <button class="btn ${u.id===me.id?"primary":""}" data-coins="${u.id}">${u.id===me.id?"Изменить мои монеты":"Изменить монеты"}</button> ${u.is_admin?"":`<button class="btn ${u.is_banned?"":"danger"}" data-ban="${u.id}" data-state="${u.is_banned}">${u.is_banned?"Разблокировать":"Блокировать"}</button>`}</td></tr>`).join("")}</tbody></table></div><h2 style="margin-top:28px">Комнаты</h2><div class="card table-wrap"><table><thead><tr><th>Код</th><th>Состояние</th><th>Обновлена</th><th></th></tr></thead><tbody>${d.rooms.map(r=>`<tr><td>${r.code}</td><td>${esc(r.state.status)}</td><td>${r.updated_at}</td><td><button class="btn danger" data-room="${r.code}">Удалить</button></td></tr>`).join("")}</tbody></table></div><h2 style="margin-top:28px">Последние матчи</h2><div class="card table-wrap"><table><thead><tr><th>ID</th><th>Комната</th><th>Раундов</th><th>Дата</th></tr></thead><tbody>${d.matches.map(m=>`<tr><td>${m.id}</td><td>${m.room_code}</td><td>${m.round_count}</td><td>${m.completed_at}</td></tr>`).join("")}</tbody></table></div>`;document.querySelectorAll("[data-ban]").forEach(b=>b.onclick=async()=>{const banned=b.dataset.state==="1";await api(`/api/admin/user/${b.dataset.ban}/${banned?"unban":"ban"}`,{method:"POST",body:JSON.stringify({reason:"Решение администратора"})});adminPage()});document.querySelectorAll("[data-coins]").forEach(b=>b.onclick=async()=>{const amount=prompt(`Игрок: ${b.closest("tr").children[1].textContent}. Сколько монет добавить или снять? Введите целое число (например, 100 или -50).`);if(amount===null)return;await api(`/api/admin/user/${b.dataset.coins}/coins`,{method:"POST",body:JSON.stringify({amount:Number(amount)})});adminPage()});document.querySelectorAll("[data-room]").forEach(b=>b.onclick=async()=>{if(confirm("Удалить комнату?")){await api(`/api/admin/room/${b.dataset.room}/delete`,{method:"POST"});adminPage()}})}catch(e){app.innerHTML=`<div class="notice">${esc(e.message)}</div>`}}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 (async()=>{try{me=(await api("/api/me")).user;if(me)connect()}catch{}render()})();
+
+
+// Рекламная плашка POTNHUB запускает шуточный скример только после клика пользователя.
+(()=>{
+  const ad=document.getElementById('potnhub-ad');
+  const overlay=document.getElementById('jumpscare');
+  const close=document.getElementById('close-jumpscare');
+  if(!ad||!overlay||!close)return;
+  let audioContext=null;
+  function stopScare(){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');if(audioContext){try{audioContext.close()}catch{}audioContext=null}}
+  ad.addEventListener('click',()=>{
+    overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
+    // Короткий синтезированный резкий звук; воспроизводится только после явного клика.
+    try{audioContext=new (window.AudioContext||window.webkitAudioContext)();const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='sawtooth';osc.frequency.setValueAtTime(180,audioContext.currentTime);osc.frequency.exponentialRampToValueAtTime(48,audioContext.currentTime+.75);gain.gain.setValueAtTime(.0001,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.22,audioContext.currentTime+.04);gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+.9);osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+.92)}catch{}
+  });
+  close.addEventListener('click',stopScare);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)stopScare()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')stopScare()});
+})();

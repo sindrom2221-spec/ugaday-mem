@@ -14,5 +14,17 @@
 <main id="app"><div class="loading">Загрузка…</div></main>
 <footer>УГАДАЙ МЕМ <span>Играйте с друзьями. Угадывайте мемы.</span></footer>
 </div>
+<!-- Шуточная рекламная плашка с локальным скримером -->
+<button id="potnhub-ad" class="potnhub-ad" type="button" aria-label="Открыть рекламу POTNHUB">
+  <span class="potnhub-logo">POTN<span>HUB</span></span>
+  <span class="potnhub-caption">нажми… если не боишься</span>
+  <span class="potnhub-tag">РЕКЛАМА</span>
+</button>
+<div id="jumpscare" class="jumpscare" aria-hidden="true" role="dialog" aria-label="Скример">
+  <div class="jumpscare-noise"></div>
+  <div class="scare-face" aria-hidden="true"><div class="scare-eyes"><i></i><i></i></div><div class="scare-nose"></div><div class="scare-mouth"><b></b><b></b><b></b><b></b><b></b></div></div>
+  <div class="scare-word">БУУУ!!!</div>
+  <button id="close-jumpscare" class="scare-close" type="button">Закрыть</button>
+</div>
 <script src="/socket.io/socket.io.js"></script><script src="/app.js"></script>
 </body></html>
