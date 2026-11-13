@@ -90,24 +90,6 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(sessionMiddleware);
-// Custom avatar uploads are stored in SQLite as data URLs so they survive app restarts
-// when the database is on persistent storage. Limit uploads to 2 MiB.
-app.post("/api/profile/avatar-upload", requireAuth, express.raw({ type: ["image/png", "image/jpeg", "image/webp"], limit: "2mb" }), (req, res) => {
-  if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Выбери файл PNG, JPG или WebP" });
-  const b = req.body;
-  const mime = req.headers["content-type"];
-  const isPng = mime === "image/png" && b.length >= 8 && b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
-  const isJpeg = mime === "image/jpeg" && b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
-  const isWebp = mime === "image/webp" && b.length >= 12 && b.toString("ascii",0,4) === "RIFF" && b.toString("ascii",8,12) === "WEBP";
-  if (!isPng && !isJpeg && !isWebp) return res.status(400).json({ error: "Файл должен быть настоящим изображением PNG, JPG или WebP" });
-  const avatar = `data:${mime};base64,${b.toString("base64")}`;
-  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("avatar:"+req.session.userId, avatar);
-  for (const r of roomCache.values()) {
-    const player = r.players.find(p => p.id === req.session.userId);
-    if (player) { player.avatar = avatar; emitRoom(r); }
-  }
-  res.json({ user: getProfile(req.session.userId) });
-});
 app.use(express.static(path.join(__dirname, "public")));
 
 const adminName = process.env.ADMIN_USERNAME || "admin";
@@ -230,6 +212,25 @@ const situationsByMeme = {
 const memes = ["Да поебать мне", "Завтрак чемпиона", "Вас заметили", "Пиздец, где я?", "Бильярд", "OZON ПИВZON", "Суровый тип", "Хаййвет, плесень", "Сладкое ёжки", "Нет, я с горла", "Весёлый / не весёлый", "Очень близко", "Урологическое отделение №2", "Да ладно? Серьёзно?", "Шок", "Пожимает плечами", "Сомнительно, но окей", "Срамота!", "Ну как так-то?"];
 
 const requireAuth = (req,res,next) => req.session.userId ? next() : res.status(401).json({error:"Сначала войдите в аккаунт"});
+
+// Custom avatar uploads are stored in SQLite as data URLs so they survive app restarts
+// when the database is on persistent storage. Limit uploads to 2 MiB.
+app.post("/api/profile/avatar-upload", requireAuth, express.raw({ type: ["image/png", "image/jpeg", "image/webp"], limit: "2mb" }), (req, res) => {
+  if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Выбери файл PNG, JPG или WebP" });
+  const b = req.body;
+  const mime = req.headers["content-type"];
+  const isPng = mime === "image/png" && b.length >= 8 && b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+  const isJpeg = mime === "image/jpeg" && b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+  const isWebp = mime === "image/webp" && b.length >= 12 && b.toString("ascii",0,4) === "RIFF" && b.toString("ascii",8,12) === "WEBP";
+  if (!isPng && !isJpeg && !isWebp) return res.status(400).json({ error: "Файл должен быть настоящим изображением PNG, JPG или WebP" });
+  const avatar = `data:${mime};base64,${b.toString("base64")}`;
+  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("avatar:"+req.session.userId, avatar);
+  for (const r of roomCache.values()) {
+    const player = r.players.find(p => p.id === req.session.userId);
+    if (player) { player.avatar = avatar; emitRoom(r); }
+  }
+  res.json({ user: getProfile(req.session.userId) });
+});
 const requireAdmin = (req,res,next) => {
   if (!req.session.userId) return res.status(401).json({error:"Требуется вход"});
   const user = db.prepare("SELECT is_admin FROM users WHERE id=?").get(req.session.userId);
