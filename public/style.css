@@ -228,3 +228,70 @@ body[data-card-skin="cover_comic"] .choice{border:3px solid #171717;border-radiu
 body[data-card-skin="cover_vapor"] .choice{border-color:#e88ad8;background:linear-gradient(145deg,#32205d,#171e4b)}
 body[data-card-skin="cover_kawaii"] .choice{border-color:#efb8d5;border-radius:20px;background:linear-gradient(145deg,#fff0f7,#e8fbf7)}
 body[data-card-skin="cover_glitch"] .choice{border-color:#36ff9a;border-radius:3px;background:linear-gradient(120deg,#07150f,#102b21)}
+
+/* Отдельные скины игрового стола: не зависят от обложек карт */
+.game-table{padding:18px;border-radius:24px;transition:background .2s,box-shadow .2s}
+body[data-table-skin="table_classic"] .game-table{background:linear-gradient(145deg,#ffffff05,#00000012)}
+body[data-table-skin="table_pixel"] .game-table{background-color:#101b35;background-image:linear-gradient(#8b9bff18 1px,transparent 1px),linear-gradient(90deg,#8b9bff18 1px,transparent 1px);background-size:16px 16px;border:3px solid #f6d85b;border-radius:3px;box-shadow:inset 0 0 30px #050b20,6px 6px 0 #080d1c}
+body[data-table-skin="table_neon"] .game-table{background:radial-gradient(ellipse at 50% 0%,#562d8066,transparent 60%),linear-gradient(135deg,#081629,#11102b 55%,#082c36);border:1px solid #48f5ff;box-shadow:0 0 22px #2feaff44,inset 0 0 35px #d72cff22}
+body[data-table-skin="table_horror"] .game-table{background:radial-gradient(ellipse at 50% 100%,#56131c,#160d13 70%,#09090c);border:1px solid #8f2633;box-shadow:inset 0 0 55px #000,0 0 18px #6b0d1c55}
+body[data-table-skin="table_comic"] .game-table{background:radial-gradient(#171717 1px,transparent 1.5px),linear-gradient(135deg,#ffe978,#ffad47 55%,#f36c85);background-size:9px 9px,auto;border:3px solid #171717;border-radius:8px;box-shadow:6px 6px 0 #171717}
+body[data-table-skin="table_vapor"] .game-table{background:linear-gradient(180deg,#f06ac5 0%,#7150c8 48%,#171e5a 100%);border:2px solid #ffd0f4;box-shadow:0 0 24px #e85acb55,inset 0 -45px 60px #090c35aa}
+body[data-table-skin="table_kawaii"] .game-table{background:radial-gradient(circle at 12% 18%,#fff9 0 5px,transparent 6px),radial-gradient(circle at 85% 75%,#fff9 0 7px,transparent 8px),linear-gradient(135deg,#ffd9eb,#c8f1e9 55%,#dcd4ff);border:2px solid #fff;border-radius:28px;box-shadow:0 8px 25px #d99ec044}
+body[data-table-skin="table_glitch"] .game-table{background:repeating-linear-gradient(0deg,#00ff880b 0 1px,transparent 1px 5px),linear-gradient(120deg,#06120e,#102c24 55%,#030806);border:1px solid #36ff9a;box-shadow:inset 0 0 45px #00ff7a18,0 0 18px #00ff7a33}
+.table-skin-preview{height:145px;margin-bottom:16px;overflow:hidden;border-radius:14px}
+.table-sample{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-weight:900;letter-spacing:2px;color:#fff;text-shadow:0 2px 8px #0009;border:1px solid #ffffff33}
+.table-sample small{font-size:10px;letter-spacing:3px;opacity:.8}
+.table-sample.table-pixel{background-color:#101b35;background-image:linear-gradient(#8b9bff33 1px,transparent 1px),linear-gradient(90deg,#8b9bff33 1px,transparent 1px);background-size:12px 12px;border:3px solid #f6d85b;border-radius:2px}
+.table-sample.table-neon{background:radial-gradient(circle at 50% 0%,#d72cff88,transparent 60%),linear-gradient(135deg,#081629,#082c36);border:2px solid #48f5ff;box-shadow:inset 0 0 20px #d72cff66}
+.table-sample.table-horror{background:radial-gradient(ellipse at 50% 100%,#8f101b,#180d16 65%,#08080d);border:2px solid #9f2832}
+.table-sample.table-comic{background:radial-gradient(#191919 1px,transparent 1.5px),linear-gradient(135deg,#ffe45c,#ff8b39 55%,#ef416e);background-size:7px 7px,auto;border:3px solid #171717;color:#171717;text-shadow:none}
+.table-sample.table-vapor{background:linear-gradient(180deg,#f05cba,#6c4bd7 55%,#161e65);border:2px solid #ffd0f4}
+.table-sample.table-kawaii{background:radial-gradient(circle at 20% 20%,#fff9 0 5px,transparent 6px),linear-gradient(135deg,#ffc9e2,#b8e9e5 55%,#cfc4ff);border:2px solid #fff;color:#654d79;text-shadow:none}
+.table-sample.table-glitch{background:repeating-linear-gradient(0deg,#00ff8818 0 1px,transparent 1px 5px),linear-gradient(135deg,#06120e,#102c24);border:2px solid #36ff9a;color:#5dffad}
+@media(max-width:650px){.game-table{padding:8px;border-radius:14px}}
+
+
+/* Атмосферные игровые сцены: оформление всего игрового поля, как на концепт-изображении */
+.game-table{position:relative;isolation:isolate;overflow:hidden;min-height:360px;padding:20px;border-radius:22px;background-size:cover;}
+.game-table:before{content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;opacity:.95;}
+.game-table:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.55;}
+.game-table>*{position:relative;z-index:1;}
+.game-table .card{backdrop-filter:blur(8px);}
+body[data-table-skin="table_classic"] .game-table{background:radial-gradient(ellipse at 50% 0%,#28313b 0,transparent 52%),linear-gradient(145deg,#151a22,#080b10 70%);border:1px solid #59616d;box-shadow:inset 0 0 80px #000b,0 12px 35px #0008}
+body[data-table-skin="table_classic"] .game-table:before{background:radial-gradient(circle at 15% 20%,#ffffff12 0 1px,transparent 2px),radial-gradient(circle at 85% 70%,#ffffff0d 0 1px,transparent 2px);background-size:38px 38px,51px 51px}
+body[data-table-skin="table_pixel"] .game-table{background-color:#142b55;background-image:linear-gradient(#9bd5ff20 1px,transparent 1px),linear-gradient(90deg,#9bd5ff20 1px,transparent 1px),linear-gradient(180deg,#1c70b8 0%,#6bc9ed 52%,#4b9b48 53%,#173d29 100%);background-size:16px 16px,16px 16px,100% 100%;border:4px solid #f6d85b;border-radius:5px;box-shadow:inset 0 0 0 4px #101b35,inset 0 0 50px #06132c,7px 7px 0 #080d1c}
+body[data-table-skin="table_pixel"] .game-table:before{background:linear-gradient(135deg,transparent 0 65%,#173d29 65% 100%),radial-gradient(ellipse at 18% 58%,#fff 0 22px,transparent 23px),radial-gradient(ellipse at 26% 58%,#fff 0 30px,transparent 31px);opacity:.24}
+body[data-table-skin="table_neon"] .game-table{background:radial-gradient(ellipse at 50% 0%,#9c35c966,transparent 45%),linear-gradient(180deg,#071b36,#10112e 60%,#071d27);border:2px solid #48f5ff;box-shadow:0 0 28px #2feaff66,inset 0 0 55px #d72cff33}
+body[data-table-skin="table_neon"] .game-table:before{background:repeating-linear-gradient(115deg,transparent 0 42px,#f72fff22 43px 45px,transparent 46px 90px),linear-gradient(90deg,transparent 8%,#16e9ff22 8.2%,transparent 8.5% 91%,#16e9ff22 91.2%,transparent 91.5%);}
+body[data-table-skin="table_neon"] .game-table:after{background:radial-gradient(ellipse at 10% 85%,#ff24c833,transparent 32%),radial-gradient(ellipse at 90% 18%,#00eaff33,transparent 30%)}
+body[data-table-skin="table_horror"] .game-table{background:radial-gradient(ellipse at 50% 100%,#57121d,#1b0c13 58%,#09090d);border:2px solid #9f2838;box-shadow:inset 0 0 75px #000,0 0 22px #8d122a66}
+body[data-table-skin="table_horror"] .game-table:before{background:repeating-linear-gradient(78deg,transparent 0 55px,#b52a3518 56px 58px,transparent 59px 105px),radial-gradient(ellipse at 50% 0%,#b82c3a33,transparent 65%)}
+body[data-table-skin="table_horror"] .game-table:after{background:linear-gradient(0deg,#05040799,transparent 45%),radial-gradient(circle at 12% 22%,#d3293522,transparent 22%)}
+body[data-table-skin="table_comic"] .game-table{background:radial-gradient(#1b1b1b 1.2px,transparent 1.7px),linear-gradient(135deg,#ffe978,#ffad47 52%,#f36c85);background-size:9px 9px,100% 100%;border:4px solid #171717;border-radius:10px;box-shadow:7px 7px 0 #171717}
+body[data-table-skin="table_comic"] .game-table:before{background:repeating-conic-gradient(from 0deg at 50% 50%,#fff5 0deg 8deg,transparent 8deg 16deg);opacity:.24}
+body[data-table-skin="table_vapor"] .game-table{background:linear-gradient(180deg,#f06ac5 0%,#a65bd0 35%,#7150c8 58%,#171e5a 100%);border:2px solid #ffd0f4;box-shadow:0 0 28px #e85acb66,inset 0 -55px 70px #090c35bb}
+body[data-table-skin="table_vapor"] .game-table:before{background:linear-gradient(180deg,transparent 0 58%,#171e5a55 59%),repeating-linear-gradient(0deg,transparent 0 18px,#ffb8ee55 19px 20px),repeating-linear-gradient(90deg,transparent 0 34px,#ffb8ee44 35px 36px);transform:perspective(240px) rotateX(48deg) scale(1.5);transform-origin:bottom;top:42%}
+body[data-table-skin="table_vapor"] .game-table:after{background:radial-gradient(circle at 50% 28%,#ffe3a855 0 42px,transparent 43px)}
+body[data-table-skin="table_kawaii"] .game-table{background:radial-gradient(circle at 12% 18%,#fff 0 5px,transparent 6px),radial-gradient(circle at 85% 75%,#fff 0 7px,transparent 8px),linear-gradient(135deg,#ffd9eb,#c8f1e9 55%,#dcd4ff);border:3px solid #fff;border-radius:28px;box-shadow:0 8px 28px #d99ec066}
+body[data-table-skin="table_kawaii"] .game-table:before{background:radial-gradient(ellipse at 15% 0%,#fff9 0 55px,transparent 56px),radial-gradient(ellipse at 90% 100%,#fff9 0 75px,transparent 76px);}
+body[data-table-skin="table_glitch"] .game-table{background:repeating-linear-gradient(0deg,#00ff8811 0 1px,transparent 1px 5px),linear-gradient(120deg,#06120e,#102c24 55%,#030806);border:2px solid #36ff9a;box-shadow:inset 0 0 55px #00ff7a22,0 0 22px #00ff7a44}
+body[data-table-skin="table_glitch"] .game-table:before{background:repeating-linear-gradient(90deg,transparent 0 28px,#00ff881c 29px 30px),repeating-linear-gradient(0deg,transparent 0 30px,#00ff8812 31px 32px)}
+body[data-table-skin="table_glitch"] .game-table:after{background:linear-gradient(90deg,transparent 0 15%,#00ff8833 15.2% 15.7%,transparent 16% 68%,#00ff8833 68.2% 68.7%,transparent 69%)}
+body[data-table-skin="table_light"] .game-table{background:radial-gradient(ellipse at 15% 18%,#fff 0 35px,transparent 36px),radial-gradient(ellipse at 23% 18%,#fff 0 48px,transparent 49px),linear-gradient(180deg,#b9e3ff 0%,#e5f5ff 58%,#c6e9bd 59%,#8bc58d 100%);border:2px solid #6da7ee;box-shadow:0 8px 30px #6da7ee44}
+body[data-table-skin="table_light"] .game-table:before{background:radial-gradient(circle at 82% 22%,#ffe58a 0 28px,transparent 29px),linear-gradient(90deg,transparent 0 12%,#ffffff22 12.2% 12.5%,transparent 13%)}
+body[data-table-skin="table_y2k"] .game-table{background:radial-gradient(ellipse at 50% 0%,#fff 0,transparent 34%),linear-gradient(135deg,#9be9ff,#a9b9ff 45%,#f4a9ed 100%);border:3px solid #fff;box-shadow:inset 0 0 0 2px #75bce9,0 0 25px #a5dfff88}
+body[data-table-skin="table_y2k"] .game-table:before{background:radial-gradient(ellipse at 12% 18%,#fff9 0 32px,transparent 33px),radial-gradient(ellipse at 88% 78%,#fff8 0 48px,transparent 49px),repeating-linear-gradient(125deg,transparent 0 48px,#ffffff38 49px 51px,transparent 52px 100px)}
+body[data-table-skin="table_pastel"] .game-table{background:radial-gradient(circle at 18% 22%,#fff 0 4px,transparent 5px),radial-gradient(circle at 82% 68%,#fff 0 5px,transparent 6px),linear-gradient(135deg,#ffe2ef,#d9f5ed 52%,#e4ddff);border:3px solid #fff;border-radius:26px;box-shadow:0 10px 30px #c8addb66}
+body[data-table-skin="table_pastel"] .game-table:before{background:radial-gradient(ellipse at 12% 0%,#fff9 0 48px,transparent 49px),radial-gradient(ellipse at 92% 100%,#fff9 0 60px,transparent 61px)}
+.table-sample.table-light{background:linear-gradient(180deg,#b9e3ff 0 58%,#9bce9b 59%);border:2px solid #6da7ee;color:#17446f;text-shadow:none}
+.table-sample.table-y2k{background:linear-gradient(135deg,#9be9ff,#a9b9ff 45%,#f4a9ed);border:3px solid #fff;color:#fff}
+.table-sample.table-pastel{background:linear-gradient(135deg,#ffe2ef,#d9f5ed 52%,#e4ddff);border:3px solid #fff;color:#725a83;text-shadow:none}
+
+
+/* Настройки ника и аватара */
+#user-chip{display:flex;align-items:center;gap:6px;white-space:nowrap}.chip-avatar{font-size:21px;vertical-align:middle}
+.profile-settings{max-width:620px;margin:0 0 30px}.profile-avatar-current{width:84px;height:84px;margin:12px auto 18px;border-radius:24px;display:grid;place-items:center;font-size:48px;background:var(--panel2);border:1px solid var(--line);box-shadow:0 8px 24px #0002}
+.avatar-picker{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}.avatar-option{min-width:0;aspect-ratio:1;border:1px solid var(--line);border-radius:13px;background:var(--panel2);font-size:27px;cursor:pointer;transition:.15s}.avatar-option:hover{transform:translateY(-2px);border-color:var(--accent)}.avatar-option.selected{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--panel2));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 18%,transparent)}.section-heading{margin:28px 0 16px}.player{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.player-avatar{font-size:25px}.player small{flex-basis:100%;margin-left:35px}
+@media(max-width:520px){.avatar-picker{grid-template-columns:repeat(4,minmax(0,1fr))}.profile-settings{padding:16px}#user-chip{font-size:11px}}
+.avatar-image{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}.profile-avatar-current .avatar-image{width:84px;height:84px;border-radius:24px}.chip-avatar .avatar-image,.player-avatar .avatar-image,.leader-avatar .avatar-image{width:30px;height:30px;border-radius:50%;vertical-align:middle}.chip-avatar{display:inline-flex;align-items:center;justify-content:center;overflow:hidden}.player-avatar{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;font-size:25px}.leader-avatar{display:inline-flex;width:30px;height:30px;vertical-align:middle;align-items:center;justify-content:center}.avatar-upload-field{margin-top:16px;padding:14px;border:1px dashed var(--line);border-radius:14px}.avatar-upload-field input{max-width:100%;margin:8px 0}.avatar-upload-field .btn{display:block;margin-top:10px}

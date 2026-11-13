@@ -90,6 +90,24 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(sessionMiddleware);
+// Custom avatar uploads are stored in SQLite as data URLs so they survive app restarts
+// when the database is on persistent storage. Limit uploads to 2 MiB.
+app.post("/api/profile/avatar-upload", requireAuth, express.raw({ type: ["image/png", "image/jpeg", "image/webp"], limit: "2mb" }), (req, res) => {
+  if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Выбери файл PNG, JPG или WebP" });
+  const b = req.body;
+  const mime = req.headers["content-type"];
+  const isPng = mime === "image/png" && b.length >= 8 && b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+  const isJpeg = mime === "image/jpeg" && b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+  const isWebp = mime === "image/webp" && b.length >= 12 && b.toString("ascii",0,4) === "RIFF" && b.toString("ascii",8,12) === "WEBP";
+  if (!isPng && !isJpeg && !isWebp) return res.status(400).json({ error: "Файл должен быть настоящим изображением PNG, JPG или WebP" });
+  const avatar = `data:${mime};base64,${b.toString("base64")}`;
+  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("avatar:"+req.session.userId, avatar);
+  for (const r of roomCache.values()) {
+    const player = r.players.find(p => p.id === req.session.userId);
+    if (player) { player.avatar = avatar; emitRoom(r); }
+  }
+  res.json({ user: getProfile(req.session.userId) });
+});
 app.use(express.static(path.join(__dirname, "public")));
 
 const adminName = process.env.ADMIN_USERNAME || "admin";
@@ -222,12 +240,38 @@ function getProfile(id) {
   const user = db.prepare("SELECT id,username,coins,total_score,games_played,is_admin FROM users WHERE id=?").get(id);
   if (!user) return null;
   const owned = db.prepare("SELECT item_id FROM inventory WHERE user_id=?").all(id).map(x=>x.item_id);
+  if (!owned.includes("table_classic")) owned.push("table_classic");
   const equipped = db.prepare("SELECT value FROM settings WHERE key=?").get("equipped:"+id)?.value || "cover_default";
   const theme = db.prepare("SELECT value FROM settings WHERE key=?").get("theme:"+id)?.value || "dark";
-  return {...user, owned, equipped, theme};
+  const tableSkin = db.prepare("SELECT value FROM settings WHERE key=?").get("table-skin:"+id)?.value || "table_classic";
+  const avatar = db.prepare("SELECT value FROM settings WHERE key=?").get("avatar:"+id)?.value || "🙂";
+  return {...user, owned, equipped, theme, tableSkin, avatar};
 }
 
 app.get("/api/me",(req,res)=>res.json({user:req.session.userId ? getProfile(req.session.userId) : null}));
+app.post("/api/profile/update",requireAuth,(req,res)=>{
+  const username=String(req.body.username||"").trim();
+  const avatar=String(req.body.avatar||"");
+  const allowedAvatars=["🙂","😎","🤩","😂","😈","👻","🤖","🐱","🐸","🦊","🐼","🐵","🐙","🦄","💀","👑"];
+  if(!/^[\p{L}\p{N}_-]{3,18}$/u.test(username)) return res.status(400).json({error:"Ник: 3–18 символов, буквы, цифры, _ или -"});
+  const currentAvatar=db.prepare("SELECT value FROM settings WHERE key=?").get("avatar:"+req.session.userId)?.value || "🙂";
+  if(avatar && !allowedAvatars.includes(avatar) && avatar!==currentAvatar) return res.status(400).json({error:"Загрузи изображение или выбери аватар из списка"});
+  try {
+    db.prepare("UPDATE users SET username=? WHERE id=?").run(username,req.session.userId);
+  } catch(e) {
+    if(String(e.code||"").startsWith("SQLITE_CONSTRAINT")) return res.status(409).json({error:"Этот ник уже занят"});
+    throw e;
+  }
+  if(avatar && allowedAvatars.includes(avatar)) db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("avatar:"+req.session.userId,avatar);
+  const savedAvatar=avatar || currentAvatar;
+  for(const r of roomCache.values()) {
+    const player=r.players.find(p=>p.id===req.session.userId);
+    if(player) { player.username=username; player.avatar=savedAvatar; emitRoom(r); }
+  }
+  const activeSocket=[...io.sockets.sockets.values()].find(sock=>sock.userId===req.session.userId);
+  if(activeSocket) activeSocket.username=username;
+  res.json({user:getProfile(req.session.userId)});
+});
 app.post("/api/profile/theme",requireAuth,(req,res)=>{
   const theme=String(req.body.theme||"");
   if(!["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"].includes(theme)) return res.status(400).json({error:"Неизвестная тема оформления"});
@@ -260,7 +304,20 @@ app.post("/api/login",(req,res)=>{
   });
 });
 app.post("/api/logout",(req,res)=>req.session.destroy(()=>res.json({ok:true})));
-app.get("/api/shop",(req,res)=>res.json({items:catalog}));
+const tableCatalog = [
+  {id:"table_classic",name:"Классический стол",price:0,description:"Чистая игровая площадка",className:"table-classic"},
+  {id:"table_pixel",name:"Pixel Arcade",price:400,description:"Пиксельная арена с ретро-сеткой",className:"table-pixel"},
+  {id:"table_neon",name:"Cyber Arena",price:550,description:"Киберпанк и неоновые линии",className:"table-neon"},
+  {id:"table_horror",name:"Dark Basement",price:600,description:"Мрачный стол с красными акцентами",className:"table-horror"},
+  {id:"table_comic",name:"Comic Stage",price:350,description:"Яркая комиксная сцена",className:"table-comic"},
+  {id:"table_vapor",name:"Sunset Grid",price:500,description:"Розово-фиолетовый ретро-закат",className:"table-vapor"},
+  {id:"table_kawaii",name:"Cloud Café",price:350,description:"Пастельные облака и звёзды",className:"table-kawaii"},
+  {id:"table_glitch",name:"Хакерская / Matrix",price:550,description:"Зелёный цифровой мир с потоками кода",className:"table-glitch"},
+  {id:"table_light",name:"Светлая арена",price:300,description:"Голубое небо, облака и чистая игровая площадка",className:"table-light"},
+  {id:"table_y2k",name:"Y2K Dream",price:500,description:"Хром, глянцевые формы и голубой металлик",className:"table-y2k"},
+  {id:"table_pastel",name:"Pastel Garden",price:350,description:"Нежные облака, звёзды и пастельные оттенки",className:"table-pastel"}
+];
+app.get("/api/shop",(req,res)=>res.json({items:catalog,tableItems:tableCatalog}));
 app.post("/api/shop/buy",requireAuth,(req,res)=>{
   const item = catalog.find(x=>x.id===req.body.itemId);
   if (!item) return res.status(404).json({error:"Товар не найден"});
@@ -281,7 +338,24 @@ app.post("/api/shop/equip",requireAuth,(req,res)=>{
   db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("equipped:"+req.session.userId,id);
   res.json({user:getProfile(req.session.userId)});
 });
-app.get("/api/leaderboard",(req,res)=>res.json({players:db.prepare("SELECT username,total_score,games_played FROM users WHERE is_banned=0 ORDER BY total_score DESC LIMIT 30").all()}));
+app.post("/api/shop/table-buy",requireAuth,(req,res)=>{
+  const item=tableCatalog.find(x=>x.id===req.body.itemId);
+  if(!item) return res.status(404).json({error:"Скин стола не найден"});
+  try { db.transaction(()=>{
+    if(db.prepare("SELECT 1 FROM inventory WHERE user_id=? AND item_id=?").get(req.session.userId,item.id)) throw Error("Уже куплено");
+    const user=db.prepare("SELECT coins FROM users WHERE id=?").get(req.session.userId);
+    if(user.coins<item.price) throw Error("Недостаточно монет");
+    db.prepare("UPDATE users SET coins=coins-? WHERE id=?").run(item.price,req.session.userId);
+    db.prepare("INSERT INTO inventory(user_id,item_id) VALUES(?,?)").run(req.session.userId,item.id);
+  })(); res.json({user:getProfile(req.session.userId)}); } catch(e){res.status(400).json({error:e.message});}
+});
+app.post("/api/shop/table-equip",requireAuth,(req,res)=>{
+  const id=String(req.body.itemId||"");
+  if(!tableCatalog.some(x=>x.id===id) || !db.prepare("SELECT 1 FROM inventory WHERE user_id=? AND item_id=?").get(req.session.userId,id)) return res.status(400).json({error:"Сначала приобретите этот стол"});
+  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("table-skin:"+req.session.userId,id);
+  res.json({user:getProfile(req.session.userId)});
+});
+app.get("/api/leaderboard",(req,res)=>{const players=db.prepare("SELECT id,username,total_score,games_played FROM users WHERE is_banned=0 ORDER BY total_score DESC LIMIT 30").all().map(p=>({...p,avatar:db.prepare("SELECT value FROM settings WHERE key=?").get("avatar:"+p.id)?.value||"🙂"}));res.json({players})});
 
 app.get("/api/admin/overview",requireAdmin,(req,res)=>{
   res.json({
@@ -332,7 +406,7 @@ function persistRoom(room) {
 function safeRoom(r) {
   return {
     code:r.code,hostId:r.hostId,status:r.status,round:r.round,maxRounds:r.maxRounds,
-    players:r.players.map(p=>({id:p.id,username:p.username,score:p.score,online:!!p.socketId,skin:p.skin||"cover_default"})),
+    players:r.players.map(p=>({id:p.id,username:p.username,avatar:p.avatar||"🙂",score:p.score,online:!!p.socketId,skin:p.skin||"cover_default"})),
     situation:r.situation,
     options:r.status==="guessing"?r.options:undefined,
     guesses:r.status==="guessing"?Object.keys(r.guesses||{}).length:undefined,
@@ -398,7 +472,7 @@ io.on("connection",socket=>{
     if(socket.roomCode) return;
     const code=roomCode();
     const r={code,hostId:socket.userId,status:"waiting",round:0,maxRounds:5,
-      players:[{id:socket.userId,username:socket.username,score:0,socketId:socket.id,skin:getProfile(socket.userId)?.equipped}],
+      players:[{id:socket.userId,username:socket.username,avatar:getProfile(socket.userId)?.avatar||"🙂",score:0,socketId:socket.id,skin:getProfile(socket.userId)?.equipped}],
       createdAt:Date.now(),guesses:{},options:[]};
     roomCache.set(code,r); socket.roomCode=code; socket.join(code); emitRoom(r);
   });
@@ -414,7 +488,7 @@ io.on("connection",socket=>{
     if(!r.players.some(p=>p.id===socket.userId)&&r.players.length>=8) return socket.emit("error:message","В комнате максимум 8 игроков");
     if(socket.roomCode&&socket.roomCode!==code) socket.leave(socket.roomCode);
     let player=r.players.find(p=>p.id===socket.userId);
-    if(!player) {player={id:socket.userId,username:socket.username,score:0,skin:getProfile(socket.userId)?.equipped};r.players.push(player);}
+    if(!player) {player={id:socket.userId,username:socket.username,avatar:getProfile(socket.userId)?.avatar||"🙂",score:0,skin:getProfile(socket.userId)?.equipped};r.players.push(player);}
     player.socketId=socket.id; socket.roomCode=code; socket.join(code); emitRoom(r);
   });
   socket.on("game:start",()=>{
