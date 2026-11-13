@@ -103,7 +103,14 @@ const catalog = [
   {id:"cover_mint",name:"Мятная",price:100,description:"Свежий минималистичный оттенок",className:"skin-mint"},
   {id:"cover_sunset",name:"Закат",price:250,description:"Тёплый спокойный градиент",className:"skin-sunset"},
   {id:"cover_midnight",name:"Полночь",price:400,description:"Глубокий синий стиль",className:"skin-midnight"},
-  {id:"cover_gold",name:"Золото",price:600,description:"Премиальное оформление",className:"skin-gold"}
+  {id:"cover_gold",name:"Золото",price:600,description:"Премиальное оформление",className:"skin-gold",pairName:"Золотой дуэт"},
+  {id:"cover_pixel",name:"Pixel World",price:350,description:"Парный набор: пиксельная мем-карта и ретро-карта ситуации",className:"skin-pixel",pairName:"Pixel Duo"},
+  {id:"cover_neon",name:"Cyber Neon",price:500,description:"Парный набор: неоновая мем-карта и кибер-ситуация",className:"skin-neon",pairName:"Cyber Duo"},
+  {id:"cover_horror",name:"Nightmare",price:550,description:"Парный набор: мрачная мем-карта и карта ситуации с тревожной рамкой",className:"skin-horror",pairName:"Nightmare Duo"},
+  {id:"cover_comic",name:"Comic Boom",price:300,description:"Парный набор: яркая мем-карта и комиксная ситуация",className:"skin-comic",pairName:"Comic Duo"},
+  {id:"cover_vapor",name:"Vapor Dream",price:450,description:"Парный набор: vaporwave-мем и карта ситуации в стиле 80-х",className:"skin-vapor",pairName:"Vapor Duo"},
+  {id:"cover_kawaii",name:"Kawaii",price:300,description:"Парный набор: пастельная мем-карта и милая карта ситуации",className:"skin-kawaii",pairName:"Kawaii Duo"},
+  {id:"cover_glitch",name:"Glitch.exe",price:500,description:"Парный набор: цифровая мем-карта и глитч-ситуация",className:"skin-glitch",pairName:"Glitch Duo"}
 ];
 const situationsByMeme = {
   "Да поебать мне": [
