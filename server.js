@@ -1,0 +1,374 @@
+require("dotenv").config();
+const express = require("express");
+const http = require("http");
+const session = require("express-session");
+const SQLiteStore = require("connect-sqlite3")(session);
+const bcrypt = require("bcryptjs");
+const Database = require("better-sqlite3");
+const helmet = require("helmet");
+const { Server } = require("socket.io");
+const crypto = require("crypto");
+const path = require("path");
+const fs = require("fs");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+const PORT = Number(process.env.PORT || 3000);
+const dataDir = path.join(__dirname, "data");
+fs.mkdirSync(dataDir, { recursive: true });
+const db = new Database(path.join(dataDir, "game.db"));
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
+db.exec(`
+CREATE TABLE IF NOT EXISTS users (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ username TEXT NOT NULL UNIQUE,
+ password_hash TEXT NOT NULL,
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ coins INTEGER NOT NULL DEFAULT 0,
+ total_score INTEGER NOT NULL DEFAULT 0,
+ games_played INTEGER NOT NULL DEFAULT 0,
+ is_admin INTEGER NOT NULL DEFAULT 0,
+ is_banned INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS inventory (
+ user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ item_id TEXT NOT NULL,
+ PRIMARY KEY(user_id,item_id)
+);
+CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rooms (
+ code TEXT PRIMARY KEY,
+ host_id INTEGER NOT NULL,
+ state TEXT NOT NULL,
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS room_players (
+ room_code TEXT NOT NULL REFERENCES rooms(code) ON DELETE CASCADE,
+ user_id INTEGER NOT NULL REFERENCES users(id),
+ seat INTEGER NOT NULL,
+ score INTEGER NOT NULL DEFAULT 0,
+ is_host INTEGER NOT NULL DEFAULT 0,
+ PRIMARY KEY(room_code,user_id)
+);
+CREATE TABLE IF NOT EXISTS matches (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ room_code TEXT NOT NULL,
+ completed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ round_count INTEGER NOT NULL,
+ results_json TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS match_payouts (
+ match_id INTEGER NOT NULL REFERENCES matches(id),
+ user_id INTEGER NOT NULL REFERENCES users(id),
+ coins INTEGER NOT NULL,
+ PRIMARY KEY(match_id,user_id)
+);
+CREATE TABLE IF NOT EXISTS bans (
+ user_id INTEGER PRIMARY KEY REFERENCES users(id),
+ reason TEXT NOT NULL DEFAULT '',
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+`);
+const sessionStore = new SQLiteStore({ db: "sessions.db", dir: dataDir });
+const sessionMiddleware = session({
+  name: "ugm.sid",
+  secret: process.env.SESSION_SECRET || "development-secret-change-before-deploy",
+  resave: false,
+  saveUninitialized: false,
+  store: sessionStore,
+  cookie: {
+    httpOnly: true, sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  }
+});
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(express.json({ limit: "32kb" }));
+app.use(express.urlencoded({ extended: false }));
+app.use(sessionMiddleware);
+app.use(express.static(path.join(__dirname, "public")));
+
+const adminName = process.env.ADMIN_USERNAME || "admin";
+if (process.env.ADMIN_PASSWORD && !db.prepare("SELECT id FROM users WHERE username=?").get(adminName)) {
+  db.prepare("INSERT INTO users(username,password_hash,is_admin) VALUES(?,?,1)")
+    .run(adminName, bcrypt.hashSync(process.env.ADMIN_PASSWORD, 12));
+}
+
+const catalog = [
+  {id:"cover_default",name:"Классика",price:0,description:"Чистый стандартный стиль",className:"skin-default"},
+  {id:"cover_mint",name:"Мятная",price:100,description:"Свежий минималистичный оттенок",className:"skin-mint"},
+  {id:"cover_sunset",name:"Закат",price:250,description:"Тёплый спокойный градиент",className:"skin-sunset"},
+  {id:"cover_midnight",name:"Полночь",price:400,description:"Глубокий синий стиль",className:"skin-midnight"},
+  {id:"cover_gold",name:"Золото",price:600,description:"Премиальное оформление",className:"skin-gold"}
+];
+const situations = [
+  "Когда сказал «я на пять минут» и пропал на три часа",
+  "Когда учитель говорит: «Это будет в контрольной»",
+  "Когда пытаешься выглядеть занятым, пока ничего не делаешь",
+  "Когда друг рассказывает историю, которую ты уже слышал 12 раз",
+  "Когда открыл холодильник в надежде, что там появилось что-то новое",
+  "Когда понедельник наступил слишком быстро",
+  "Когда всё шло по плану, но план был плохой",
+  "Когда случайно отправил сообщение не в тот чат"
+];
+const memes = [
+  "Distracted Boyfriend","Drake Hotline Bling","Woman Yelling at Cat",
+  "This Is Fine","Surprised Pikachu","Expanding Brain","Coffin Dance",
+  "Two Buttons","Hide the Pain Harold","Doge"
+];
+
+const requireAuth = (req,res,next) => req.session.userId ? next() : res.status(401).json({error:"Сначала войдите в аккаунт"});
+const requireAdmin = (req,res,next) => {
+  if (!req.session.userId) return res.status(401).json({error:"Требуется вход"});
+  const user = db.prepare("SELECT is_admin FROM users WHERE id=?").get(req.session.userId);
+  if (!user?.is_admin) return res.status(403).json({error:"Недостаточно прав"});
+  next();
+};
+function getProfile(id) {
+  const user = db.prepare("SELECT id,username,coins,total_score,games_played,is_admin FROM users WHERE id=?").get(id);
+  if (!user) return null;
+  const owned = db.prepare("SELECT item_id FROM inventory WHERE user_id=?").all(id).map(x=>x.item_id);
+  const equipped = db.prepare("SELECT value FROM settings WHERE key=?").get("equipped:"+id)?.value || "cover_default";
+  return {...user, owned, equipped};
+}
+
+app.get("/api/me",(req,res)=>res.json({user:req.session.userId ? getProfile(req.session.userId) : null}));
+app.post("/api/register",(req,res)=>{
+  const username = String(req.body.username || "").trim();
+  const password = String(req.body.password || "");
+  if (!/^[\p{L}\p{N}_-]{3,18}$/u.test(username)) return res.status(400).json({error:"Имя: 3–18 символов, буквы, цифры, _ или -"});
+  if (password.length < 8 || password.length > 128) return res.status(400).json({error:"Пароль должен содержать от 8 до 128 символов"});
+  try {
+    const result = db.prepare("INSERT INTO users(username,password_hash) VALUES(?,?)").run(username,bcrypt.hashSync(password,12));
+    db.prepare("INSERT INTO inventory(user_id,item_id) VALUES(?,?)").run(result.lastInsertRowid,"cover_default");
+    req.session.regenerate(err=>{
+      if (err) return res.status(500).json({error:"Не удалось создать сессию"});
+      req.session.userId = Number(result.lastInsertRowid);
+      res.json({user:getProfile(req.session.userId)});
+    });
+  } catch { res.status(409).json({error:"Это имя уже занято"}); }
+});
+app.post("/api/login",(req,res)=>{
+  const user = db.prepare("SELECT * FROM users WHERE username=?").get(String(req.body.username||"").trim());
+  if (!user || !bcrypt.compareSync(String(req.body.password||""),user.password_hash)) return res.status(401).json({error:"Неверное имя или пароль"});
+  if (user.is_banned) return res.status(403).json({error:"Аккаунт заблокирован"});
+  req.session.regenerate(err=>{
+    if (err) return res.status(500).json({error:"Не удалось создать сессию"});
+    req.session.userId = user.id;
+    res.json({user:getProfile(user.id)});
+  });
+});
+app.post("/api/logout",(req,res)=>req.session.destroy(()=>res.json({ok:true})));
+app.get("/api/shop",(req,res)=>res.json({items:catalog}));
+app.post("/api/shop/buy",requireAuth,(req,res)=>{
+  const item = catalog.find(x=>x.id===req.body.itemId);
+  if (!item) return res.status(404).json({error:"Товар не найден"});
+  try {
+    db.transaction(()=>{
+      if (db.prepare("SELECT 1 FROM inventory WHERE user_id=? AND item_id=?").get(req.session.userId,item.id)) throw Error("Уже куплено");
+      const user = db.prepare("SELECT coins FROM users WHERE id=?").get(req.session.userId);
+      if (user.coins < item.price) throw Error("Недостаточно монет");
+      db.prepare("UPDATE users SET coins=coins-? WHERE id=?").run(item.price,req.session.userId);
+      db.prepare("INSERT INTO inventory(user_id,item_id) VALUES(?,?)").run(req.session.userId,item.id);
+    })();
+    res.json({user:getProfile(req.session.userId)});
+  } catch(e) { res.status(400).json({error:e.message}); }
+});
+app.post("/api/shop/equip",requireAuth,(req,res)=>{
+  const id = String(req.body.itemId||"");
+  if (!db.prepare("SELECT 1 FROM inventory WHERE user_id=? AND item_id=?").get(req.session.userId,id)) return res.status(400).json({error:"Сначала приобретите эту обложку"});
+  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("equipped:"+req.session.userId,id);
+  res.json({user:getProfile(req.session.userId)});
+});
+app.get("/api/leaderboard",(req,res)=>res.json({players:db.prepare("SELECT username,total_score,games_played FROM users WHERE is_banned=0 ORDER BY total_score DESC LIMIT 30").all()}));
+
+app.get("/api/admin/overview",requireAdmin,(req,res)=>{
+  res.json({
+    users:db.prepare("SELECT id,username,coins,total_score,games_played,is_banned,is_admin,created_at FROM users ORDER BY id DESC LIMIT 200").all(),
+    rooms:db.prepare("SELECT code,host_id,state,created_at,updated_at FROM rooms ORDER BY updated_at DESC").all(),
+    matches:db.prepare("SELECT id,room_code,completed_at,round_count,results_json FROM matches ORDER BY id DESC LIMIT 30").all()
+  });
+});
+app.post("/api/admin/user/:id/ban",requireAdmin,(req,res)=>{
+  const id=Number(req.params.id), reason=String(req.body.reason||"Нарушение правил").slice(0,200);
+  const user=db.prepare("SELECT id,is_admin FROM users WHERE id=?").get(id);
+  if(!user || user.is_admin) return res.status(400).json({error:"Нельзя заблокировать этого пользователя"});
+  db.prepare("UPDATE users SET is_banned=1 WHERE id=?").run(id);
+  db.prepare("INSERT INTO bans(user_id,reason) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET reason=excluded.reason,created_at=CURRENT_TIMESTAMP").run(id,reason);
+  for(const s of io.sockets.sockets.values()) if(s.userId===id) s.disconnect(true);
+  res.json({ok:true});
+});
+app.post("/api/admin/user/:id/unban",requireAdmin,(req,res)=>{
+  db.prepare("UPDATE users SET is_banned=0 WHERE id=?").run(Number(req.params.id));
+  db.prepare("DELETE FROM bans WHERE user_id=?").run(Number(req.params.id));
+  res.json({ok:true});
+});
+app.post("/api/admin/user/:id/coins",requireAdmin,(req,res)=>{
+  const amount=Number(req.body.amount);
+  if(!Number.isInteger(amount)||amount < -100000||amount > 100000) return res.status(400).json({error:"Введите целое число от -100000 до 100000"});
+  db.prepare("UPDATE users SET coins=MAX(0,coins+?) WHERE id=?").run(amount,Number(req.params.id));
+  res.json({ok:true});
+});
+app.post("/api/admin/room/:code/delete",requireAdmin,(req,res)=>{
+  const code=String(req.params.code).toUpperCase();
+  db.prepare("DELETE FROM rooms WHERE code=?").run(code);
+  roomCache.delete(code);
+  io.to(code).emit("room:closed",{message:"Комната закрыта администратором"});
+  io.in(code).socketsLeave(code);
+  res.json({ok:true});
+});
+
+const roomCache = new Map();
+function persistRoom(room) {
+  db.prepare(`INSERT INTO rooms(code,host_id,state,updated_at) VALUES(?,?,?,CURRENT_TIMESTAMP)
+    ON CONFLICT(code) DO UPDATE SET host_id=excluded.host_id,state=excluded.state,updated_at=CURRENT_TIMESTAMP`)
+    .run(room.code,room.hostId,JSON.stringify(room));
+  db.transaction(()=>{
+    db.prepare("DELETE FROM room_players WHERE room_code=?").run(room.code);
+    room.players.forEach((p,i)=>db.prepare("INSERT INTO room_players(room_code,user_id,seat,score,is_host) VALUES(?,?,?,?,?)").run(room.code,p.id,i,p.score||0,p.id===room.hostId?1:0));
+  })();
+}
+function safeRoom(r) {
+  return {
+    code:r.code,hostId:r.hostId,status:r.status,round:r.round,maxRounds:r.maxRounds,
+    players:r.players.map(p=>({id:p.id,username:p.username,score:p.score,online:!!p.socketId,skin:p.skin||"cover_default"})),
+    situation:r.situation,
+    options:r.status==="guessing"?r.options:undefined,
+    guesses:r.status==="guessing"?Object.keys(r.guesses||{}).length:undefined,
+    target:r.status==="results"?r.target:undefined,
+    results:r.results||null,
+    chooserId:r.chooserId,
+    chooserName:r.players.find(p=>p.id===r.chooserId)?.username
+  };
+}
+function emitRoom(r) { persistRoom(r); io.to(r.code).emit("room:update",safeRoom(r)); }
+function roomCode() {
+  let code;
+  do { code=crypto.randomBytes(3).toString("hex").toUpperCase(); }
+  while(roomCache.has(code)||db.prepare("SELECT 1 FROM rooms WHERE code=?").get(code));
+  return code;
+}
+function startRound(r) {
+  r.status="choosing"; r.round=Math.min(r.round,r.maxRounds);
+  r.situation=null; r.options=[]; r.target=null; r.guesses={}; r.results=null;
+  r.chooserId=r.players[(r.round-1)%r.players.length].id;
+  io.to(r.code).emit("round:choosing",{chooserId:r.chooserId,chooserName:r.players.find(p=>p.id===r.chooserId)?.username,round:r.round,maxRounds:r.maxRounds});
+  emitRoom(r);
+}
+function completeGame(r) {
+  if(r.status==="completed") return;
+  r.status="completed";
+  const resultList=[...r.players].sort((a,b)=>b.score-a.score);
+  const payout = db.transaction(()=>{
+    const matchId=db.prepare("INSERT INTO matches(room_code,round_count,results_json) VALUES(?,?,?)").run(r.code,r.round,JSON.stringify(resultList.map(p=>({id:p.id,username:p.username,score:p.score})))).lastInsertRowid;
+    for(const p of r.players) {
+      const reward=Math.max(0,p.score)*10;
+      db.prepare("UPDATE users SET coins=coins+?,total_score=total_score+?,games_played=games_played+1 WHERE id=?").run(reward,p.score,p.id);
+      db.prepare("INSERT INTO match_payouts(match_id,user_id,coins) VALUES(?,?,?)").run(matchId,p.id,reward);
+    }
+    return matchId;
+  });
+  const matchId=payout();
+  r.results=resultList.map(p=>({id:p.id,username:p.username,score:p.score,coins:Math.max(0,p.score)*10}));
+  emitRoom(r);
+  io.to(r.code).emit("game:completed",{results:r.results,matchId});
+}
+function finishRound(r) {
+  if(r.status!=="guessing") return;
+  const correct=Object.entries(r.guesses).filter(([id,guess])=>guess===r.target).map(([id])=>Number(id));
+  if(correct.length) correct.forEach(id=>{const p=r.players.find(x=>x.id===id);if(p)p.score+=2;});
+  else {const chooser=r.players.find(p=>p.id===r.chooserId);if(chooser)chooser.score+=3;}
+  r.status="results"; r.results={correctIds:correct,noOne:correct.length===0};
+  emitRoom(r);
+  io.to(r.code).emit("round:results",{room:safeRoom(r),correctIds:correct,noOne:correct.length===0});
+}
+function nextRound(r) { if(r.round>=r.maxRounds) completeGame(r); else {r.round++;startRound(r);} }
+
+io.engine.use(sessionMiddleware);
+io.use((socket,next)=>{
+  const uid=socket.request.session?.userId;
+  if(!uid) return next(new Error("Нужно войти в аккаунт"));
+  const user=db.prepare("SELECT id,username,is_banned FROM users WHERE id=?").get(uid);
+  if(!user||user.is_banned) return next(new Error("Аккаунт недоступен"));
+  socket.userId=user.id; socket.username=user.username; next();
+});
+io.on("connection",socket=>{
+  socket.on("room:create",()=>{
+    if(socket.roomCode) return;
+    const code=roomCode();
+    const r={code,hostId:socket.userId,status:"waiting",round:0,maxRounds:5,
+      players:[{id:socket.userId,username:socket.username,score:0,socketId:socket.id,skin:getProfile(socket.userId)?.equipped}],
+      createdAt:Date.now(),guesses:{},options:[]};
+    roomCache.set(code,r); socket.roomCode=code; socket.join(code); emitRoom(r);
+  });
+  socket.on("room:join",({code}={})=>{
+    code=String(code||"").toUpperCase();
+    let r=roomCache.get(code);
+    if(!r) {
+      const saved=db.prepare("SELECT state FROM rooms WHERE code=?").get(code);
+      if(saved) { try {r=JSON.parse(saved.state);r.players.forEach(p=>p.socketId=null);roomCache.set(code,r);} catch {} }
+    }
+    if(!r) return socket.emit("error:message","Комната не найдена");
+    if(r.status==="completed") return socket.emit("error:message","Игра завершена");
+    if(!r.players.some(p=>p.id===socket.userId)&&r.players.length>=8) return socket.emit("error:message","В комнате максимум 8 игроков");
+    if(socket.roomCode&&socket.roomCode!==code) socket.leave(socket.roomCode);
+    let player=r.players.find(p=>p.id===socket.userId);
+    if(!player) {player={id:socket.userId,username:socket.username,score:0,skin:getProfile(socket.userId)?.equipped};r.players.push(player);}
+    player.socketId=socket.id; socket.roomCode=code; socket.join(code); emitRoom(r);
+  });
+  socket.on("game:start",()=>{
+    const r=roomCache.get(socket.roomCode);
+    if(!r||r.hostId!==socket.userId||r.status!=="waiting") return;
+    if(r.players.length<3) return socket.emit("error:message","Для игры нужно минимум 3 игрока");
+    r.round=1;startRound(r);
+  });
+  socket.on("round:choose",({situation,options,target}={})=>{
+    const r=roomCache.get(socket.roomCode);
+    if(!r||r.status!=="choosing"||r.chooserId!==socket.userId) return;
+    if(!situations.includes(situation)||!Array.isArray(options)||options.length!==4||options.some(x=>!memes.includes(x))||new Set(options).size!==4||!options.includes(target)) return socket.emit("error:message","Некорректный выбор");
+    r.situation=situation;r.options=options;r.target=target;r.status="guessing";r.guesses={};
+    emitRoom(r);io.to(r.code).emit("round:started",{situation,options:r.options,chooserId:r.chooserId});
+  });
+  socket.on("round:guess",({meme}={})=>{
+    const r=roomCache.get(socket.roomCode);
+    if(!r||r.status!=="guessing"||socket.userId===r.chooserId||!r.options.includes(meme)||r.guesses[socket.userId]) return;
+    r.guesses[socket.userId]=meme;emitRoom(r);
+    const guessers=r.players.filter(p=>p.id!==r.chooserId);
+    if(guessers.every(p=>r.guesses[p.id])) finishRound(r);
+  });
+  socket.on("round:next",()=>{
+    const r=roomCache.get(socket.roomCode);
+    if(!r||r.hostId!==socket.userId||r.status!=="results") return;
+    nextRound(r);
+  });
+  socket.on("game:restart",()=>{
+    const r=roomCache.get(socket.roomCode);
+    if(!r||r.hostId!==socket.userId||r.status!=="completed") return;
+    r.players.forEach(p=>p.score=0);r.round=1;r.guesses={};r.results=null;startRound(r);
+  });
+  socket.on("room:leave",()=>{
+    const r=roomCache.get(socket.roomCode);if(!r)return;
+    r.players=r.players.filter(p=>p.id!==socket.userId);
+    if(!r.players.length){roomCache.delete(r.code);db.prepare("DELETE FROM rooms WHERE code=?").run(r.code);}
+    else {if(r.hostId===socket.userId)r.hostId=r.players[0].id;emitRoom(r);}
+    socket.leave(r.code);socket.roomCode=null;
+  });
+  socket.on("disconnect",()=>{
+    const r=roomCache.get(socket.roomCode);if(!r)return;
+    const p=r.players.find(p=>p.id===socket.userId);if(p)p.socketId=null;
+    emitRoom(r);
+  });
+});
+
+// Recover rooms from persistent storage; players can reconnect by entering the room code.
+for(const row of db.prepare("SELECT code,state FROM rooms").all()) {
+  try {
+    const r=JSON.parse(row.state);
+    if(r.status!=="completed") {r.players.forEach(p=>p.socketId=null);roomCache.set(row.code,r);}
+  } catch {}
+}
+app.get("*",(req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+server.listen(PORT,()=>console.log(`УГАДАЙ МЕМ: http://localhost:${PORT}`));
