@@ -12,6 +12,7 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
+app.set("trust proxy", 1);
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = Number(process.env.PORT || 3000);
