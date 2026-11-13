@@ -395,6 +395,7 @@ app.post("/api/admin/room/:code/delete",requireAdmin,(req,res)=>{
 });
 
 const roomCache = new Map();
+const roomTimers = new Map();
 function persistRoom(room) {
   db.prepare(`INSERT INTO rooms(code,host_id,state,updated_at) VALUES(?,?,?,CURRENT_TIMESTAMP)
     ON CONFLICT(code) DO UPDATE SET host_id=excluded.host_id,state=excluded.state,updated_at=CURRENT_TIMESTAMP`)
@@ -407,6 +408,7 @@ function persistRoom(room) {
 function safeRoom(r) {
   return {
     code:r.code,hostId:r.hostId,status:r.status,round:r.round,maxRounds:r.maxRounds,
+    settings:{rounds:r.settings?.rounds||5,thinkSeconds:r.settings?.thinkSeconds||30,chooseSeconds:r.settings?.chooseSeconds||45},
     players:r.players.map(p=>({id:p.id,username:p.username,avatar:p.avatar||"🙂",score:p.score,online:!!p.socketId,skin:p.skin||"cover_default"})),
     situation:r.situation,
     options:r.status==="guessing"?r.options:undefined,
@@ -424,15 +426,35 @@ function roomCode() {
   while(roomCache.has(code)||db.prepare("SELECT 1 FROM rooms WHERE code=?").get(code));
   return code;
 }
+function clearRoomTimer(r) { const timer=roomTimers.get(r.code); if(timer) clearTimeout(timer); roomTimers.delete(r.code); }
 function startRound(r) {
+  clearRoomTimer(r);
   r.status="choosing"; r.round=Math.min(r.round,r.maxRounds);
   r.situation=null; r.options=[]; r.target=null; r.guesses={}; r.results=null;
   r.chooserId=r.players[(r.round-1)%r.players.length].id;
   io.to(r.code).emit("round:choosing",{chooserId:r.chooserId,chooserName:r.players.find(p=>p.id===r.chooserId)?.username,round:r.round,maxRounds:r.maxRounds});
   emitRoom(r);
+  const seconds=r.settings?.chooseSeconds||45;
+  io.to(r.code).emit("phase:timer",{phase:"choosing",endsAt:Date.now()+seconds*1000});
+  roomTimers.set(r.code,setTimeout(()=>{
+    if(r.status!=="choosing") return;
+    const target=memes[Math.floor(Math.random()*memes.length)];
+    const situation=situationsByMeme[target][Math.floor(Math.random()*situationsByMeme[target].length)];
+    applyChoice(r,situation,target);
+  },seconds*1000));
+}
+function applyChoice(r,situation,target) {
+  clearRoomTimer(r);
+  const distractors=memes.filter(m=>m!==target).sort(()=>Math.random()-0.5).slice(0,2);
+  r.situation=situation;r.options=[target,...distractors].sort(()=>Math.random()-0.5);r.target=target;r.status="guessing";r.guesses={};
+  emitRoom(r);io.to(r.code).emit("round:started",{situation,options:r.options,chooserId:r.chooserId});
+  const seconds=r.settings?.thinkSeconds||30;
+  io.to(r.code).emit("phase:timer",{phase:"guessing",endsAt:Date.now()+seconds*1000});
+  roomTimers.set(r.code,setTimeout(()=>{if(r.status==="guessing")finishRound(r);},seconds*1000));
 }
 function completeGame(r) {
   if(r.status==="completed") return;
+  clearRoomTimer(r);
   r.status="completed";
   const resultList=[...r.players].sort((a,b)=>b.score-a.score);
   const payout = db.transaction(()=>{
@@ -451,6 +473,7 @@ function completeGame(r) {
 }
 function finishRound(r) {
   if(r.status!=="guessing") return;
+  clearRoomTimer(r);
   const correct=Object.entries(r.guesses).filter(([id,guess])=>guess===r.target).map(([id])=>Number(id));
   if(correct.length) correct.forEach(id=>{const p=r.players.find(x=>x.id===id);if(p)p.score+=2;});
   else {const chooser=r.players.find(p=>p.id===r.chooserId);if(chooser)chooser.score+=3;}
@@ -472,10 +495,17 @@ io.on("connection",socket=>{
   socket.on("room:create",()=>{
     if(socket.roomCode) return;
     const code=roomCode();
-    const r={code,hostId:socket.userId,status:"waiting",round:0,maxRounds:5,
+    const r={code,hostId:socket.userId,status:"waiting",round:0,maxRounds:5,settings:{rounds:5,thinkSeconds:30,chooseSeconds:45},
       players:[{id:socket.userId,username:socket.username,avatar:getProfile(socket.userId)?.avatar||"🙂",score:0,socketId:socket.id,skin:getProfile(socket.userId)?.equipped}],
       createdAt:Date.now(),guesses:{},options:[]};
     roomCache.set(code,r); socket.roomCode=code; socket.join(code); emitRoom(r);
+  });
+  socket.on("room:settings",({rounds,thinkSeconds,chooseSeconds}={})=>{
+    const r=roomCache.get(socket.roomCode);
+    if(!r||r.hostId!==socket.userId||r.status!=="waiting") return;
+    const allowedRounds=[3,5,7,10], allowedTimes=[15,30,45,60,90];
+    if(!allowedRounds.includes(Number(rounds))||!allowedTimes.includes(Number(thinkSeconds))||!allowedTimes.includes(Number(chooseSeconds))) return socket.emit("error:message","Некорректные настройки комнаты");
+    r.settings={rounds:Number(rounds),thinkSeconds:Number(thinkSeconds),chooseSeconds:Number(chooseSeconds)};r.maxRounds=r.settings.rounds;emitRoom(r);
   });
   socket.on("room:join",({code}={})=>{
     code=String(code||"").toUpperCase();
@@ -496,16 +526,14 @@ io.on("connection",socket=>{
     const r=roomCache.get(socket.roomCode);
     if(!r||r.hostId!==socket.userId||r.status!=="waiting") return;
     if(r.players.length<3) return socket.emit("error:message","Для игры нужно минимум 3 игрока");
-    r.round=1;r.maxRounds=r.players.length;startRound(r);
+    r.round=1;r.maxRounds=r.settings?.rounds||5;startRound(r);
   });
   socket.on("round:choose",({situation,target}={})=>{
     const r=roomCache.get(socket.roomCode);
     if(!r||r.status!=="choosing"||r.chooserId!==socket.userId) return;
     if(!memes.includes(target)||!situationsByMeme[target]?.includes(situation)) return socket.emit("error:message","Некорректный выбор");
-    // Ведущий задаёт правильный мем; сервер сам добавляет два случайных отвлекающих варианта.
-    const distractors=memes.filter(m=>m!==target).sort(()=>Math.random()-0.5).slice(0,2);
-    r.situation=situation;r.options=[target,...distractors].sort(()=>Math.random()-0.5);r.target=target;r.status="guessing";r.guesses={};
-    emitRoom(r);io.to(r.code).emit("round:started",{situation,options:r.options,chooserId:r.chooserId});
+    // Ведущий задаёт правильный мем; сервер добавляет два случайных отвлекающих варианта.
+    applyChoice(r,situation,target);
   });
   socket.on("round:guess",({meme}={})=>{
     const r=roomCache.get(socket.roomCode);
@@ -522,12 +550,12 @@ io.on("connection",socket=>{
   socket.on("game:restart",()=>{
     const r=roomCache.get(socket.roomCode);
     if(!r||r.hostId!==socket.userId||r.status!=="completed") return;
-    r.players.forEach(p=>p.score=0);r.round=1;r.maxRounds=r.players.length;r.guesses={};r.results=null;startRound(r);
+    r.players.forEach(p=>p.score=0);r.round=1;r.maxRounds=r.settings?.rounds||5;r.guesses={};r.results=null;startRound(r);
   });
   socket.on("room:leave",()=>{
     const r=roomCache.get(socket.roomCode);if(!r)return;
     r.players=r.players.filter(p=>p.id!==socket.userId);
-    if(!r.players.length){roomCache.delete(r.code);db.prepare("DELETE FROM rooms WHERE code=?").run(r.code);}
+    if(!r.players.length){clearRoomTimer(r);roomCache.delete(r.code);db.prepare("DELETE FROM rooms WHERE code=?").run(r.code);}
     else {if(r.hostId===socket.userId)r.hostId=r.players[0].id;emitRoom(r);}
     socket.leave(r.code);socket.roomCode=null;
   });
