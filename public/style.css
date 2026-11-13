@@ -309,14 +309,17 @@ body[data-table-skin="table_pastel"] .game-table:before{background:radial-gradie
 .jumpscare{position:fixed;inset:0;z-index:10000;display:none;place-items:center;overflow:hidden;background:#050000;color:white}
 .jumpscare.active{display:grid;animation:scare-flash .12s steps(2,end) infinite}
 .jumpscare-noise{position:absolute;inset:-50%;opacity:.3;background:repeating-linear-gradient(0deg,transparent 0 3px,#fff2 4px 5px);animation:scare-noise .08s steps(2,end) infinite}
-.scare-face{position:relative;width:min(72vw,520px);height:min(72vw,520px);border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 40%,#e8d8c8 0 17%,#9e7770 45%,#210d12 75%);box-shadow:0 0 90px 35px #b00018;transform:scale(1.12);animation:scare-zoom .28s cubic-bezier(.1,.8,.2,1) both}
-.scare-eyes{position:absolute;top:29%;left:16%;right:16%;display:flex;justify-content:space-between}.scare-eyes i{display:block;width:29%;height:72px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 15px #16090b,0 0 24px #ff001e;transform:rotate(-8deg)}.scare-eyes i+ i{transform:rotate(8deg)}
+.scare-face{position:relative;width:min(78vw,600px);height:min(78vw,600px);border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 38%,#f2e4d7 0 9%,#c7a39a 28%,#674047 58%,#100509 79%);box-shadow:0 0 35px 12px #ff102e,0 0 130px 65px #8d0018;transform:scale(1.12);filter:contrast(1.35) saturate(.8);animation:scare-zoom .22s cubic-bezier(.1,.8,.2,1) both,scare-shake .075s infinite}
+.scare-eyes{position:absolute;top:27%;left:12%;right:12%;display:flex;justify-content:space-between;filter:drop-shadow(0 0 18px #f00)}.scare-eyes i{display:block;width:32%;height:clamp(55px,11vw,105px);border-radius:48% 52% 45% 55%;background:radial-gradient(ellipse,#fff 0 28%,#f8dadd 30% 43%,#100307 46% 67%,#790014 70%);box-shadow:0 0 32px #ff001e,inset 0 0 18px #000;transform:rotate(-8deg);animation:eye-twitch .11s infinite alternate}.scare-eyes i+ i{transform:rotate(8deg)}
 .scare-nose{position:absolute;top:48%;left:43%;width:14%;height:13%;background:#38151a;clip-path:polygon(50% 0,100% 100%,0 100%)}
-.scare-mouth{position:absolute;left:25%;right:25%;bottom:12%;height:28%;border-radius:10% 10% 50% 50%;background:#090204;border:8px solid #4c151a;display:flex;justify-content:space-around;align-items:flex-start;overflow:hidden;padding:0 5px}.scare-mouth b{width:16%;height:30%;background:#eee;clip-path:polygon(0 0,100% 0,50% 100%)}
+.scare-mouth{position:absolute;left:20%;right:20%;bottom:10%;height:34%;border-radius:18% 18% 48% 48%;background:radial-gradient(ellipse at 50% 15%,#4b0712,#050103 68%);border:10px solid #351018;box-shadow:0 0 35px #ff001e,inset 0 0 30px #000;display:flex;justify-content:space-around;align-items:flex-start;overflow:hidden;padding:0 5px;animation:mouth-jaw .19s infinite alternate}.scare-mouth b{width:16%;height:30%;background:#eee;clip-path:polygon(0 0,100% 0,50% 100%)}
 .scare-word{position:absolute;bottom:8%;font-size:clamp(38px,9vw,100px);font-weight:1000;color:#ff1b35;text-shadow:0 4px 0 #39000a,0 0 30px #f00;letter-spacing:4px;animation:scare-word .16s infinite alternate}
 .scare-close{position:absolute;top:18px;right:18px;border:1px solid #fff8;border-radius:9px;background:#17080b;color:#fff;padding:10px 15px;cursor:pointer;font-weight:700}
 @keyframes scare-flash{0%{background:#050000}50%{background:#4b0008}}
 @keyframes scare-noise{0%{transform:translate(0,0)}50%{transform:translate(2%, -1%)}100%{transform:translate(-1%,2%)}}
 @keyframes scare-zoom{from{transform:scale(.18) rotate(-8deg)}to{transform:scale(1.12) rotate(0)}}
 @keyframes scare-word{from{transform:scale(.94) rotate(-2deg)}to{transform:scale(1.06) rotate(2deg)}}
+@keyframes scare-shake{0%{translate:-3px 2px}50%{translate:4px -2px}100%{translate:-2px -3px}}
+@keyframes eye-twitch{from{transform:scaleY(.88) rotate(-7deg)}to{transform:scaleY(1.08) rotate(-10deg)}}
+@keyframes mouth-jaw{from{transform:scaleY(.9)}to{transform:scaleY(1.08)}}
 @media(max-width:520px){.potnhub-ad{right:10px;bottom:10px;width:150px;min-height:65px}.scare-eyes i{height:45px}.scare-mouth{border-width:5px}}

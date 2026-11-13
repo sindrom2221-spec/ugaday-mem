@@ -60,18 +60,49 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 (async()=>{try{me=(await api("/api/me")).user;if(me)connect()}catch{}render()})();
 
 
-// Рекламная плашка POTNHUB запускает шуточный скример только после клика пользователя.
+// Рекламная плашка POTNHUB запускает скример после явного клика пользователя.
 (()=>{
   const ad=document.getElementById('potnhub-ad');
   const overlay=document.getElementById('jumpscare');
   const close=document.getElementById('close-jumpscare');
   if(!ad||!overlay||!close)return;
-  let audioContext=null;
-  function stopScare(){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');if(audioContext){try{audioContext.close()}catch{}audioContext=null}}
+  let audioContext=null, soundTimer=null;
+  function stopScare(){
+    overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');
+    if(soundTimer){clearTimeout(soundTimer);soundTimer=null;}
+    if(audioContext){try{audioContext.close()}catch{}audioContext=null;}
+  }
+  function screamForThreeSeconds(){
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return;
+      audioContext=new AC();const ctx=audioContext,now=ctx.currentTime,duration=3;
+      // Синтезированный хоррор-крик: шумовой выдох + два резко меняющихся формантных тона.
+      const length=Math.floor(ctx.sampleRate*duration),buffer=ctx.createBuffer(1,length,ctx.sampleRate),data=buffer.getChannelData(0);
+      for(let i=0;i<length;i++){
+        const t=i/ctx.sampleRate,env=Math.min(1,t/.045)*Math.min(1,(duration-t)/.18);
+        data[i]=(Math.random()*2-1)*env*(.62+.38*Math.sin(2*Math.PI*7*t));
+      }
+      const noise=ctx.createBufferSource();noise.buffer=buffer;
+      const band=ctx.createBiquadFilter();band.type='bandpass';band.Q.value=1.1;
+      band.frequency.setValueAtTime(950,now);band.frequency.linearRampToValueAtTime(1750,now+.42);band.frequency.linearRampToValueAtTime(720,now+1.25);band.frequency.linearRampToValueAtTime(1450,now+2.05);band.frequency.linearRampToValueAtTime(900,now+duration);
+      const ng=ctx.createGain();ng.gain.setValueAtTime(.0001,now);ng.gain.linearRampToValueAtTime(.42,now+.06);ng.gain.setValueAtTime(.34,now+2.65);ng.gain.linearRampToValueAtTime(.0001,now+duration);
+      noise.connect(band);band.connect(ng);ng.connect(ctx.destination);noise.start(now);noise.stop(now+duration);
+      [0,1].forEach((n)=>{
+        const osc=ctx.createOscillator(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();
+        osc.type=n?'sawtooth':'triangle';
+        const base=n?510:330;
+        osc.frequency.setValueAtTime(base,now);osc.frequency.linearRampToValueAtTime(base*1.8,now+.35);osc.frequency.linearRampToValueAtTime(base*.72,now+1.15);osc.frequency.linearRampToValueAtTime(base*1.55,now+2.05);osc.frequency.linearRampToValueAtTime(base*.85,now+duration);
+        osc.detune.value=n?13:-9;filter.type=' bandpass'.trim();filter.frequency.value=n?1250:850;filter.Q.value=2.2;
+        gain.gain.setValueAtTime(.0001,now);gain.gain.linearRampToValueAtTime(n?.11:.16,now+.05);gain.gain.setValueAtTime(n?.09:.13,now+2.65);gain.gain.linearRampToValueAtTime(.0001,now+duration);
+        osc.connect(filter);filter.connect(gain);gain.connect(ctx.destination);osc.start(now);osc.stop(now+duration);
+      });
+      soundTimer=setTimeout(()=>{if(audioContext){try{audioContext.close()}catch{}audioContext=null;}soundTimer=null;},3100);
+    }catch{}
+  }
   ad.addEventListener('click',()=>{
     overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
-    // Короткий синтезированный резкий звук; воспроизводится только после явного клика.
-    try{audioContext=new (window.AudioContext||window.webkitAudioContext)();const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='sawtooth';osc.frequency.setValueAtTime(180,audioContext.currentTime);osc.frequency.exponentialRampToValueAtTime(48,audioContext.currentTime+.75);gain.gain.setValueAtTime(.0001,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.22,audioContext.currentTime+.04);gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+.9);osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+.92)}catch{}
+    screamForThreeSeconds();
   });
   close.addEventListener('click',stopScare);
   overlay.addEventListener('click',e=>{if(e.target===overlay)stopScare()});
