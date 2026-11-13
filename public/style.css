@@ -20,8 +20,23 @@ input{width:100%;background:#111318;border:1px solid var(--line);border-radius:1
 .player{padding:15px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}.player small{display:block;color:var(--muted);margin-top:6px}
 .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0}.choice{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--panel);cursor:pointer;text-align:left;color:var(--text);font:inherit}
 .choice:hover,.choice.selected{border-color:var(--accent);background:#22271b}.choice.selected:after{content:"Выбрано";display:block;color:var(--accent);font-size:11px;margin-top:9px}
-.cover{height:104px;border-radius:12px;margin-bottom:14px;background:linear-gradient(135deg,#292d36,#17191f);border:1px solid #ffffff12}
-.skin-mint{background:linear-gradient(135deg,#b4e7d3,#4b8d79)}.skin-sunset{background:linear-gradient(135deg,#ffb18a,#a95775)}.skin-midnight{background:linear-gradient(135deg,#273c65,#12192c)}.skin-gold{background:linear-gradient(135deg,#f4df9b,#80652d)}
+.cover{height:190px;max-width:100%;aspect-ratio:1.58/1;border-radius:15px;margin:0 auto 18px;padding:10px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #ffffff35;box-shadow:0 10px 24px #0003;isolation:isolate}
+.cover:before,.cover:after{content:"";position:absolute;pointer-events:none;z-index:-1}
+.cover:before{inset:8px;border:1px solid #ffffff70;border-radius:10px}
+.cover:after{width:150px;height:150px;border:1px solid #ffffff35;transform:rotate(45deg);border-radius:28px}
+.cover-inner{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;color:#fff;text-shadow:0 2px 8px #0007}
+.cover-emblem{width:38px;height:38px;border:2px solid currentColor;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;letter-spacing:-1px}
+.cover-title{font-size:clamp(19px,3vw,27px);font-weight:900;letter-spacing:2px;line-height:.95}
+.cover-bottom{font-size:8px;font-weight:800;letter-spacing:2px;opacity:.85;margin-top:4px}
+.skin-mint{background:radial-gradient(circle at 20% 15%,#e7fff3 0 3%,transparent 3.5%),linear-gradient(135deg,#b4e7d3,#4b8d79 58%,#244c43)}
+.skin-sunset{background:radial-gradient(circle at 80% 20%,#ffe6a8 0 8%,transparent 8.5%),linear-gradient(135deg,#ffb18a,#d87978 55%,#743e65)}
+.skin-midnight{background:radial-gradient(circle at 50% 35%,#829bd5 0 2%,transparent 2.5%),linear-gradient(135deg,#273c65,#18233d 55%,#090f20)}
+.skin-gold{background:radial-gradient(circle at 50% 50%,#fff1b8 0 2%,transparent 2.5%),linear-gradient(135deg,#f4df9b,#b18b42 55%,#59421c)}
+.skin-gold .cover-emblem{border-radius:9px;transform:rotate(45deg)}
+.skin-gold .cover-emblem{font-size:0}.skin-gold .cover-emblem:after{content:"УМ";font-size:11px;transform:rotate(-45deg)}
+body[data-theme="comic"] .cover{border:3px solid #211b16;border-radius:6px;box-shadow:5px 5px 0 #211b16}
+body[data-theme="comic"] .cover:before{border:2px solid #fff}
+
 .table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--muted);font-weight:500}
 .inline{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.small{font-size:12px;color:var(--muted)}.loading,.empty{color:var(--muted);padding:45px;text-align:center}
 .progress{height:5px;background:var(--line);border-radius:8px;overflow:hidden;margin:14px 0}.progress span{display:block;height:100%;background:var(--accent)}
@@ -34,3 +49,16 @@ input{width:100%;background:#111318;border:1px solid var(--line);border-radius:1
 .result-meme{display:flex;align-items:center;gap:14px;margin:14px 0 22px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
 .result-meme img{width:112px;height:112px;object-fit:contain;border-radius:9px;background:#111}
 @media(max-width:600px){.meme-choice img{height:145px}.result-meme img{width:88px;height:88px}}
+
+
+/* Профильные темы оформления */
+.theme-grid{align-items:stretch}.theme-card{display:block;width:100%;text-align:left;color:var(--text);cursor:pointer;transition:border-color .15s,transform .15s}.theme-card:hover{transform:translateY(-2px)}.theme-card.theme-selected{border:2px solid var(--accent);padding:21px}.theme-preview{height:150px;border-radius:12px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:18px;overflow:hidden}.theme-preview span{font-size:11px;font-weight:900;letter-spacing:2px}.theme-preview b{font-size:30px;font-weight:900}.theme-preview small{font-size:11px}.preview-dark{background:#101114;color:#f4f5f7;border:1px solid #3b3e47}.preview-dark span{color:#c7f36b}.preview-comic{background:#ffdf35;color:#17120b;border:3px solid #17120b;box-shadow:5px 5px 0 #e94b35;transform:rotate(-1deg)}.preview-comic span{background:#e94b35;color:white;align-self:flex-start;padding:5px 9px;border:2px solid #17120b;transform:rotate(-4deg)}.preview-comic b{font-style:italic;text-shadow:2px 2px 0 #fff}.theme-status{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;color:var(--accent)}
+body[data-theme="comic"]{--bg:#fff2c9;--panel:#fffdf4;--panel2:#ffe56b;--line:#211b16;--text:#211b16;--muted:#625344;--accent:#ed4b35;--accentText:#fff;--danger:#c62920;color-scheme:light}
+body[data-theme="comic"] .brand-mark{background:#ed4b35;color:#fff;border:2px solid #211b16;border-radius:4px;box-shadow:3px 3px 0 #211b16}
+body[data-theme="comic"] .card,body[data-theme="comic"] .stat,body[data-theme="comic"] .player,body[data-theme="comic"] .choice{border:2px solid #211b16;box-shadow:4px 4px 0 #211b16;border-radius:8px}
+body[data-theme="comic"] .btn{border:2px solid #211b16;border-radius:5px;box-shadow:3px 3px 0 #211b16;font-weight:800}
+body[data-theme="comic"] .btn.primary{background:#ed4b35;color:#fff;border-color:#211b16}
+body[data-theme="comic"] .eyebrow{color:#d33a26}
+body[data-theme="comic"] .choice:hover,body[data-theme="comic"] .choice.selected{background:#ffe56b;border-color:#211b16}
+body[data-theme="comic"] input{background:#fffdf4;color:#211b16;border:2px solid #211b16;border-radius:5px}
+body[data-theme="comic"] .progress{background:#e5d4aa}body[data-theme="comic"] .progress span{background:#ed4b35}

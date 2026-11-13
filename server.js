@@ -216,10 +216,17 @@ function getProfile(id) {
   if (!user) return null;
   const owned = db.prepare("SELECT item_id FROM inventory WHERE user_id=?").all(id).map(x=>x.item_id);
   const equipped = db.prepare("SELECT value FROM settings WHERE key=?").get("equipped:"+id)?.value || "cover_default";
-  return {...user, owned, equipped};
+  const theme = db.prepare("SELECT value FROM settings WHERE key=?").get("theme:"+id)?.value || "dark";
+  return {...user, owned, equipped, theme};
 }
 
 app.get("/api/me",(req,res)=>res.json({user:req.session.userId ? getProfile(req.session.userId) : null}));
+app.post("/api/profile/theme",requireAuth,(req,res)=>{
+  const theme=String(req.body.theme||"");
+  if(!["dark","comic"].includes(theme)) return res.status(400).json({error:"Неизвестная тема оформления"});
+  db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run("theme:"+req.session.userId,theme);
+  res.json({user:getProfile(req.session.userId)});
+});
 app.post("/api/register",(req,res)=>{
   const username = String(req.body.username || "").trim();
   const password = String(req.body.password || "");
