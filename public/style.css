@@ -659,3 +659,71 @@ body.partner-ad-modal-open{overflow:hidden}
   .partner-ad-orbit-one{right:-210px}
   .partner-ad-orbit-two{right:-255px}
 }
+
+
+/* Финальная версия баннера: минималистичный игровой стиль, фиолетовый акцент */
+.partner-ad-dialog{width:min(820px,100%)}
+.partner-ad-dialog-head h2{font-size:13px;letter-spacing:2px;color:var(--muted);font-weight:800}
+.partner-ad-creative{
+  min-height:clamp(250px,39vh,360px);
+  padding:clamp(22px,4.5vw,42px);
+  background:
+    radial-gradient(ellipse at 82% 18%,#702bd955 0,transparent 34%),
+    linear-gradient(125deg,#090914 0%,#15102a 58%,#0b1020 100%);
+  border-color:#7843b6;
+}
+.partner-ad-creative:after{
+  content:"";position:absolute;right:-8%;top:-42%;width:52%;aspect-ratio:1;
+  border:1px solid #b77aff33;border-radius:50%;pointer-events:none;
+  box-shadow:0 0 0 28px #b77aff09,0 0 0 58px #b77aff06;
+}
+.partner-ad-orbit-one{width:380px;height:165px;right:-90px;top:44px;border-color:#c48aff26}
+.partner-ad-orbit-two{width:480px;height:210px;right:-125px;top:20px;border-color:#c48aff18}
+.partner-ad-creative-top{font-size:9px;letter-spacing:1.7px;color:#b9a5d2}
+.partner-ad-live-dot{color:#c9a2ff}
+.partner-ad-wordmark{
+  font-size:clamp(44px,8vw,78px);
+  line-height:.83;
+  letter-spacing:-.075em;
+  font-weight:950;
+  text-shadow:0 8px 34px #9e55ff35;
+}
+.partner-ad-wordmark span{
+  display:inline-block;margin:9px 0 0 .52em;
+  color:#c18bff;-webkit-text-stroke:0;
+  text-shadow:0 0 24px #9d53ff55;
+}
+.partner-ad-tagline{
+  max-width:420px;margin:18px 0 0;
+  font-size:clamp(14px,2.2vw,18px);line-height:1.45;
+  color:#e7dff2;font-weight:600;
+}
+.partner-ad-creative-bottom{
+  position:relative;z-index:1;padding-top:18px;
+  color:#a996c1;font-size:9px;letter-spacing:1px;
+}
+.partner-ad-arrow{
+  width:36px;height:36px;background:#b878ff;color:#160b25;
+  font-size:21px;box-shadow:0 0 24px #a95aff44;
+}
+.partner-ad-dialog-actions .partner-ad-link{
+  min-height:46px;padding:0 22px;border-radius:11px;
+  background:linear-gradient(100deg,#a94bff,#7c35df);
+  border:1px solid #c18aff;color:#fff;
+  font-size:11px;letter-spacing:1.05px;
+  box-shadow:0 7px 22px #843ce344;
+  transition:transform .18s,box-shadow .18s,filter .18s;
+}
+.partner-ad-dialog-actions .partner-ad-link:hover{
+  transform:translateY(-2px);filter:brightness(1.08);
+  box-shadow:0 11px 28px #843ce366;
+}
+.partner-ad-dismiss{min-height:46px;padding:0 18px}
+.partner-ad-note{font-size:10px}
+@media(max-width:600px){
+  .partner-ad-creative{min-height:250px;padding:24px 20px}
+  .partner-ad-wordmark{font-size:clamp(43px,13vw,62px)}
+  .partner-ad-creative-top{font-size:8px;letter-spacing:1px}
+  .partner-ad-creative-bottom{padding-top:16px}
+  .partner-ad-dialog-actions .partner-ad-link{padding:0 12px;font-size:10px;letter-spacing:.6px}
+}
