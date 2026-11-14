@@ -378,3 +378,35 @@ body.room-window-fullscreen #app .game-table{position:fixed;inset:0;z-index:9999
 @media(prefers-reduced-motion:reduce){#app.page-transition>*,.meme-choice,.choice.selected,.card-played{animation:none!important;transition:none!important}.choice:hover{transform:none}}
 
 .meme-choice.selected{animation:card-selected .25s ease-out}
+
+/* Таймер раунда: обратный отсчёт, заполнение и предупреждение о последних секундах */
+.phase-timer{margin:16px 0 20px;padding:14px 16px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 10%,var(--panel)),var(--panel));box-shadow:0 8px 22px #0002}
+.phase-timer-head,.phase-timer-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.phase-timer-head>span{font-size:13px;font-weight:700;color:var(--muted)}
+.phase-timer .timer-value{font-size:clamp(25px,4vw,34px);font-variant-numeric:tabular-nums;letter-spacing:1px;color:var(--text);min-width:76px;text-align:right}
+.phase-timer-track{height:10px;margin:9px 0 7px;overflow:hidden;border-radius:20px;background:var(--line)}
+.phase-timer-fill{display:block;width:100%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 48%,#fff));box-shadow:0 0 12px color-mix(in srgb,var(--accent) 45%,transparent);transition:width .12s linear}
+.phase-timer-foot{font-size:11px;color:var(--muted)}
+.phase-timer-foot b{font-weight:700;color:var(--accent)}
+.phase-timer.timer-urgent{border-color:#e59b36;background:linear-gradient(120deg,#e59b361b,var(--panel))}
+.phase-timer.timer-urgent .timer-value{color:#f0a33e;animation:timer-pulse .65s ease-in-out infinite alternate}
+.phase-timer.timer-urgent .phase-timer-fill{background:linear-gradient(90deg,#efb348,#ed713c);box-shadow:0 0 14px #ec913b88}
+.phase-timer.timer-expired{border-color:#d65b5b}
+.phase-timer.timer-expired .timer-value{color:#e06464}
+@keyframes timer-pulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+.answer-reveal{margin:22px 0;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.answer-reveal h3{margin:0 0 13px}.answer-list{display:grid;gap:9px}
+.answer-row{display:grid;grid-template-columns:38px minmax(90px,1fr) minmax(120px,1.4fr) auto;align-items:center;gap:11px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);animation:answer-reveal-in .28s ease both}
+.answer-row:nth-child(2){animation-delay:35ms}.answer-row:nth-child(3){animation-delay:70ms}.answer-row:nth-child(4){animation-delay:105ms}.answer-row:nth-child(5){animation-delay:140ms}.answer-row:nth-child(6){animation-delay:175ms}.answer-row:nth-child(7){animation-delay:210ms}.answer-row:nth-child(8){animation-delay:245ms}
+.answer-avatar{width:36px;height:36px;display:grid;place-items:center;overflow:hidden;border-radius:50%;font-size:22px;background:var(--panel)}
+.answer-avatar .avatar-image{width:100%;height:100%;object-fit:cover}
+.answer-person{display:grid;gap:3px;min-width:0}.answer-person b{overflow-wrap:anywhere}.answer-person small{font-size:10px;color:var(--muted)}
+.answer-choice{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px;font-weight:600}.answer-choice img{width:42px;height:42px;object-fit:contain;border-radius:7px;background:#111;flex:none}.answer-choice span{overflow-wrap:anywhere}
+.answer-status{font-size:11px;white-space:nowrap;color:var(--muted)}
+.answer-correct{border-color:#39a66c66}.answer-correct .answer-status{color:#36b879}
+.answer-wrong{border-color:#d66a6a55}.answer-wrong .answer-status{color:#df7777}
+.answer-chooser{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.answer-missed .answer-status{color:#d79c52}
+@keyframes answer-reveal-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:620px){.answer-row{grid-template-columns:34px minmax(0,1fr) auto;gap:8px}.answer-choice{grid-column:2/4;grid-row:2;padding-left:2px}.answer-status{grid-column:3;grid-row:1}.answer-avatar{grid-row:1/3;width:32px;height:32px}.answer-person{grid-column:2;grid-row:1}}
+@media(prefers-reduced-motion:reduce){.timer-urgent .timer-value,.answer-row{animation:none!important}.phase-timer-fill{transition:none}}

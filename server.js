@@ -419,6 +419,15 @@ function safeRoom(r, userId) {
     results:r.results||null,
     chooserId:r.chooserId,
     chooserName:r.players.find(p=>p.id===r.chooserId)?.username,
+    timerEndsAt:r.timerEndsAt||null,
+    timerDuration:r.timerDuration||null,
+    answers:r.status==="results"?r.players.map(p=>({
+      id:p.id,username:p.username,avatar:p.avatar||"🙂",
+      isChooser:p.id===r.chooserId,
+      meme:p.id===r.chooserId?r.target:((r.guesses||{})[p.id]||null),
+      correct:p.id===r.chooserId?null:((r.guesses||{})[p.id]===r.target),
+      answered:p.id===r.chooserId?true:!!(r.guesses||{})[p.id]
+    })):undefined,
     myHand:ownPlayer?.hand?ownPlayer.hand.slice():[],
     deckCount:ownPlayer?.deck?.length||0,
     discardedCount:ownPlayer?.discarded?.length||0
@@ -457,17 +466,25 @@ function roomCode() {
   while(roomCache.has(code)||db.prepare("SELECT 1 FROM rooms WHERE code=?").get(code));
   return code;
 }
-function clearRoomTimer(r) { const timer=roomTimers.get(r.code); if(timer) clearTimeout(timer); roomTimers.delete(r.code); }
+function clearRoomTimer(r) {
+  const timer=roomTimers.get(r.code);
+  if(timer) clearTimeout(timer);
+  roomTimers.delete(r.code);
+  r.timerEndsAt=null;
+  r.timerDuration=null;
+}
 function startRound(r) {
   clearRoomTimer(r);
   if(!r.cardsInitialized || r.players.some(p=>!Array.isArray(p.hand)||!Array.isArray(p.deck))) dealRoomCards(r);
   r.status="choosing"; r.round=Math.min(r.round,r.maxRounds);
   r.situation=null; r.options=[]; r.target=null; r.guesses={}; r.results=null;
   r.chooserId=r.players[(r.round-1)%r.players.length].id;
+  const seconds=r.settings?.chooseSeconds||45;
+  r.timerDuration=seconds;
+  r.timerEndsAt=Date.now()+seconds*1000;
   io.to(r.code).emit("round:choosing",{chooserId:r.chooserId,chooserName:r.players.find(p=>p.id===r.chooserId)?.username,round:r.round,maxRounds:r.maxRounds});
   emitRoom(r);
-  const seconds=r.settings?.chooseSeconds||45;
-  io.to(r.code).emit("phase:timer",{phase:"choosing",endsAt:Date.now()+seconds*1000});
+  io.to(r.code).emit("phase:timer",{phase:"choosing",endsAt:r.timerEndsAt,duration:seconds});
   roomTimers.set(r.code,setTimeout(()=>{
     if(r.status!=="choosing") return;
     const chooser=r.players.find(p=>p.id===r.chooserId);
@@ -496,9 +513,11 @@ function applyChoice(r,situation,target) {
   clearRoomTimer(r);
   const distractors=memes.filter(m=>m!==target).sort(()=>Math.random()-0.5).slice(0,2);
   r.situation=situation;r.options=[target,...distractors].sort(()=>Math.random()-0.5);r.target=target;r.status="guessing";r.guesses={};
-  emitRoom(r);io.to(r.code).emit("round:started",{situation,options:r.options,chooserId:r.chooserId});
   const seconds=r.settings?.thinkSeconds||30;
-  io.to(r.code).emit("phase:timer",{phase:"guessing",endsAt:Date.now()+seconds*1000});
+  r.timerDuration=seconds;
+  r.timerEndsAt=Date.now()+seconds*1000;
+  emitRoom(r);io.to(r.code).emit("round:started",{situation,options:r.options,chooserId:r.chooserId});
+  io.to(r.code).emit("phase:timer",{phase:"guessing",endsAt:r.timerEndsAt,duration:seconds});
   roomTimers.set(r.code,setTimeout(()=>{if(r.status==="guessing")finishRound(r);},seconds*1000));
 }
 function completeGame(r) {
