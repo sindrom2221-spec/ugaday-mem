@@ -59,26 +59,7 @@ function render(token=viewRenderId){
   else if(view==="admin")adminPage(token);
 }
 function home(){
-  const trollface=`<svg class="troll-illustration" viewBox="0 0 460 350" role="img" aria-label="Улыбающийся мем-персонаж указывает на название игры">
-    <g class="troll-arm" stroke="#08090b" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
-      <path fill="#ededed" d="M54 320c20-36 46-59 82-76l57-29 33 45-65 43c-23 15-39 31-49 47H65z"/>
-      <path fill="#ededed" d="M137 250c-9-17-18-33-29-46-8-10-20-16-29-10-9 6-7 18 1 30l12 19-38-4c-17-2-28 5-27 16 1 10 12 15 26 17l44 9-20 10c-12 6-15 17-8 25 7 9 19 7 30 1l48-26z"/>
-      <path fill="#ededed" d="M77 235c-2-18-4-37-3-53 1-14 10-23 21-20 10 3 12 14 12 25l2 39"/>
-    </g>
-    <g class="troll-head">
-      <path fill="#f0f0f0" stroke="#08090b" stroke-width="11" stroke-linejoin="round" d="M185 34c-31-6-65 6-84 29-17 20-23 47-19 74-13 14-20 33-16 54 4 19 18 33 36 40 5 25 27 44 53 48 22 21 55 30 91 25 42-5 77-27 90-60 24-12 38-33 38-57 0-17-8-32-21-44 3-35-8-68-33-88-31-24-91-33-135-21z"/>
-      <path fill="none" stroke="#08090b" stroke-width="10" stroke-linecap="round" d="M112 104c14-14 32-18 49-10M247 94c19-13 40-11 55 4"/>
-      <path fill="#08090b" d="M109 120c17-13 36-13 52 0 3 17-5 28-18 29-18 1-31-10-34-29zM249 112c17-12 37-9 51 6-2 18-13 28-28 26-16-2-24-15-23-32z"/>
-      <path fill="#f0f0f0" d="M127 126c6-4 12-4 18 0-5 7-11 9-18 0zM267 120c6-4 13-3 18 2-5 7-12 7-18-2z"/>
-      <path fill="none" stroke="#08090b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="M206 137c-1 12-10 22-17 31 10 7 22 8 34 2"/>
-      <path fill="#08090b" stroke="#08090b" stroke-width="7" stroke-linejoin="round" d="M111 177c25-24 52-27 81-12 16 9 33 8 50-1 31-17 65-12 87 12-12 48-51 76-110 77-53 1-94-23-108-76z"/>
-      <path fill="#f5f5f5" d="M130 183c18-10 37-11 56-4l-2 23c-16-4-30-2-44 6zM193 181c18 5 35 5 52-2l8 22c-21 8-42 8-63 1zM263 177c17-5 33-3 48 7l-12 23c-13-7-25-8-38-4zM148 220c19 9 40 13 63 13 29 0 52-6 73-20l-16 24c-19 13-41 19-65 19-24 0-45-8-61-24z"/>
-      <path fill="none" stroke="#08090b" stroke-width="5" d="M184 180l3 43M251 178l5 42M139 207l13 15M284 204l-13 17"/>
-      <path fill="none" stroke="#08090b" stroke-width="9" stroke-linecap="round" d="M89 151l-24 8M344 144l26 10M358 183l21 5"/>
-    </g>
-    <path class="troll-spark" d="M390 50l8 20 20 8-20 8-8 20-8-20-20-8 20-8z"/>
-    <path class="troll-spark" d="M420 139l5 12 12 5-12 5-5 12-5-12-12-5 12-5z"/>
-  </svg>`;
+  const trollface='<img class="troll-illustration" src="https://wallpapers.com/images/hd/trollface-meme-classic-2n53k9w7jw1zwsn2.png" alt="Классический Trollface" loading="eager" decoding="async">';
   app.innerHTML=`<section class="reference-home">
     <div class="reference-home-copy">
       <h1>УГАДАЙ МЕМ</h1>
