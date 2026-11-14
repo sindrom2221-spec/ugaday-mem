@@ -62,16 +62,16 @@ function trollfaceForTheme(theme){
   const t=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"].includes(theme)?theme:"dark";
   // Одно и то же оригинальное изображение Trollface. Меняются только внешние аксессуары и декор.
   const decorations={
-    dark:'<span class="tf-crown">♛</span><span class="tf-gold-spark tf-spark-a">✦</span><span class="tf-gold-spark tf-spark-b">✦</span>',
+    dark:'<span class="tf-crown"><i></i><b></b></span><span class="tf-gold-spark tf-spark-a">✦</span><span class="tf-gold-spark tf-spark-b">✦</span>',
     comic:'<span class="tf-comic-burst">POW!</span><span class="tf-comic-mark">‼</span><span class="tf-comic-star tf-star-a">✦</span><span class="tf-comic-star tf-star-b">✦</span>',
-    light:'<span class="tf-halo"></span><span class="tf-angel-wing tf-wing-left">✧</span><span class="tf-angel-wing tf-wing-right">✧</span>',
+    light:'<span class="tf-halo"></span><span class="tf-angel-wing tf-wing-left"><i></i></span><span class="tf-angel-wing tf-wing-right"><i></i></span>',
     neon:'<span class="tf-neon-glasses"><i></i><i></i><b></b></span><span class="tf-neon-spark tf-neon-a">✦</span><span class="tf-neon-spark tf-neon-b">✧</span>',
     vaporwave:'<span class="tf-vapor-glasses"><i></i><i></i><b></b></span><span class="tf-vapor-sun"></span><span class="tf-vapor-palm">✦</span>',
-    "8bit":'<span class="tf-pixel-crown">♛</span><span class="tf-pixel-coin tf-coin-a">◆</span><span class="tf-pixel-coin tf-coin-b">◆</span><span class="tf-pixel-block">?</span>',
+    "8bit":'<span class="tf-pixel-crown"><i></i></span><span class="tf-pixel-coin tf-coin-a">◆</span><span class="tf-pixel-coin tf-coin-b">◆</span><span class="tf-pixel-block">?</span>',
     horror:'<span class="tf-horror-aura"></span><span class="tf-horror-eye tf-horror-eye-left"></span><span class="tf-horror-eye tf-horror-eye-right"></span><span class="tf-horror-scratch tf-scratch-a">╱╱</span><span class="tf-horror-scratch tf-scratch-b">╲</span>',
-    y2k:'<span class="tf-y2k-star-glasses"><i>★</i><i>★</i><b></b></span><span class="tf-chrome-star tf-chrome-a">✧</span><span class="tf-chrome-star tf-chrome-b">✦</span>',
+    y2k:'<span class="tf-y2k-star-glasses"><i></i><i></i><b></b></span><span class="tf-chrome-star tf-chrome-a">✧</span><span class="tf-chrome-star tf-chrome-b">✦</span>',
     hacker:'<span class="tf-hacker-hood"></span><span class="tf-code-column tf-code-a">01<br>10<br>11</span><span class="tf-code-column tf-code-b">10<br>01<br>00</span><span class="tf-hacker-scan"></span>',
-    pastel:'<span class="tf-pastel-bow">♡</span><span class="tf-pastel-heart tf-heart-a">♥</span><span class="tf-pastel-heart tf-heart-b">♥</span><span class="tf-pastel-spark tf-pastel-a">✧</span><span class="tf-pastel-spark tf-pastel-b">✦</span>'
+    pastel:'<span class="tf-pastel-bow"><i></i><b></b></span><span class="tf-pastel-heart tf-heart-a">♥</span><span class="tf-pastel-heart tf-heart-b">♥</span><span class="tf-pastel-spark tf-pastel-a">✧</span><span class="tf-pastel-spark tf-pastel-b">✦</span>'
   };
   return `<div class="trollface-stage trollface-${t}" data-trollface-theme="${t}">
     <img class="trollface-original" src="https://i.kym-cdn.com/photos/images/newsfeed/000/150/229/umadwhynne.PNG" alt="Оригинальный классический Trollface" title="Trollface — оригинальный мем, источник: Know Your Meme" referrerpolicy="no-referrer" loading="eager" decoding="async">
