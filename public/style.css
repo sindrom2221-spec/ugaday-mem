@@ -417,3 +417,110 @@ body.room-window-fullscreen #app .game-table{position:fixed;inset:0;z-index:9999
 @keyframes view-spin{to{transform:rotate(360deg)}}
 #app.page-transition>.view-loading{animation:page-enter .18s ease-out both}
 @media(prefers-reduced-motion:reduce){.view-loading-spinner{animation:none}}
+
+
+/* Партнёрская реклама Depni Hatu: встроенный предпросмотр оригинального сайта */
+.partner-ad{
+  margin:0 0 30px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:
+    radial-gradient(ellipse at 88% 0%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 48%),
+    linear-gradient(145deg,var(--panel),#13151a);
+  box-shadow:0 16px 42px #0003;
+}
+.partner-ad-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:22px 24px;
+}
+.partner-ad-copy{min-width:0}
+.partner-ad-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--accent);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:1.7px;
+}
+.partner-ad-copy h2{
+  margin:8px 0 5px;
+  color:var(--text);
+  font-size:clamp(24px,4vw,36px);
+  line-height:1;
+  letter-spacing:-1.5px;
+  font-weight:900;
+}
+.partner-ad-copy p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.partner-ad-link{
+  flex:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-height:42px;
+  padding:0 17px;
+  border:1px solid var(--accent);
+  border-radius:11px;
+  background:var(--accent);
+  color:var(--accentText);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  transition:transform .18s,filter .18s,box-shadow .18s;
+  box-shadow:0 5px 18px color-mix(in srgb,var(--accent) 18%,transparent);
+}
+.partner-ad-link:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 24%,transparent)}
+.partner-ad-preview{
+  position:relative;
+  width:100%;
+  height:clamp(240px,34vw,390px);
+  overflow:hidden;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:#0c0d11;
+}
+.partner-ad-preview iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  background:#0c0d11;
+}
+.partner-ad-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:11px 18px;
+  background:#00000018;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:1.1px;
+}
+.partner-ad-foot a{
+  color:var(--text);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0;
+  text-decoration:none;
+}
+.partner-ad-foot a:hover{color:var(--accent)}
+@media(max-width:600px){
+  .partner-ad{border-radius:15px}
+  .partner-ad-heading{align-items:flex-start;flex-direction:column;padding:18px;gap:14px}
+  .partner-ad-link{width:100%}
+  .partner-ad-preview{height:270px}
+  .partner-ad-foot{align-items:flex-start;flex-direction:column;padding:12px 15px}
+}
+@media(prefers-reduced-motion:reduce){.partner-ad-link{transition:none}}
