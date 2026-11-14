@@ -17,8 +17,35 @@ const server = http.createServer(app);
 const io = new Server(server);
 const PORT = Number(process.env.PORT || 3000);
 // Keep the existing project-local data storage; no Persistent Disk configuration.
-const dataDir = path.join(__dirname, "data");
+// DATA_DIR позволяет размещать SQLite и сессии на постоянном диске хостинга.
+const dataDir = path.resolve(process.env.DATA_DIR || path.join(__dirname, "data"));
 fs.mkdirSync(dataDir, { recursive: true });
+
+// Стабильный секрет сохраняется рядом с БД, если SESSION_SECRET не задан.
+// Это позволяет проверять старые cookie после перезапуска сервера при постоянном DATA_DIR.
+function loadSessionSecret() {
+  if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
+  const secretFile = path.join(dataDir, "session-secret");
+  try {
+    const existing = fs.readFileSync(secretFile, "utf8").trim();
+    if (existing.length >= 64) return existing;
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+  }
+  const generated = crypto.randomBytes(48).toString("hex");
+  try {
+    fs.writeFileSync(secretFile, generated, { encoding: "utf8", flag: "wx", mode: 0o600 });
+    return generated;
+  } catch (err) {
+    if (err.code !== "EEXIST") throw err;
+    const existing = fs.readFileSync(secretFile, "utf8").trim();
+    if (existing.length < 64) throw new Error("Файл session-secret повреждён");
+    return existing;
+  }
+}
+const sessionSecret = loadSessionSecret();
+const sessionMaxAgeDays = Math.min(3650, Math.max(1, Number(process.env.SESSION_MAX_AGE_DAYS) || 365));
+const sessionMaxAgeMs = sessionMaxAgeDays * 24 * 60 * 60 * 1000;
 const db = new Database(path.join(dataDir, "game.db"));
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
@@ -77,14 +104,16 @@ CREATE TABLE IF NOT EXISTS bans (
 const sessionStore = new SQLiteStore({ db: "sessions.db", dir: dataDir });
 const sessionMiddleware = session({
   name: "ugm.sid",
-  secret: process.env.SESSION_SECRET || "development-secret-change-before-deploy",
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   store: sessionStore,
   cookie: {
-    httpOnly: true, sameSite: "lax",
+    httpOnly: true,
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: sessionMaxAgeMs
   }
 });
 app.use(helmet({ contentSecurityPolicy: false }));
