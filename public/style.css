@@ -1453,3 +1453,88 @@ body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49a
   body[data-theme="8bit"] .reference-home{box-shadow:4px 4px 0 #07131b}
   body[data-theme="pastel"] .reference-home{border-radius:20px}
 }
+
+
+/* Десять отдельных выражений Trollface — рисуются локально, без внешних картинок */
+.troll-illustration{
+  display:block;width:min(100%,455px);height:100%;max-height:100%;
+  overflow:visible;filter:drop-shadow(0 18px 24px #0008);
+}
+.reference-home .reference-home-art{filter:none!important}
+.tf-body{fill:#101114;stroke:#050506;stroke-width:10;stroke-linejoin:round}
+.tf-head{fill:#f5f5f2;stroke:#08090b;stroke-width:11;stroke-linejoin:round}
+.tf-line{fill:none;stroke:#08090b;stroke-width:10;stroke-linecap:round}
+.tf-eye{fill:#08090b;stroke:#08090b;stroke-width:5}
+.tf-mouth{fill:#050506;stroke:#08090b;stroke-width:7;stroke-linejoin:round}
+.tf-teeth{fill:#f5f5f1;stroke:#070707;stroke-width:4;stroke-linejoin:round}
+.tf-brow{fill:none;stroke:#08090b;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
+.tf-eye-wide{fill:#fff;stroke:#08090b;stroke-width:8}
+.tf-pupil{fill:#08090b}
+.tf-teeth-wide{fill:#fff;stroke:#08090b;stroke-width:4;stroke-linejoin:round}
+.tf-tongue{fill:#ed4d64;stroke:#08090b;stroke-width:5}
+.tf-exclaim{fill:#ffcf36;stroke:#08090b;stroke-width:5}
+.tf-crown{fill:#f2c52c;stroke:#070707;stroke-width:7;stroke-linejoin:round}
+.tf-crown-line{fill:none;stroke:#070707;stroke-width:8;stroke-linecap:round}
+.tf-halo{fill:none;stroke:#ffc93b;stroke-width:12;filter:drop-shadow(0 0 7px #ffc93b)}
+.tf-wing{fill:none;stroke:#08090b;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.tf-mouth-light{fill:#090909;stroke:#08090b;stroke-width:6}
+.tf-cheek{fill:none;stroke:#e8b4a5;stroke-width:7;stroke-linecap:round}
+.tf-neon-ring{fill:none;stroke:#30eaff;stroke-width:8;filter:url(#tf-glow)}
+.tf-glasses{fill:#19132e;stroke:#33f2ff;stroke-width:8;filter:url(#tf-glow)}
+.tf-glint{fill:none;stroke:#ed85ff;stroke-width:7;stroke-linecap:round}
+.tf-lightning{fill:#ff45d3;stroke:#30eaff;stroke-width:4;filter:url(#tf-glow)}
+.tf-circuit{fill:none;stroke:#33eaff;stroke-width:5}
+.tf-sun{fill:#ff6dd5;opacity:.7}
+.tf-sun-lines{fill:none;stroke:#25153c;stroke-width:7}
+.tf-shades{fill:#261038;stroke:#ff79d6;stroke-width:8}
+.tf-shade-line{fill:none;stroke:#5bf2ed;stroke-width:7}
+.tf-palm{fill:none;stroke:#29143d;stroke-width:5}
+.tf-star{fill:#ffcc59;stroke:#25133b;stroke-width:3}
+.tf-pixel-bg{fill:#f1b52b;stroke:#101010;stroke-width:5}
+.tf-pixel-star{fill:#39e5a0}
+.tf-pixel-head{fill:#f6f6f1;stroke:#080808;stroke-width:8;shape-rendering:crispEdges}
+.tf-pixel-eye{fill:#080808;shape-rendering:crispEdges}
+.tf-pixel-pupil{fill:#fff;shape-rendering:crispEdges}
+.tf-pixel-mouth{fill:#080808;stroke:#080808;stroke-width:6;shape-rendering:crispEdges}
+.tf-pixel-teeth{fill:#fff;shape-rendering:crispEdges}
+.tf-pixel-cap{fill:#e7b92d;stroke:#090909;stroke-width:6;shape-rendering:crispEdges}
+.tf-pixel-body{fill:#101114;stroke:#090909;stroke-width:8;shape-rendering:crispEdges}
+.tf-horror-smoke{fill:#3b1119;stroke:#16070c;stroke-width:6}
+.tf-horror-head{fill:#b6a9a7;stroke:#080509;stroke-width:13;stroke-linejoin:round}
+.tf-horror-brow{fill:none;stroke:#170609;stroke-width:17;stroke-linecap:round}
+.tf-horror-eye{fill:#050204}
+.tf-horror-glow{fill:#ff203d;filter:url(#tf-glow)}
+.tf-horror-mouth{fill:#080306;stroke:#090306;stroke-width:8}
+.tf-fang{fill:#ded8d4;stroke:#080509;stroke-width:4;stroke-linejoin:round}
+.tf-horror-shadow{fill:none;stroke:#650d1c;stroke-width:8;stroke-linecap:round}
+.tf-horror-scratch{fill:none;stroke:#b41229;stroke-width:8;stroke-linecap:round}
+.tf-head-y2k{fill:url(#tf-silver);stroke:#566b8e}
+.tf-chrome{fill:#d7f7ff;stroke:#c080ff;stroke-width:7}
+.tf-y2k-glasses{fill:#192e51;stroke:#f7a5e2;stroke-width:7}
+.tf-star-eyes{fill:#f5d6ff;stroke:#5f57a0;stroke-width:3}
+.tf-y2k-shine{fill:none;stroke:#e5faff;stroke-width:8;stroke-linecap:round}
+.tf-hood{fill:#071b12;stroke:#39ff70;stroke-width:12;stroke-linejoin:round}
+.tf-code{fill:none;stroke:#39ff70;stroke-width:6;stroke-linecap:round}
+.tf-hacker-head{fill:#bde9c7;stroke:#07130a;stroke-width:12}
+.tf-hacker-eye{fill:#061008;stroke:#061008;stroke-width:8}
+.tf-hacker-glow{fill:none;stroke:#39ff70;stroke-width:7;filter:url(#tf-glow)}
+.tf-hacker-mouth{fill:#061008;stroke:#061008;stroke-width:7}
+.tf-hacker-teeth{fill:#aaffb5;stroke:#061008;stroke-width:3}
+.tf-heart{fill:#ff8fc4;stroke:#a94a8b;stroke-width:4}
+.tf-head-pastel{fill:#fff8f5;stroke:#8c688e}
+.tf-heart-eyes{fill:#ff74b7;stroke:#8d587b;stroke-width:3}
+.tf-pastel-mouth{fill:none;stroke:#8d587b;stroke-width:9;stroke-linecap:round}
+.tf-blush{fill:#ff9fc2;opacity:.65}
+.tf-hand{fill:none;stroke:#fff8f5;stroke-width:17;stroke-linecap:round}
+body[data-theme="comic"] .tf-body{fill:#241c16}
+body[data-theme="light"] .tf-body{fill:#d8e9fa}
+body[data-theme="neon"] .tf-body{fill:#111329;stroke:#29ebff;filter:url(#tf-glow)}
+body[data-theme="vaporwave"] .tf-body{fill:#28113a;stroke:#ff7cda}
+body[data-theme="8bit"] .tf-body{fill:#18364a;stroke:#a8ff60}
+body[data-theme="horror"] .tf-body{fill:#100609;stroke:#8f1023}
+body[data-theme="y2k"] .tf-body{fill:#d6eaff;stroke:#a6bde5}
+body[data-theme="hacker"] .tf-body{fill:#07140c;stroke:#39ff70}
+body[data-theme="pastel"] .tf-body{fill:#f2dff5;stroke:#d69bcf}
+@media(max-width:680px){
+  .troll-illustration{width:min(100%,340px);height:100%}
+}
