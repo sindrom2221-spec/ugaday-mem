@@ -406,7 +406,8 @@ function persistRoom(room) {
     room.players.forEach((p,i)=>db.prepare("INSERT INTO room_players(room_code,user_id,seat,score,is_host) VALUES(?,?,?,?,?)").run(room.code,p.id,i,p.score||0,p.id===room.hostId?1:0));
   })();
 }
-function safeRoom(r) {
+function safeRoom(r, userId) {
+  const ownPlayer=r.players.find(p=>p.id===userId);
   return {
     code:r.code,hostId:r.hostId,status:r.status,round:r.round,maxRounds:r.maxRounds,
     settings:{rounds:r.settings?.rounds||5,thinkSeconds:r.settings?.thinkSeconds||30,chooseSeconds:r.settings?.chooseSeconds||45},
@@ -417,10 +418,39 @@ function safeRoom(r) {
     target:r.status==="results"?r.target:undefined,
     results:r.results||null,
     chooserId:r.chooserId,
-    chooserName:r.players.find(p=>p.id===r.chooserId)?.username
+    chooserName:r.players.find(p=>p.id===r.chooserId)?.username,
+    myHand:ownPlayer?.hand?ownPlayer.hand.slice():[],
+    deckCount:ownPlayer?.deck?.length||0,
+    discardedCount:ownPlayer?.discarded?.length||0
   };
 }
-function emitRoom(r) { persistRoom(r); io.to(r.code).emit("room:update",safeRoom(r)); }
+function emitRoom(r) {
+  persistRoom(r);
+  for(const p of r.players) if(p.socketId) io.to(p.socketId).emit("room:update",safeRoom(r,p.id));
+}
+function shuffleCards(cards) {
+  const result=cards.slice();
+  for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
+  return result;
+}
+function dealPlayerCards(player) {
+  const shuffled=shuffleCards(memes);
+  player.hand=shuffled.slice(0,6);
+  player.deck=shuffled.slice(6);
+  player.discarded=[];
+}
+function dealRoomCards(r) {
+  r.players.forEach(dealPlayerCards);
+  r.cardsInitialized=true;
+}
+function usePlayerCard(player,target) {
+  if(!Array.isArray(player.hand)||!player.hand.includes(target)) return false;
+  player.hand=player.hand.filter(card=>card!==target);
+  if(!Array.isArray(player.discarded)) player.discarded=[];
+  player.discarded.push(target);
+  if(Array.isArray(player.deck)&&player.deck.length) player.hand.push(player.deck.shift());
+  return true;
+}
 function roomCode() {
   let code;
   do { code=crypto.randomBytes(3).toString("hex").toUpperCase(); }
@@ -430,6 +460,7 @@ function roomCode() {
 function clearRoomTimer(r) { const timer=roomTimers.get(r.code); if(timer) clearTimeout(timer); roomTimers.delete(r.code); }
 function startRound(r) {
   clearRoomTimer(r);
+  if(!r.cardsInitialized || r.players.some(p=>!Array.isArray(p.hand)||!Array.isArray(p.deck))) dealRoomCards(r);
   r.status="choosing"; r.round=Math.min(r.round,r.maxRounds);
   r.situation=null; r.options=[]; r.target=null; r.guesses={}; r.results=null;
   r.chooserId=r.players[(r.round-1)%r.players.length].id;
@@ -439,10 +470,27 @@ function startRound(r) {
   io.to(r.code).emit("phase:timer",{phase:"choosing",endsAt:Date.now()+seconds*1000});
   roomTimers.set(r.code,setTimeout(()=>{
     if(r.status!=="choosing") return;
-    const target=memes[Math.floor(Math.random()*memes.length)];
-    const situation=situationsByMeme[target][Math.floor(Math.random()*situationsByMeme[target].length)];
+    const chooser=r.players.find(p=>p.id===r.chooserId);
+    if(!chooser||!Array.isArray(chooser.hand)||!chooser.hand.length) return finishGameForEmptyHand(r);
+    const target=chooser.hand[Math.floor(Math.random()*chooser.hand.length)];
+    const situation=situationsByMeme[target]?.[Math.floor(Math.random()*(situationsByMeme[target]?.length||1))]||"Когда всё пошло совсем не по плану";
+    usePlayerCard(chooser,target);
     applyChoice(r,situation,target);
   },seconds*1000));
+}
+function finishGameForEmptyHand(r) {
+  const chooser=r.players.find(p=>p.id===r.chooserId);
+  if(chooser && Array.isArray(chooser.deck) && chooser.deck.length && Array.isArray(chooser.hand) && !chooser.hand.length) chooser.hand.push(...chooser.deck.splice(0,6));
+  if(chooser && chooser.hand.length) {
+    const target=chooser.hand[0];
+    usePlayerCard(chooser,target);
+    const situation=situationsByMeme[target]?.[0]||"Когда всё пошло не по плану";
+    applyChoice(r,situation,target);
+  } else {
+    // Обычно недостижимо в матче до 10 раундов; завершаем фазу безопасно.
+    r.status="results";r.results={correctIds:[],noOne:true};emitRoom(r);
+    for(const p of r.players) if(p.socketId) io.to(p.socketId).emit("round:results",{room:safeRoom(r,p.id),correctIds:[],noOne:true});
+  }
 }
 function applyChoice(r,situation,target) {
   clearRoomTimer(r);
@@ -480,7 +528,7 @@ function finishRound(r) {
   else {const chooser=r.players.find(p=>p.id===r.chooserId);if(chooser)chooser.score+=3;}
   r.status="results"; r.results={correctIds:correct,noOne:correct.length===0};
   emitRoom(r);
-  io.to(r.code).emit("round:results",{room:safeRoom(r),correctIds:correct,noOne:correct.length===0});
+  for(const p of r.players) if(p.socketId) io.to(p.socketId).emit("round:results",{room:safeRoom(r,p.id),correctIds:correct,noOne:correct.length===0});
 }
 function nextRound(r) { if(r.round>=r.maxRounds) completeGame(r); else {r.round++;startRound(r);} }
 
@@ -518,23 +566,27 @@ io.on("connection",socket=>{
     if(!r) return socket.emit("error:message","Комната не найдена");
     if(r.status==="completed") return socket.emit("error:message","Игра завершена");
     if(!r.players.some(p=>p.id===socket.userId)&&r.players.length>=8) return socket.emit("error:message","В комнате максимум 8 игроков");
+    if(r.status!=="waiting"&&(!r.cardsInitialized||r.players.some(p=>!Array.isArray(p.hand)||!Array.isArray(p.deck)))) dealRoomCards(r);
     if(socket.roomCode&&socket.roomCode!==code) socket.leave(socket.roomCode);
     let player=r.players.find(p=>p.id===socket.userId);
-    if(!player) {player={id:socket.userId,username:socket.username,avatar:getProfile(socket.userId)?.avatar||"🙂",score:0,skin:getProfile(socket.userId)?.equipped};r.players.push(player);}
+    if(!player) {player={id:socket.userId,username:socket.username,avatar:getProfile(socket.userId)?.avatar||"🙂",score:0,skin:getProfile(socket.userId)?.equipped};if(r.status!=="waiting")dealPlayerCards(player);r.players.push(player);}
     player.socketId=socket.id; socket.roomCode=code; socket.join(code); emitRoom(r);
   });
   socket.on("game:start",()=>{
     const r=roomCache.get(socket.roomCode);
     if(!r||r.hostId!==socket.userId||r.status!=="waiting") return;
     if(r.players.length<3) return socket.emit("error:message","Для игры нужно минимум 3 игрока");
-    r.round=1;r.maxRounds=r.settings?.rounds||5;startRound(r);
+    r.round=1;r.maxRounds=r.settings?.rounds||5;dealRoomCards(r);startRound(r);
   });
   socket.on("round:choose",({situation,target}={})=>{
     const r=roomCache.get(socket.roomCode);
     if(!r||r.status!=="choosing"||r.chooserId!==socket.userId) return;
-    if(!memes.includes(target)||!situationsByMeme[target]?.includes(situation)) return socket.emit("error:message","Некорректный выбор");
-    // Ведущий задаёт правильный мем; сервер добавляет два случайных отвлекающих варианта.
-    applyChoice(r,situation,target);
+    const chooser=r.players.find(p=>p.id===socket.userId);
+    const cleanSituation=String(situation||"").trim().slice(0,240);
+    if(!chooser||!Array.isArray(chooser.hand)||!chooser.hand.includes(target)||cleanSituation.length<3) return socket.emit("error:message","Выбери мем из своей руки и напиши ситуацию (не менее 3 символов)");
+    // Использованная карта уходит в сброс до конца матча; игрок добирает верхнюю карту своей личной колоды.
+    usePlayerCard(chooser,target);
+    applyChoice(r,cleanSituation,target);
   });
   socket.on("round:guess",({meme}={})=>{
     const r=roomCache.get(socket.roomCode);
@@ -551,7 +603,7 @@ io.on("connection",socket=>{
   socket.on("game:restart",()=>{
     const r=roomCache.get(socket.roomCode);
     if(!r||r.hostId!==socket.userId||r.status!=="completed") return;
-    r.players.forEach(p=>p.score=0);r.round=1;r.maxRounds=r.settings?.rounds||5;r.guesses={};r.results=null;startRound(r);
+    r.players.forEach(p=>p.score=0);r.round=1;r.maxRounds=r.settings?.rounds||5;r.guesses={};r.results=null;dealRoomCards(r);startRound(r);
   });
   socket.on("room:leave",()=>{
     const r=roomCache.get(socket.roomCode);if(!r)return;
