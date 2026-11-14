@@ -26,7 +26,26 @@ function setView(v){
   app.classList.add("page-transition");
   render(token);
 }
-function header(){document.body.dataset.theme=me?.theme||"dark";document.body.dataset.cardSkin=me?.equipped||"cover_default";document.body.dataset.tableSkin=me?.tableSkin||"table_classic";nav.innerHTML=me?`<a href="#" data-view="home">Главная</a><a href="#" data-view="game">Играть</a><a href="#" data-view="shop">Магазин</a><a href="#" data-view="leaderboard">Рейтинг</a><a href="#" data-view="profile">Профиль</a>${me.is_admin?'<a href="#" data-view="admin">Админка</a>':''}`:`<a href="#" data-view="home">Главная</a>`;nav.querySelectorAll("[data-view]").forEach(a=>{if(a.dataset.view===view)a.setAttribute("aria-current","page");a.onclick=e=>{e.preventDefault();setView(a.dataset.view)}});chip.innerHTML=me?`<span class="chip-avatar">${avatarView(me.avatar,"avatar-image")}</span> ${esc(me.username)} · ${me.coins} монет`:""}
+function header(){
+  document.body.dataset.theme=me?.theme||"dark";
+  document.body.dataset.cardSkin=me?.equipped||"cover_default";
+  document.body.dataset.tableSkin=me?.tableSkin||"table_classic";
+  nav.innerHTML=me
+    ? `<a href="#" data-view="home">Главная</a><a href="#" data-view="game">Играть</a><a href="#" data-view="shop">Магазин</a><a href="#" data-view="leaderboard">Рейтинг</a><a href="#" data-view="profile">Профиль</a>${me.is_admin?'<a href="#" data-view="admin">Админка</a>':''}`
+    : `<a href="#" data-view="home">Главная</a><a href="#" data-view="shop">Магазин</a><a href="#" data-view="leaderboard">Рейтинг</a><a class="nav-anchor" href="#how-to-play">Правила</a>`;
+  nav.querySelectorAll("[data-view]").forEach(a=>{
+    if(a.dataset.view===view)a.setAttribute("aria-current","page");
+    a.onclick=e=>{
+      e.preventDefault();
+      if(!me&&["shop","leaderboard"].includes(a.dataset.view)){setView("login");return;}
+      setView(a.dataset.view);
+    };
+  });
+  chip.innerHTML=me
+    ? `<span class="chip-avatar">${avatarView(me.avatar,"avatar-image")}</span><span class="header-user-name">${esc(me.username)}</span><span class="header-user-coins">${me.coins} монет</span>`
+    : `<button class="header-login" id="header-login" type="button">Войти</button>`;
+  $("#header-login")?.addEventListener("click",()=>setView("login"));
+}
 function render(token=viewRenderId){
   header();
   if(!me&&["game","shop","admin","profile"].includes(view))view="home";
@@ -40,12 +59,53 @@ function render(token=viewRenderId){
   else if(view==="admin")adminPage(token);
 }
 function home(){
-  const features=`<section class="home-features" aria-label="Особенности игры"><div class="home-section-heading"><div><div class="eyebrow">КАК ЭТО РАБОТАЕТ</div><h2>Просто начать. Сложно остановиться.</h2></div><p>Соберите друзей и проверьте, насколько совпадает ваше чувство юмора.</p></div><div class="grid home-feature-grid"><article class="card home-feature"><span class="feature-index">01</span><h3>Создайте комнату</h3><p>Пригласите от 2 до 7 друзей по короткому коду.</p></article><article class="card home-feature"><span class="feature-index">02</span><h3>Подберите мем</h3><p>Выберите карточку, которая лучше всего подходит к ситуации.</p></article><article class="card home-feature"><span class="feature-index">03</span><h3>Наберите очки</h3><p>Угадывайте ответы, побеждайте и собирайте награды.</p></article></div></section>`;
-  app.innerHTML=`<section class="hero hero-minimal"><div class="hero-main"><div class="eyebrow"><span class="hero-live-dot"></span> МУЛЬТИПЛЕЕРНАЯ ИГРА · 3–8 ИГРОКОВ</div>${me?`<div class="hero-welcome">С возвращением, ${esc(me.username)}</div>`:""}<h1>Угадай мем.<br><span>Попади в ситуацию.</span></h1><p>Соберите компанию, выбирайте мемы и проверьте, насколько хорошо вы понимаете чувство юмора друг друга.</p><div class="actions">${me?`<button class="btn primary" id="go-game">Начать игру <span aria-hidden="true">→</span></button><button class="btn" id="go-shop">Открыть магазин</button><button class="btn btn-quiet" id="logout">Выйти</button>`:`<button class="btn primary" id="go-register">Создать аккаунт <span aria-hidden="true">→</span></button><button class="btn" id="go-login">Войти</button>`}</div><div class="hero-footnote"><span>БЕЗ СЛОЖНЫХ ПРАВИЛ</span><span>·</span><span>ТОЛЬКО ХОРОШИЕ МЕМЫ</span></div></div><aside class="hero-art" aria-label="Пример мем-карточки"><div class="hero-art-top"><span>КАРТОЧКА МЕМА</span><span>01 / 06</span></div><div class="hero-face" aria-hidden="true">ಠ‿ಠ</div><div class="hero-art-bottom"><span>Подбери мем к ситуации</span><span class="hero-art-arrow" aria-hidden="true">↗</span></div><div class="hero-art-caption">СОВПАДЕНИЕ ЮМОРА — ЛУЧШИЙ РЕЗУЛЬТАТ</div></aside></section>${me?`<section class="stats home-stats" aria-label="Твоя статистика"><div class="stat"><span>Монеты</span><b>${me.coins}</b></div><div class="stat"><span>Очки за всё время</span><b>${me.total_score}</b></div><div class="stat"><span>Сыграно игр</span><b>${me.games_played}</b></div></section>`:""}${features}`;
+  const trollface=`<svg class="troll-illustration" viewBox="0 0 460 350" role="img" aria-label="Улыбающийся мем-персонаж указывает на название игры">
+    <g class="troll-arm" stroke="#08090b" stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+      <path fill="#ededed" d="M54 320c20-36 46-59 82-76l57-29 33 45-65 43c-23 15-39 31-49 47H65z"/>
+      <path fill="#ededed" d="M137 250c-9-17-18-33-29-46-8-10-20-16-29-10-9 6-7 18 1 30l12 19-38-4c-17-2-28 5-27 16 1 10 12 15 26 17l44 9-20 10c-12 6-15 17-8 25 7 9 19 7 30 1l48-26z"/>
+      <path fill="#ededed" d="M77 235c-2-18-4-37-3-53 1-14 10-23 21-20 10 3 12 14 12 25l2 39"/>
+    </g>
+    <g class="troll-head">
+      <path fill="#f0f0f0" stroke="#08090b" stroke-width="11" stroke-linejoin="round" d="M185 34c-31-6-65 6-84 29-17 20-23 47-19 74-13 14-20 33-16 54 4 19 18 33 36 40 5 25 27 44 53 48 22 21 55 30 91 25 42-5 77-27 90-60 24-12 38-33 38-57 0-17-8-32-21-44 3-35-8-68-33-88-31-24-91-33-135-21z"/>
+      <path fill="none" stroke="#08090b" stroke-width="10" stroke-linecap="round" d="M112 104c14-14 32-18 49-10M247 94c19-13 40-11 55 4"/>
+      <path fill="#08090b" d="M109 120c17-13 36-13 52 0 3 17-5 28-18 29-18 1-31-10-34-29zM249 112c17-12 37-9 51 6-2 18-13 28-28 26-16-2-24-15-23-32z"/>
+      <path fill="#f0f0f0" d="M127 126c6-4 12-4 18 0-5 7-11 9-18 0zM267 120c6-4 13-3 18 2-5 7-12 7-18-2z"/>
+      <path fill="none" stroke="#08090b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" d="M206 137c-1 12-10 22-17 31 10 7 22 8 34 2"/>
+      <path fill="#08090b" stroke="#08090b" stroke-width="7" stroke-linejoin="round" d="M111 177c25-24 52-27 81-12 16 9 33 8 50-1 31-17 65-12 87 12-12 48-51 76-110 77-53 1-94-23-108-76z"/>
+      <path fill="#f5f5f5" d="M130 183c18-10 37-11 56-4l-2 23c-16-4-30-2-44 6zM193 181c18 5 35 5 52-2l8 22c-21 8-42 8-63 1zM263 177c17-5 33-3 48 7l-12 23c-13-7-25-8-38-4zM148 220c19 9 40 13 63 13 29 0 52-6 73-20l-16 24c-19 13-41 19-65 19-24 0-45-8-61-24z"/>
+      <path fill="none" stroke="#08090b" stroke-width="5" d="M184 180l3 43M251 178l5 42M139 207l13 15M284 204l-13 17"/>
+      <path fill="none" stroke="#08090b" stroke-width="9" stroke-linecap="round" d="M89 151l-24 8M344 144l26 10M358 183l21 5"/>
+    </g>
+    <path class="troll-spark" d="M390 50l8 20 20 8-20 8-8 20-8-20-20-8 20-8z"/>
+    <path class="troll-spark" d="M420 139l5 12 12 5-12 5-5 12-5-12-12-5 12-5z"/>
+  </svg>`;
+  app.innerHTML=`<section class="reference-home">
+    <div class="reference-home-copy">
+      <h1>УГАДАЙ МЕМ</h1>
+      <p>Угадывай мемы, собирай очки<br class="desktop-break"> и побеждай друзей!</p>
+      <div class="reference-home-actions">
+        <button class="btn primary reference-play" id="${me?"go-game":"go-register"}" type="button">Начать игру <span aria-hidden="true">→</span></button>
+        ${me?'<button class="reference-logout" id="logout" type="button">Выйти из аккаунта</button>':''}
+      </div>
+    </div>
+    <div class="reference-home-art">${trollface}</div>
+  </section>
+  <section class="reference-feature-strip" id="how-to-play" aria-label="Особенности игры">
+    <div class="reference-feature">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="10" cy="9" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 24c.5-5 3-7.5 7.5-7.5s7 2.5 7.5 7.5M20 6a3.5 3.5 0 010 7M21 17c3 .4 4.5 2.5 4.8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>3–8 игроков</span>
+    </div>
+    <div class="reference-feature">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M16.5 1.8L5.7 15.2h7.1l-1.4 11L22.5 11h-7.2z" fill="currentColor"/></svg>
+      <span>Динамичные раунды</span>
+    </div>
+    <div class="reference-feature">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M8 3h12v5c0 4-2.5 7-6 7s-6-3-6-7zM8 5H3v3c0 3 2 5 5 5M20 5h5v3c0 3-2 5-5 5M14 15v6m-5 4h10m-8-4h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Рейтинги и награды</span>
+    </div>
+  </section>`;
   $("#go-game")?.addEventListener("click",()=>setView("game"));
-  $("#go-shop")?.addEventListener("click",()=>setView("shop"));
   $("#go-register")?.addEventListener("click",()=>setView("register"));
-  $("#go-login")?.addEventListener("click",()=>setView("login"));
   $("#logout")?.addEventListener("click",async()=>{await api("/api/logout",{method:"POST"});if(socket)socket.disconnect();me=null;room=null;setView("home")});
 }
 function auth(reg){app.innerHTML=`<div class="card form"><div class="eyebrow">${reg?"Новый игрок":"С возвращением"}</div><h1>${reg?"Создать аккаунт":"Войти"}</h1><div id="auth-error"></div><form id="auth-form"><div class="field"><label>Имя игрока</label><input name="username" minlength="3" maxlength="18" required autocomplete="username"></div><div class="field"><label>Пароль</label><input name="password" type="password" minlength="8" required autocomplete="${reg?"new-password":"current-password"}"></div><button class="btn primary" type="submit">${reg?"Зарегистрироваться":"Войти"}</button></form><div class="switch">${reg?"Уже есть аккаунт?":"Впервые здесь?"} <a id="auth-switch">${reg?"Войти":"Создать аккаунт"}</a></div></div>`;$("#auth-switch").onclick=()=>setView(reg?"login":"register");$("#auth-form").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{const d=await api(reg?"/api/register":"/api/login",{method:"POST",body:JSON.stringify({username:f.get("username"),password:f.get("password")})});me=d.user;connect();setView("home")}catch(err){$("#auth-error").innerHTML=`<div class="notice">${esc(err.message)}</div>`}}}
