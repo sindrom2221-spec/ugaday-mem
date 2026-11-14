@@ -58,10 +58,24 @@ function render(token=viewRenderId){
   else if(view==="profile")profilePage(token);
   else if(view==="admin")adminPage(token);
 }
-function trollfaceForTheme(){
-  // Обычный классический Trollface: без аксессуаров, слоёв и тематических фильтров.
-  return `<div class="trollface-stage">
-    <img class="trollface-original" src="https://i.kym-cdn.com/photos/images/newsfeed/000/150/229/umadwhynne.PNG" alt="Классический Trollface" title="Классический Trollface" referrerpolicy="no-referrer" loading="eager" decoding="async">
+function trollfaceForTheme(theme){
+  const t=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"].includes(theme)?theme:"dark";
+  const decor={
+    dark:'<span class="tf-crown"><i></i><b></b><em></em></span><span class="tf-spark tf-spark-a">✦</span><span class="tf-spark tf-spark-b">✦</span>',
+    comic:'<span class="tf-comic-burst"></span><span class="tf-comic-word">POW!</span><span class="tf-comic-star tf-star-a">✦</span><span class="tf-comic-star tf-star-b">✦</span>',
+    light:'<span class="tf-halo"></span><span class="tf-wing tf-wing-left"></span><span class="tf-wing tf-wing-right"></span>',
+    neon:'<span class="tf-glasses tf-neon-glasses"><i></i><i></i><b></b></span><span class="tf-neon-spark tf-spark-a">✦</span><span class="tf-neon-spark tf-spark-b">✧</span>',
+    vaporwave:'<span class="tf-glasses tf-vapor-glasses"><i></i><i></i><b></b></span><span class="tf-vapor-sun"></span><span class="tf-vapor-grid"></span>',
+    "8bit":'<span class="tf-pixel-crown"></span><span class="tf-pixel-coin tf-coin-a">◆</span><span class="tf-pixel-coin tf-coin-b">◆</span><span class="tf-pixel-block">?</span>',
+    horror:'<span class="tf-horror-aura"></span><span class="tf-horror-eye tf-eye-left"></span><span class="tf-horror-eye tf-eye-right"></span><span class="tf-horror-scratch tf-scratch-a">╱</span><span class="tf-horror-scratch tf-scratch-b">╲</span>',
+    y2k:'<span class="tf-glasses tf-y2k-glasses"><i></i><i></i><b></b></span><span class="tf-chrome-star tf-star-a">✧</span><span class="tf-chrome-star tf-star-b">✦</span>',
+    hacker:'<span class="tf-hacker-hood"></span><span class="tf-code-column tf-code-a">01<br>10<br>11</span><span class="tf-code-column tf-code-b">10<br>01<br>00</span><span class="tf-hacker-scan"></span>',
+    pastel:'<span class="tf-pastel-bow"><i></i></span><span class="tf-pastel-heart tf-heart-a">♥</span><span class="tf-pastel-heart tf-heart-b">♥</span><span class="tf-pastel-spark tf-spark-a">✧</span><span class="tf-pastel-spark tf-spark-b">✦</span>'
+  };
+  return `<div class="trollface-stage trollface-${t}" data-trollface-theme="${t}">
+    <div class="tf-background" aria-hidden="true"></div>
+    <img class="trollface-original" src="https://w7.pngwing.com/pngs/761/310/png-transparent-internet-troll-internet-meme-trollface-laughing-face-meme-sticker-miscellaneous-face-food.png" alt="Классический Trollface с PNGWing" title="Классический Trollface — PNGWing" referrerpolicy="no-referrer" loading="eager" decoding="async">
+    <div class="tf-overlays" aria-hidden="true">${decor[t]}</div>
   </div>`;
 }
 
