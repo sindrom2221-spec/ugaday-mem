@@ -1067,3 +1067,388 @@ body[data-theme="pastel"] .reference-feature-strip{background:var(--panel);borde
 body[data-theme="light"] .reference-feature,
 body[data-theme="y2k"] .reference-feature,
 body[data-theme="pastel"] .reference-feature{color:var(--text)}
+
+
+/* ============================================================
+   ДЕСЯТЬ САМОСТОЯТЕЛЬНЫХ ОФОРМЛЕНИЙ СТРАНИЦЫ
+   Меняются фон, графика, рамки, шапка, кнопки и карточки.
+   DOM и логика выбора темы в профиле остаются без изменений.
+   ============================================================ */
+
+/* 01 — DARK: лаконичный чёрный игровой зал */
+body[data-theme="dark"] .reference-home{
+  border-color:#34363b;
+  background:
+    radial-gradient(ellipse at 78% 44%,#ffffff0c 0,transparent 38%),
+    linear-gradient(135deg,#090a0c,#101114 62%,#08090b);
+}
+body[data-theme="dark"] .reference-home:after{
+  content:"";position:absolute;right:4%;top:12%;width:245px;height:245px;
+  border:1px solid #f1c63835;border-radius:50%;pointer-events:none;
+  box-shadow:0 0 0 18px #f1c63808,0 0 0 38px #f1c63806;
+}
+body[data-theme="dark"] .reference-home-copy h1{letter-spacing:-.075em}
+body[data-theme="dark"] .reference-home-actions .reference-play{background:#f5f5f5;color:#111;border-color:#fff}
+body[data-theme="dark"] .reference-feature-strip{background:#0b0c0e;border-color:#292b30}
+body[data-theme="dark"] .reference-feature:nth-child(3) svg{color:#f1c638}
+body[data-theme="dark"] .card,body[data-theme="dark"] .stat,body[data-theme="dark"] .player,body[data-theme="dark"] .choice{
+  background:#121417;border-color:#2b2e33;box-shadow:none
+}
+
+/* 02 — COMIC: жёлтые комиксные панели и красные акценты */
+body[data-theme="comic"] .reference-home{
+  border:4px solid #211b16;border-radius:9px;
+  background:
+    radial-gradient(circle at 82% 30%,#fff8c7 0 2px,transparent 3px),
+    radial-gradient(circle at 82% 30%,#f3b91d 0 17%,transparent 17.5%),
+    repeating-conic-gradient(from 8deg at 82% 30%,#fff0a8 0deg 8deg,#ffdb55 8deg 16deg);
+  background-color:#ffdf45;
+  box-shadow:7px 7px 0 #211b16;
+}
+body[data-theme="comic"] .reference-home:before{
+  background:linear-gradient(90deg,#fff0a9dd 0%,#ffe45b99 57%,#f2b52b22 100%);
+}
+body[data-theme="comic"] .reference-home-copy h1{
+  color:#211b16;letter-spacing:-.055em;text-transform:uppercase;
+  text-shadow:3px 3px 0 #fff,6px 6px 0 #ed4b35;
+  transform:rotate(-1deg);transform-origin:left center;
+}
+body[data-theme="comic"] .reference-home-copy p{color:#211b16;font-weight:800}
+body[data-theme="comic"] .reference-home-art{filter:drop-shadow(6px 7px 0 #211b16)}
+body[data-theme="comic"] .troll-head path{stroke:#211b16!important}
+body[data-theme="comic"] .troll-spark{fill:#ed4b35}
+body[data-theme="comic"] .reference-home-actions .reference-play{
+  background:#ed4b35;color:#fff;border:3px solid #211b16;border-radius:5px;
+  box-shadow:4px 4px 0 #211b16;text-transform:uppercase
+}
+body[data-theme="comic"] .reference-feature-strip{
+  margin-top:10px;border:3px solid #211b16;border-radius:8px;
+  background:#fff4cb;box-shadow:5px 5px 0 #211b16
+}
+body[data-theme="comic"] .reference-feature{color:#211b16;font-weight:900;text-transform:uppercase}
+body[data-theme="comic"] .reference-feature+.reference-feature{border-color:#211b16}
+body[data-theme="comic"] .reference-feature svg{color:#ed4b35}
+body[data-theme="comic"] .card,body[data-theme="comic"] .stat,body[data-theme="comic"] .player,body[data-theme="comic"] .choice{
+  border:2px solid #211b16;box-shadow:4px 4px 0 #211b16;border-radius:7px
+}
+
+/* 03 — LIGHT: светлая игровая студия с синими акцентами */
+body[data-theme="light"] .reference-home{
+  border-color:#d3deeb;border-radius:22px;
+  background:
+    radial-gradient(ellipse at 82% 18%,#dceaff 0,transparent 42%),
+    linear-gradient(120deg,#fff 0%,#f2f7ff 64%,#e9f2ff 100%);
+  box-shadow:0 18px 50px #45658d12;
+}
+body[data-theme="light"] .reference-home:before{
+  background:radial-gradient(circle at 88% 70%,#3974c61c 0 5px,transparent 6px),
+    radial-gradient(circle at 94% 20%,#3974c614 0 3px,transparent 4px);
+}
+body[data-theme="light"] .reference-home-copy h1{color:#1d2b40}
+body[data-theme="light"] .reference-home-copy p{color:#53657c}
+body[data-theme="light"] .reference-home-art{filter:drop-shadow(0 16px 20px #5277a522)}
+body[data-theme="light"] .troll-head path{stroke:#243247!important}
+body[data-theme="light"] .troll-head path:first-child{fill:#f7fbff!important}
+body[data-theme="light"] .troll-spark{fill:#3974c6}
+body[data-theme="light"] .reference-home-actions .reference-play{
+  background:#3974c6;color:#fff;border-color:#3974c6;box-shadow:0 8px 20px #3974c633
+}
+body[data-theme="light"] .reference-feature-strip{
+  margin-top:12px;border:1px solid #d8e1ed;border-radius:15px;background:#fff;
+  box-shadow:0 10px 30px #2432470c
+}
+body[data-theme="light"] .reference-feature{color:#31435a}
+body[data-theme="light"] .reference-feature svg{color:#3974c6}
+body[data-theme="light"] .card,body[data-theme="light"] .stat,body[data-theme="light"] .player,body[data-theme="light"] .choice{
+  border-color:#d8e1ed;background:#fff;box-shadow:0 8px 24px #2432470b
+}
+
+/* 04 — NEON: кибер-аркада с бирюзовым свечением */
+body[data-theme="neon"] .reference-home{
+  border:1px solid #35f4ed;border-radius:13px;
+  background:
+    linear-gradient(#00eaff0b 1px,transparent 1px),
+    linear-gradient(90deg,#00eaff0b 1px,transparent 1px),
+    radial-gradient(ellipse at 78% 50%,#8b36ff36,transparent 48%),
+    linear-gradient(125deg,#080817,#11112a 65%,#09091b);
+  background-size:28px 28px,28px 28px,auto,auto;
+  box-shadow:0 0 0 1px #35f4ed22,inset 0 0 44px #00d9ff13,0 0 30px #00eaff22
+}
+body[data-theme="neon"] .reference-home:before{
+  background:linear-gradient(120deg,transparent 0 58%,#35f4ed0d 58.2% 58.7%,transparent 59%),
+    linear-gradient(60deg,transparent 0 79%,#e34cff14 79.2% 79.7%,transparent 80%)
+}
+body[data-theme="neon"] .reference-home-copy h1{
+  color:#fff;text-shadow:0 0 22px #35f4ed44;letter-spacing:-.055em
+}
+body[data-theme="neon"] .reference-home-copy p{color:#c6c5e4}
+body[data-theme="neon"] .reference-home-art{filter:drop-shadow(0 0 18px #35f4ed66)}
+body[data-theme="neon"] .troll-head path{stroke:#35f4ed!important}
+body[data-theme="neon"] .troll-spark{fill:#ff4dda}
+body[data-theme="neon"] .reference-home-actions .reference-play{
+  background:#35f4ed;color:#071515;border-color:#35f4ed;
+  box-shadow:0 0 18px #35f4ed77,0 0 45px #35f4ed22
+}
+body[data-theme="neon"] .reference-feature-strip{
+  margin-top:10px;border:1px solid #35f4ed66;border-radius:12px;
+  background:#0c0c20;box-shadow:0 0 20px #00eaff16
+}
+body[data-theme="neon"] .reference-feature{color:#d8faff}
+body[data-theme="neon"] .reference-feature svg{color:#35f4ed;filter:drop-shadow(0 0 5px #35f4ed99)}
+body[data-theme="neon"] .card,body[data-theme="neon"] .stat,body[data-theme="neon"] .player,body[data-theme="neon"] .choice{
+  background:#11112a;border-color:#454477;box-shadow:inset 0 0 22px #00eaff09,0 0 12px #00eaff12
+}
+
+/* 05 — VAPORWAVE: синтвейв, сетка и розово-бирюзовый закат */
+body[data-theme="vaporwave"] .reference-home{
+  border:1px solid #b77aff;border-radius:4px;
+  background:
+    linear-gradient(transparent 95%,#ff8bd81f 96%),
+    linear-gradient(90deg,transparent 95%,#43d9e81f 96%),
+    radial-gradient(ellipse at 78% 38%,#ff8bd855 0,transparent 35%),
+    linear-gradient(145deg,#211638,#30204b 55%,#122a49);
+  background-size:24px 24px,24px 24px,auto,auto;
+  box-shadow:0 0 28px #ff8bd833
+}
+body[data-theme="vaporwave"] .reference-home:after{
+  content:"";position:absolute;right:9%;top:13%;width:210px;height:210px;
+  border-radius:50%;background:repeating-linear-gradient(0deg,#ffb0df 0 8px,#e66ac8 9px 13px);
+  opacity:.16;z-index:-1;pointer-events:none
+}
+body[data-theme="vaporwave"] .reference-home-copy h1{
+  color:#fff0ff;text-shadow:3px 3px 0 #ff5fc4,6px 6px 0 #36cce0;
+  letter-spacing:-.06em
+}
+body[data-theme="vaporwave"] .reference-home-copy p{color:#f0c9ec}
+body[data-theme="vaporwave"] .reference-home-art{filter:drop-shadow(0 0 15px #ff8bd899)}
+body[data-theme="vaporwave"] .troll-head path{stroke:#211638!important}
+body[data-theme="vaporwave"] .troll-spark{fill:#43d9e8}
+body[data-theme="vaporwave"] .reference-home-actions .reference-play{
+  background:linear-gradient(100deg,#ff8bd8,#43d9e8);color:#35163c;border:0;
+  box-shadow:0 5px 22px #ff8bd855
+}
+body[data-theme="vaporwave"] .reference-feature-strip{
+  margin-top:12px;border:1px solid #79538e;border-radius:4px;
+  background:linear-gradient(90deg,#30204b,#3b2452 50%,#17334f)
+}
+body[data-theme="vaporwave"] .reference-feature{color:#fff0ff}
+body[data-theme="vaporwave"] .reference-feature svg{color:#ff8bd8}
+body[data-theme="vaporwave"] .card,body[data-theme="vaporwave"] .stat,body[data-theme="vaporwave"] .player,body[data-theme="vaporwave"] .choice{
+  border-color:#79538e;background:#30204b;box-shadow:0 8px 25px #120a2580
+}
+
+/* 06 — 8-BIT: пиксельная аркада */
+body[data-theme="8bit"] .reference-home{
+  border:4px solid #a8ff60;border-radius:0;
+  background:
+    linear-gradient(#a8ff6010 1px,transparent 1px),
+    linear-gradient(90deg,#a8ff6010 1px,transparent 1px),
+    linear-gradient(135deg,#172b38,#203b49 60%,#102630);
+  background-size:16px 16px,16px 16px,auto;
+  box-shadow:7px 7px 0 #07131b
+}
+body[data-theme="8bit"] .reference-home:before{
+  background:repeating-linear-gradient(135deg,transparent 0 24px,#a8ff6008 24px 32px)
+}
+body[data-theme="8bit"] .reference-home-copy h1{
+  color:#e5ffd5;font-family:monospace;letter-spacing:0;
+  text-shadow:4px 4px 0 #07131b,7px 7px 0 #276b54;
+  text-transform:uppercase
+}
+body[data-theme="8bit"] .reference-home-copy p{color:#b9d7c5;font-family:monospace;font-size:13px}
+body[data-theme="8bit"] .reference-home-art{image-rendering:pixelated;filter:drop-shadow(6px 6px 0 #07131b) saturate(.8)}
+body[data-theme="8bit"] .troll-head path{stroke:#07131b!important;stroke-width:14!important}
+body[data-theme="8bit"] .troll-spark{fill:#a8ff60}
+body[data-theme="8bit"] .reference-home-actions .reference-play{
+  background:#a8ff60;color:#14251c;border:3px solid #e5ffd5;border-radius:0;
+  box-shadow:5px 5px 0 #07131b;font-family:monospace;text-transform:uppercase
+}
+body[data-theme="8bit"] .reference-feature-strip{
+  margin-top:12px;border:3px solid #52736e;border-radius:0;background:#203b49;
+  box-shadow:5px 5px 0 #07131b
+}
+body[data-theme="8bit"] .reference-feature{color:#e5ffd5;font-family:monospace;text-transform:uppercase;font-size:10px}
+body[data-theme="8bit"] .reference-feature svg{color:#a8ff60}
+body[data-theme="8bit"] .card,body[data-theme="8bit"] .stat,body[data-theme="8bit"] .player,body[data-theme="8bit"] .choice{
+  border:3px solid #52736e;border-radius:0;background:#203b49;box-shadow:5px 5px 0 #07131b
+}
+
+/* 07 — HORROR: тёмная тревожная сцена с красным свечением */
+body[data-theme="horror"] .reference-home{
+  border:1px solid #75202b;border-radius:8px;
+  background:
+    radial-gradient(ellipse at 76% 52%,#a0002535 0,transparent 42%),
+    linear-gradient(115deg,#10090c,#1d1117 55%,#090608);
+  box-shadow:inset 0 0 75px #000b,0 12px 36px #0008
+}
+body[data-theme="horror"] .reference-home:before{
+  background:linear-gradient(90deg,transparent 0 54%,#8b001b12 100%),
+    repeating-linear-gradient(108deg,transparent 0 76px,#9b172311 77px 78px)
+}
+body[data-theme="horror"] .reference-home-copy h1{
+  color:#f1e5e8;text-shadow:0 0 20px #a0002844;letter-spacing:-.055em
+}
+body[data-theme="horror"] .reference-home-copy p{color:#c7aeb5}
+body[data-theme="horror"] .reference-home-art{filter:grayscale(.85) contrast(1.12) drop-shadow(0 0 17px #8b001b77)}
+body[data-theme="horror"] .troll-head path{stroke:#5e1827!important}
+body[data-theme="horror"] .troll-spark{fill:#d52c43}
+body[data-theme="horror"] .reference-home-actions .reference-play{
+  background:linear-gradient(135deg,#b3213c,#5c101f);color:#fff;border:1px solid #df4058;
+  box-shadow:0 0 20px #a0002544
+}
+body[data-theme="horror"] .reference-feature-strip{
+  margin-top:10px;border:1px solid #54232d;border-radius:8px;background:#160c11;
+  box-shadow:inset 0 0 30px #0009
+}
+body[data-theme="horror"] .reference-feature{color:#e7d8dd}
+body[data-theme="horror"] .reference-feature svg{color:#d52c43}
+body[data-theme="horror"] .card,body[data-theme="horror"] .stat,body[data-theme="horror"] .player,body[data-theme="horror"] .choice{
+  background:#1d1117;border-color:#54232d;box-shadow:inset 0 0 24px #0008
+}
+
+/* 08 — Y2K: глянцевый цифровой интерфейс начала 2000-х */
+body[data-theme="y2k"] .reference-home{
+  border:2px solid #fff;border-radius:24px;
+  background:
+    radial-gradient(ellipse at 80% 15%,#fff 0,#dff6ff 15%,transparent 43%),
+    linear-gradient(130deg,#eaf7ff,#d9f0ff 46%,#fbe4f5);
+  box-shadow:inset 0 0 0 1px #9bc8ec,0 10px 0 #b9a9e3,0 20px 35px #6886a833
+}
+body[data-theme="y2k"] .reference-home:before{
+  background:linear-gradient(135deg,#ffffff88 0 12%,transparent 12.2% 70%,#fff7 70.2% 72%,transparent 72.2%)
+}
+body[data-theme="y2k"] .reference-home-copy h1{
+  color:#314b70;text-shadow:2px 3px 0 #fff,4px 5px 0 #b6d5ee;
+  letter-spacing:-.07em
+}
+body[data-theme="y2k"] .reference-home-copy p{color:#526f91}
+body[data-theme="y2k"] .reference-home-art{filter:drop-shadow(0 12px 18px #7e8dc755) saturate(.85)}
+body[data-theme="y2k"] .troll-head path{stroke:#5b78a1!important}
+body[data-theme="y2k"] .troll-spark{fill:#ff83c8}
+body[data-theme="y2k"] .reference-home-actions .reference-play{
+  background:linear-gradient(110deg,#ff83c8,#8bdcff);color:#fff;border:2px solid #fff;
+  border-radius:24px;box-shadow:0 5px 0 #9c8acb;text-shadow:0 1px 2px #6b5a9a
+}
+body[data-theme="y2k"] .reference-feature-strip{
+  margin-top:18px;border:2px solid #fff;border-radius:18px;
+  background:linear-gradient(100deg,#fff,#e6f7ff 50%,#fff0f8);box-shadow:0 5px 0 #b9a9e3
+}
+body[data-theme="y2k"] .reference-feature{color:#496487}
+body[data-theme="y2k"] .reference-feature svg{color:#ed82c5}
+body[data-theme="y2k"] .card,body[data-theme="y2k"] .stat,body[data-theme="y2k"] .player,body[data-theme="y2k"] .choice{
+  background:linear-gradient(145deg,#fff,#f0f8ff);border:1px solid #c8dff4;box-shadow:0 5px 0 #c6b8e5
+}
+
+/* 09 — HACKER: терминальная панель с зелёным кодом */
+body[data-theme="hacker"] .reference-home{
+  border:1px solid #39ff70;border-radius:2px;
+  background:
+    repeating-linear-gradient(0deg,#39ff700b 0 1px,transparent 1px 5px),
+    linear-gradient(90deg,#39ff7008 1px,transparent 1px),
+    radial-gradient(ellipse at 83% 45%,#39ff7018 0,transparent 42%),
+    #050b07;
+  background-size:auto,22px 22px,auto,auto;
+  box-shadow:0 0 24px #39ff7022,inset 0 0 55px #000
+}
+body[data-theme="hacker"] .reference-home:before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(transparent 0 48%,#39ff7010 50%,transparent 52%);
+  background-size:100% 9px;pointer-events:none
+}
+body[data-theme="hacker"] .reference-home-copy h1{
+  color:#b9ffca;font-family:ui-monospace,monospace;
+  font-size:clamp(38px,4.8vw,62px);letter-spacing:-.07em;
+  text-shadow:0 0 13px #39ff7066
+}
+body[data-theme="hacker"] .reference-home-copy h1:before{content:"> ";color:#39ff70}
+body[data-theme="hacker"] .reference-home-copy p{
+  color:#75c88b;font-family:ui-monospace,monospace;font-size:13px
+}
+body[data-theme="hacker"] .reference-home-art{filter:grayscale(1) sepia(1) hue-rotate(70deg) saturate(2) drop-shadow(0 0 14px #39ff7077)}
+body[data-theme="hacker"] .troll-head path{stroke:#39ff70!important}
+body[data-theme="hacker"] .troll-spark{fill:#39ff70}
+body[data-theme="hacker"] .reference-home-actions .reference-play{
+  background:#39ff70;color:#041108;border:1px solid #39ff70;border-radius:2px;
+  font-family:ui-monospace,monospace;text-transform:uppercase;
+  box-shadow:0 0 18px #39ff7055
+}
+body[data-theme="hacker"] .reference-feature-strip{
+  margin-top:10px;border:1px solid #1d5830;border-radius:2px;background:#0b160e;
+  box-shadow:inset 0 0 28px #39ff700c
+}
+body[data-theme="hacker"] .reference-feature{color:#b9ffca;font-family:ui-monospace,monospace;text-transform:uppercase;font-size:10px}
+body[data-theme="hacker"] .reference-feature svg{color:#39ff70}
+body[data-theme="hacker"] .card,body[data-theme="hacker"] .stat,body[data-theme="hacker"] .player,body[data-theme="hacker"] .choice{
+  background:#0b160e;border-color:#1d5830;box-shadow:inset 0 0 22px #39ff700a
+}
+
+/* 10 — PASTEL: мягкие округлые панели и нежные переливы */
+body[data-theme="pastel"] .reference-home{
+  border:1px solid #fff;border-radius:28px;
+  background:
+    radial-gradient(ellipse at 85% 18%,#e8d8ff 0,transparent 40%),
+    radial-gradient(ellipse at 12% 88%,#d8f5ec 0,transparent 36%),
+    linear-gradient(130deg,#fffaff,#f4edf9 54%,#edf8f5);
+  box-shadow:0 18px 50px #aa8db526
+}
+body[data-theme="pastel"] .reference-home:before{
+  background:radial-gradient(circle at 75% 20%,#fff9 0 2px,transparent 3px),
+    radial-gradient(circle at 90% 65%,#c49ad933 0 8px,transparent 9px),
+    radial-gradient(circle at 62% 78%,#9dcfc433 0 5px,transparent 6px)
+}
+body[data-theme="pastel"] .reference-home-copy h1{
+  color:#574c68;letter-spacing:-.065em;text-shadow:2px 3px 0 #fff
+}
+body[data-theme="pastel"] .reference-home-copy p{color:#83748f}
+body[data-theme="pastel"] .reference-home-art{filter:drop-shadow(0 14px 18px #ad91be44) saturate(.72)}
+body[data-theme="pastel"] .troll-head path{stroke:#867398!important}
+body[data-theme="pastel"] .troll-spark{fill:#c49ad9}
+body[data-theme="pastel"] .reference-home-actions .reference-play{
+  background:linear-gradient(120deg,#c49ad9,#e7a9c8);color:#fff;border:0;
+  border-radius:24px;box-shadow:0 7px 18px #c49ad955
+}
+body[data-theme="pastel"] .reference-feature-strip{
+  margin-top:14px;border:1px solid #fff;border-radius:20px;
+  background:linear-gradient(110deg,#fffaff,#f4edf9 52%,#edf8f5);
+  box-shadow:0 8px 24px #aa8db51c
+}
+body[data-theme="pastel"] .reference-feature{color:#796a8e}
+body[data-theme="pastel"] .reference-feature svg{color:#b58bcf}
+body[data-theme="pastel"] .card,body[data-theme="pastel"] .stat,body[data-theme="pastel"] .player,body[data-theme="pastel"] .choice{
+  background:#fffaff;border-color:#e4d7ec;border-radius:18px;
+  box-shadow:0 8px 24px #aa8db51c
+}
+
+/* Общие детали страниц — тема влияет и на разделы вне главной */
+body[data-theme="comic"] .page-head h1,body[data-theme="comic"] .section-heading{
+  text-transform:uppercase;text-shadow:2px 2px 0 #ffe56b
+}
+body[data-theme="neon"] .page-head h1,body[data-theme="neon"] .section-heading{
+  text-shadow:0 0 18px #35f4ed33
+}
+body[data-theme="vaporwave"] .page-head h1{
+  text-shadow:2px 2px 0 #ff8bd8,4px 4px 0 #43d9e8
+}
+body[data-theme="horror"] .page-head h1{
+  text-shadow:0 0 18px #a0002544;letter-spacing:.02em
+}
+body[data-theme="y2k"] .page-head h1{ text-shadow:2px 3px 0 #fff,4px 4px 0 #b9a9e3 }
+body[data-theme="hacker"] .page-head h1:before{content:"> ";color:#39ff70}
+body[data-theme="pastel"] .page-head h1{color:#796a9e}
+body[data-theme="light"] .page-head h1{color:#314b70}
+body[data-theme="8bit"] .page-head h1{font-family:ui-monospace,monospace;text-transform:uppercase}
+body[data-theme="comic"] .theme-card.theme-selected{box-shadow:4px 4px 0 #211b16}
+body[data-theme="neon"] .theme-card.theme-selected{box-shadow:0 0 16px #35f4ed55}
+body[data-theme="vaporwave"] .theme-card.theme-selected{box-shadow:0 0 16px #ff8bd855}
+body[data-theme="horror"] .theme-card.theme-selected{box-shadow:0 0 16px #d52c4344}
+body[data-theme="y2k"] .theme-card.theme-selected{box-shadow:0 5px 0 #b9a9e3}
+body[data-theme="hacker"] .theme-card.theme-selected{box-shadow:0 0 16px #39ff7044}
+body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49ad944}
+
+@media(max-width:680px){
+  body[data-theme="comic"] .reference-home{box-shadow:4px 4px 0 #211b16}
+  body[data-theme="neon"] .reference-home{box-shadow:0 0 18px #35f4ed33}
+  body[data-theme="vaporwave"] .reference-home:after{width:145px;height:145px;right:6%;top:45%}
+  body[data-theme="8bit"] .reference-home{box-shadow:4px 4px 0 #07131b}
+  body[data-theme="pastel"] .reference-home{border-radius:20px}
+}
