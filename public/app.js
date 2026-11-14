@@ -58,8 +58,112 @@ function render(token=viewRenderId){
   else if(view==="profile")profilePage(token);
   else if(view==="admin")adminPage(token);
 }
+function trollfaceForTheme(theme){
+  const t=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"].includes(theme)?theme:"dark";
+  const faces={
+    dark:{
+      label:"Классический Trollface с короной",
+      bg:"",
+      head:'<path class="tf-head" d="M105 82C111 40 159 22 225 27c75-7 128 29 135 89 16 18 21 43 12 70-7 16-21 28-39 34-11 53-58 84-111 84-58 0-104-32-116-86-30-8-49-31-49-61 0-19 10-36 28-48z"/>',
+      eyes:'<path class="tf-line" d="M139 118c14-18 36-22 55-10m51-5c19-14 43-12 58 4"/><path class="tf-eye" d="M145 130c14-13 31-13 45 0-2 17-11 25-23 24-13-1-21-10-22-24zm103-11c15-12 33-9 44 5-3 16-13 23-25 21-13-2-20-11-19-26z"/>',
+      mouth:'<path class="tf-mouth" d="M126 176c28-29 60-32 91-14 17 10 37 9 55-2 29-17 60-12 82 12-13 51-52 79-114 80-58 1-100-24-114-76z"/><path class="tf-teeth" d="M145 181c17-12 36-14 54-6l-3 26c-16-5-30-2-44 7zm62-8c18 4 34 3 50-4l8 25c-18 8-37 8-56 2zm69-5c16-5 30-2 43 8l-14 24c-11-7-21-8-34-4z"/>',
+      extra:'<path class="tf-crown" d="M174 35l9-28 29 21 24-24 22 29 29-13 4 40-116 5z"/><path class="tf-crown-line" d="M174 62l119-2"/>'
+    },
+    comic:{
+      label:"Комиксный Trollface — громко смеётся",
+      bg:'<path class="tf-burst" d="M24 76l44 12-28-35 52 11-15-42 47 29 8-45 28 40 35-38 5 52 47-29-8 47 53-13-28 38 54 8-49 25 39 27-53 3 23 43-49-18 5 49-38-31-13 50-26-43-29 39-8-49-42 30 8-52-48 16 29-42-53-5 46-27-42-26 54-2z"/>',
+      head:'<path class="tf-head" d="M103 78c12-42 60-60 124-54 72-4 121 35 128 92 22 20 23 54 4 75-16 17-39 22-58 17-22 46-70 69-121 59-50-9-83-39-88-83-26-7-42-29-42-55 0-22 18-43 53-51z"/>',
+      eyes:'<path class="tf-brow" d="M135 111l-8-15 69-6 6 17m42-20l8-17 68 18-10 15"/><ellipse class="tf-eye-wide" cx="166" cy="135" rx="25" ry="32"/><ellipse class="tf-eye-wide" cx="278" cy="129" rx="25" ry="32"/><circle class="tf-pupil" cx="172" cy="137" r="9"/><circle class="tf-pupil" cx="272" cy="132" r="9"/>',
+      mouth:'<path class="tf-mouth" d="M111 175c8-25 37-35 70-29 30 5 48 21 74 12 33-12 77-9 91 18 18 38-7 89-53 105-61 22-138 5-168-31-18-22-23-51-14-75z"/>',
+      extra:'<path class="tf-teeth-wide" d="M132 174l32-9 7 31-30 5zm44-9l34 3 2 29-34-2zm45 4l32-8 8 28-36 8zm48-11l31-1 2 30-33 2zm-126 50l32-6 9 27-29 8zm47-6l34-1 3 29-31 2zm48 1l35-6 7 27-37 8z"/><path class="tf-tongue" d="M201 250c22-18 49-17 69 1-8 17-20 26-36 26-18 0-28-9-33-27z"/><path class="tf-exclaim" d="M360 43l11-35 8 3-8 35zm18 20l23-15 4 7-23 15z"/>'
+    },
+    light:{
+      label:"Добрый Trollface с нимбом и крыльями",
+      bg:'<path class="tf-cloud" d="M15 245c-15-22 2-46 29-43 2-28 43-38 59-13 23-12 48 8 39 30 28 7 31 36 5 47H31c-10-4-16-10-16-21zm307-175c-8-20 11-37 31-29 8-25 43-23 50 2 24-2 32 27 12 39h-75c-10-1-16-5-18-12z"/>',
+      head:'<path class="tf-head" d="M111 84c12-42 59-60 120-55 69-4 119 34 125 91 20 19 23 50 6 71-12 16-33 24-53 20-19 48-66 74-117 65-51-8-86-40-91-84-28-7-44-29-44-55 0-22 18-43 54-53z"/>',
+      eyes:'<path class="tf-line" d="M137 134c12 16 29 16 43-1m68 0c12 16 29 16 43-1"/>',
+      mouth:'<path class="tf-mouth-light" d="M139 177c19 35 46 52 84 52 41 0 68-19 87-53-30 11-56 13-86 13-31 0-57-3-85-12z"/>',
+      extra:'<ellipse class="tf-halo" cx="230" cy="24" rx="63" ry="15"/><path class="tf-wing" d="M93 145c-39-30-64-20-71 4 20-6 34 3 44 22-26-7-38 8-39 26 24-10 43-3 59 16m220-68c39-30 64-20 71 4-20-6-34 3-44 22 26-7 38 8 39 26-24-10-43-3-59 16"/><path class="tf-cheek" d="M132 165c12 7 22 7 32 1m132-1c12 7 22 7 32 1"/>'
+    },
+    neon:{
+      label:"Неоновый Trollface в светящихся очках",
+      bg:'<path class="tf-neon-ring" d="M28 92l35-35 35 35-35 35zM362 51l30 30-30 30-30-30zM382 242l20 20-20 20-20-20z"/>',
+      head:'<path class="tf-head" d="M109 83c12-44 60-60 122-55 70-4 119 34 126 91 20 20 22 51 4 72-13 16-34 23-54 19-20 48-66 75-118 65-51-8-85-40-91-84-28-7-44-29-44-55 0-22 18-43 55-53z"/>',
+      eyes:'<path class="tf-glasses" d="M127 118l86-13 9 48c-3 20-18 30-42 29-27-1-42-15-46-38zm121-13l86-4-4 49c-5 21-23 31-46 29-25-2-40-16-40-38z"/><path class="tf-glint" d="M147 129l36-14m-23 27l16-6m94-11l39-10"/>',
+      mouth:'<path class="tf-mouth" d="M129 183c27-26 57-28 89-12 17 9 35 8 53-2 29-16 59-10 79 12-12 47-52 74-112 75-56 0-97-23-109-73z"/><path class="tf-teeth" d="M148 187l46-7-1 27-42 6zm57-8l50-4 2 28-50 3zm61-7l45 2-8 26-40-1z"/>',
+      extra:'<path class="tf-lightning" d="M370 134l-26 49h23l-14 39 43-60h-25l16-28z"/><path class="tf-circuit" d="M68 210h28v20h-28m278 37h26v-17h24"/>'
+    },
+    vaporwave:{
+      label:"Vaporwave Trollface в ретро-очках",
+      bg:'<circle class="tf-sun" cx="323" cy="83" r="49"/><path class="tf-sun-lines" d="M274 77h98m-95 20h92m-80 20h67"/>',
+      head:'<path class="tf-head" d="M109 83c12-44 60-60 122-55 70-4 119 34 126 91 20 20 22 51 4 72-13 16-34 23-54 19-20 48-66 75-118 65-51-8-85-40-91-84-28-7-44-29-44-55 0-22 18-43 55-53z"/>',
+      eyes:'<path class="tf-shades" d="M126 119q43-31 86-7l8 39q-34 31-78 3zm124-7q46-25 87 5l-10 37q-42 24-74-5z"/><path class="tf-shade-line" d="M145 128l54 22m69-26l48 22"/>',
+      mouth:'<path class="tf-mouth" d="M130 180c26-24 57-28 87-11 18 10 36 9 53-2 29-17 61-11 81 13-13 47-54 72-114 72-55 0-95-23-107-72z"/><path class="tf-teeth" d="M148 184l45-7-1 27-43 6zm58-9l48-3 2 28-49 3zm59-7l44 2-8 26-39-2z"/>',
+      extra:'<path class="tf-palm" d="M85 290h270"/><path class="tf-star" d="M88 70l7 16 17 1-13 11 4 17-15-9-15 9 4-17-13-11 17-1zM390 175l6 13 14 1-11 9 3 14-12-7-12 7 3-14-11-9 14-1z"/>'
+    },
+    "8bit":{
+      label:"Пиксельный Trollface из 8-bit игры",
+      bg:'<path class="tf-pixel-bg" d="M28 46h38v38H28zm310 0h38v38h-38zM12 254h34v34H12zm340-10h42v42h-42z"/><path class="tf-pixel-star" d="M75 34h15v15H75zm255 260h15v15h-15z"/>',
+      head:'<path class="tf-pixel-head" d="M112 64h210v24h27v31h24v108h-24v38h-37v24H142v-24h-37v-38H81V119h31z"/>',
+      eyes:'<path class="tf-pixel-eye" d="M130 128h51v26h-51zm140 0h51v26h-51z"/><path class="tf-pixel-pupil" d="M156 128h25v26h-25zm140 0h25v26h-25z"/>',
+      mouth:'<path class="tf-pixel-mouth" d="M116 180h26v-12h52v12h52v-12h52v12h38v62h-26v26H142v-26h-26z"/><path class="tf-pixel-teeth" d="M142 180h36v25h-36zm55 0h36v25h-36zm55 0h36v25h-36zm-83 42h36v22h-36zm55 0h36v22h-36zm55 0h36v22h-36z"/>',
+      extra:'<path class="tf-pixel-cap" d="M148 46h128v18H148zm22-20h82v20h-82z"/><path class="tf-pixel-body" d="M120 285h190v42H120z"/>'
+    },
+    horror:{
+      label:"Зловещий Trollface с красными глазами и клыками",
+      bg:'<path class="tf-horror-smoke" d="M20 90c32-57 65-36 75 8-38-2-45 28-75 30zm330-53c39-38 70-15 76 24-32-7-50 6-76-24zM20 270c32-37 49-13 55 23-29-9-44 1-55-23z"/>',
+      head:'<path class="tf-horror-head" d="M111 80c14-48 64-62 124-55 71-4 121 36 127 94 22 19 25 52 7 75-13 16-35 22-55 17-20 48-67 73-119 63-51-8-85-40-91-85-29-7-45-29-45-56 0-23 18-43 52-53z"/>',
+      eyes:'<path class="tf-horror-brow" d="M126 117l75 24m-75-24l76-3m61-2l78-20m-76 44l76-24"/><ellipse class="tf-horror-eye" cx="166" cy="143" rx="16" ry="9"/><ellipse class="tf-horror-eye" cx="291" cy="137" rx="16" ry="9"/><circle class="tf-horror-glow" cx="167" cy="143" r="6"/><circle class="tf-horror-glow" cx="291" cy="137" r="6"/>',
+      mouth:'<path class="tf-horror-mouth" d="M116 178c29-23 58-22 92-9 18 8 35 7 53-4 31-19 67-11 89 13-9 54-49 81-111 82-60 0-107-26-123-82z"/><path class="tf-fang" d="M143 180l22 4-8 28zm50 4l21 2-9 30zm94-6l22-2-14 29zm-45 38l-17 27-15-28z"/>',
+      extra:'<path class="tf-horror-shadow" d="M96 105q-30 39-6 76m286-74q22 42 0 77"/><path class="tf-horror-scratch" d="M370 210l-13 29 11 18-24 27"/>'
+    },
+    y2k:{
+      label:"Y2K Trollface со звёздными очками",
+      bg:'<path class="tf-chrome" d="M24 50l30-30 30 30-30 30zm320 210l24-24 24 24-24 24z"/>',
+      head:'<path class="tf-head tf-head-y2k" d="M109 83c12-44 60-60 122-55 70-4 119 34 126 91 20 20 22 51 4 72-13 16-34 23-54 19-20 48-66 75-118 65-51-8-85-40-91-84-28-7-44-29-44-55 0-22 18-43 55-53z"/>',
+      eyes:'<path class="tf-y2k-glasses" d="M130 115h80l10 53h-92zm126 0h78l-9 53h-90z"/><path class="tf-star-eyes" d="M166 128l7 14 16 2-12 11 3 15-14-8-14 8 3-15-12-11 16-2zm125 0l7 14 16 2-12 11 3 15-14-8-14 8 3-15-12-11 16-2z"/>',
+      mouth:'<path class="tf-mouth" d="M132 180c25-25 55-29 86-12 18 10 36 9 53-2 29-17 60-11 80 13-13 46-53 72-113 72-55 0-94-23-106-71z"/><path class="tf-teeth" d="M149 184l44-7-1 27-42 6zm58-9l48-3 2 28-49 3zm60-7l43 2-8 26-38-2z"/>',
+      extra:'<path class="tf-y2k-shine" d="M90 115l12-25 12 25 25 12-25 12-12 25-12-25-25-12zM350 105l8-18 8 18 18 8-18 8-8 18-8-18-18-8z"/>'
+    },
+    hacker:{
+      label:"Хакерский Trollface в капюшоне",
+      bg:'<path class="tf-hood" d="M94 112c-4-82 53-119 136-111 75 6 124 51 129 127l-28-22c-18-29-52-42-99-43-51-2-91 12-113 49z"/><path class="tf-code" d="M44 70l9 13-9 13m22-26l-9 13 9 13m284 89l9 13-9 13m22-26l-9 13 9 13"/>',
+      head:'<path class="tf-hacker-head" d="M121 102c18-39 62-54 111-52 61-3 103 25 119 72 14 20 13 47-4 64-12 12-28 18-45 15-20 39-58 61-108 54-45-7-74-33-80-71-23-7-36-25-36-46 0-15 15-29 43-36z"/>',
+      eyes:'<path class="tf-hacker-eye" d="M139 141l45-12 19 12-20 9h-40zm107-3l48-17 14 14-19 11h-42z"/><path class="tf-hacker-glow" d="M150 143h37m79-3h38"/>',
+      mouth:'<path class="tf-hacker-mouth" d="M140 183c23-21 48-24 76-10 16 8 31 7 47-2 27-14 53-8 70 12-12 39-46 61-98 61-48 0-81-20-95-61z"/><path class="tf-hacker-teeth" d="M155 186h40v22h-40zm51-7h42v24h-42zm54 0h37l-6 23h-36z"/>',
+      extra:'<path class="tf-code" d="M68 151h18m-9-9v18m282-106h18m-9-9v18M80 250h18m-9-9v18m262 44h18m-9-9v18"/>'
+    },
+    pastel:{
+      label:"Милый пастельный Trollface с румянцем",
+      bg:'<path class="tf-heart" d="M42 104c-18-21-51 4-10 39 41-35 8-60-10-39zm328-41c-18-21-51 4-10 39 41-35 8-60-10-39zM348 260c-18-21-51 4-10 39 41-35 8-60-10-39z"/>',
+      head:'<path class="tf-head tf-head-pastel" d="M109 83c12-44 60-60 122-55 70-4 119 34 126 91 20 20 22 51 4 72-13 16-34 23-54 19-20 48-66 75-118 65-51-8-85-40-91-84-28-7-44-29-44-55 0-22 18-43 55-53z"/>',
+      eyes:'<path class="tf-heart-eyes" d="M139 128c-17-17-39 5 0 35 39-30 17-52 0-35zm124-1c-17-17-39 5 0 35 39-30 17-52 0-35z"/>',
+      mouth:'<path class="tf-pastel-mouth" d="M154 189c18 17 43 25 72 25 29 0 52-8 70-25-18 32-41 47-70 47-30 0-55-15-72-47z"/>',
+      extra:'<ellipse class="tf-blush" cx="125" cy="173" rx="22" ry="10"/><ellipse class="tf-blush" cx="326" cy="173" rx="22" ry="10"/><path class="tf-hand" d="M93 215c-13-15-32-9-29 9 2 12 17 21 35 27m268-36c13-15 32-9 29 9-2 12-17 21-35 27"/>'
+    }
+  };
+  const v=faces[t]||faces.dark;
+  return \`<svg class="troll-illustration trollface-\${t}" viewBox="0 0 420 340" role="img" aria-label="\${v.label}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="tf-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="11" stdDeviation="9" flood-color="#000" flood-opacity=".42"/></filter>
+      <filter id="tf-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <linearGradient id="tf-silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".52" stop-color="#e7e9ef"/><stop offset="1" stop-color="#aeb8c5"/></linearGradient>
+    </defs>
+    \${v.bg}
+    <g filter="url(#tf-shadow)">
+      <path class="tf-body" d="M58 338c7-50 37-80 92-91h117c55 10 89 42 98 91z"/>
+      \${v.extra.includes("tf-hood")?"":""}
+      \${v.head}
+      \${v.eyes}
+      \${v.mouth}
+      \${t==="dark"?'<path class="tf-hand-point" d="M312 265c15-18 32-20 45-8l35 39-17 17-39-27-9 54h-27l4-53-18 17-17-17z"/>':""}
+      \${t==="light"?'<path class="tf-wing" d="M75 178c-44-25-59-9-61 11 21-5 34 4 43 20-21-2-30 12-29 25 21-9 39-2 54 13m260-69c44-25 59-9 61 11-21-5-34 4-43 20 21-2 30 12 29 25-21-9-39-2-54 13"/>':""}
+    </g>
+  </svg>\`;
+}
+
 function home(){
-  const trollface='<img class="troll-illustration" src="https://wallpapers.com/images/hd/trollface-meme-classic-2n53k9w7jw1zwsn2.png" alt="Классический Trollface" loading="eager" decoding="async">';
+  const trollface=trollfaceForTheme(me?.theme || "dark")
   app.innerHTML=`<section class="reference-home">
     <div class="reference-home-copy">
       <h1>УГАДАЙ МЕМ</h1>
