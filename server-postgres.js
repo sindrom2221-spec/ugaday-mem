@@ -42,7 +42,7 @@ const sessionMaxAgeDays=Math.min(3650,Math.max(1,Number(process.env.SESSION_MAX_
 const sessionMaxAgeMs=sessionMaxAgeDays*24*60*60*1000;
 const sessionStore=new PgSession({pool,tableName:"user_sessions",createTableIfMissing:true,pruneSessionInterval:900});
 const sessionMiddleware=session({name:"ugm.sid",secret:process.env.SESSION_SECRET,resave:false,saveUninitialized:false,rolling:true,store:sessionStore,cookie:{httpOnly:true,sameSite:"lax",secure:process.env.NODE_ENV==="production",maxAge:sessionMaxAgeMs}});
-app.use(helmet({ contentSecurityPolicy: false }));app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(sessionMiddleware);
