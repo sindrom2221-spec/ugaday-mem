@@ -14,31 +14,7 @@
 <a class="brand" href="#"><span class="brand-mark">У</span> УГАДАЙ МЕМ</a>
 <nav id="nav" class="nav"></nav><div id="user-chip"></div>
 </header>
-<section class="partner-ad" aria-label="Реклама сайта Depni Hatu">
-  <div class="partner-ad-heading">
-    <div class="partner-ad-copy">
-      <span class="partner-ad-eyebrow">РЕКЛАМА · ПАРТНЁРСКИЙ САЙТ</span>
-      <h2>DEPNI HATU</h2>
-      <p>Посмотри сайт партнёра прямо здесь или открой его в отдельной вкладке.</p>
-    </div>
-    <a class="partner-ad-link" href="https://depni-hatu.onrender.com/" target="_blank" rel="noopener noreferrer">
-      Открыть сайт <span aria-hidden="true">↗</span>
-    </a>
-  </div>
-  <div class="partner-ad-preview">
-    <iframe
-      src="https://depni-hatu.onrender.com/"
-      title="Предпросмотр сайта Depni Hatu"
-      loading="lazy"
-      referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">
-    </iframe>
-  </div>
-  <div class="partner-ad-foot">
-    <span>ПАРТНЁРСКИЙ ПРОЕКТ</span>
-    <a href="https://depni-hatu.onrender.com/" target="_blank" rel="noopener noreferrer">Перейти на depni-hatu.onrender.com ↗</a>
-  </div>
-</section>
+
 <main id="app"><div class="loading">Загрузка…</div></main>
 
 <footer>УГАДАЙ МЕМ <span>Играйте с друзьями. Угадывайте мемы.</span></footer>
@@ -55,5 +31,75 @@
   <div class="scare-word">БУУУ!!!</div>
   <button id="close-jumpscare" class="scare-close" type="button">Закрыть</button>
 </div>
+
+<!-- Отдельное всплывающее рекламное окно Depni Hatu -->
+<button id="partner-ad-open" class="partner-ad-fab" type="button" aria-label="Открыть рекламу Depni Hatu">
+  <span class="partner-ad-fab-label">РЕКЛАМА</span>
+  <strong>DEPNI HATU</strong>
+  <span aria-hidden="true">↗</span>
+</button>
+<div id="partner-ad-modal" class="partner-ad-modal" aria-hidden="true">
+  <section class="partner-ad-dialog" role="dialog" aria-modal="true" aria-labelledby="partner-ad-title">
+    <header class="partner-ad-dialog-head">
+      <div>
+        <span class="partner-ad-eyebrow">ПАРТНЁРСКИЙ ПРОЕКТ · РЕКЛАМА</span>
+        <h2 id="partner-ad-title">DEPNI HATU</h2>
+      </div>
+      <button id="partner-ad-close" class="partner-ad-close" type="button" aria-label="Закрыть рекламу">×</button>
+    </header>
+    <div class="partner-ad-dialog-body">
+      <p>Загляни на сайт Depni Hatu</p>
+      <iframe
+        src="https://depni-hatu.onrender.com/"
+        title="Сайт Depni Hatu"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    </div>
+    <footer class="partner-ad-dialog-foot">
+      <span>DEPNI HATU</span>
+      <div class="partner-ad-dialog-actions">
+        <button id="partner-ad-dismiss" class="partner-ad-dismiss" type="button">Закрыть</button>
+        <a class="partner-ad-link" href="https://depni-hatu.onrender.com/" target="_blank" rel="noopener noreferrer">Перейти на сайт ↗</a>
+      </div>
+    </footer>
+  </section>
+</div>
+<script>
+(() => {
+  const modal = document.getElementById("partner-ad-modal");
+  const openButton = document.getElementById("partner-ad-open");
+  const closeButton = document.getElementById("partner-ad-close");
+  const dismissButton = document.getElementById("partner-ad-dismiss");
+  if (!modal || !openButton) return;
+
+  const openAd = () => {
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("partner-ad-modal-open");
+    try { sessionStorage.setItem("depni-hatu-ad-seen", "1"); } catch (_) {}
+  };
+  const closeAd = () => {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("partner-ad-modal-open");
+  };
+
+  openButton.addEventListener("click", openAd);
+  closeButton?.addEventListener("click", closeAd);
+  dismissButton?.addEventListener("click", closeAd);
+  modal.addEventListener("click", event => {
+    if (event.target === modal) closeAd();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) closeAd();
+  });
+
+  let alreadySeen = false;
+  try { alreadySeen = sessionStorage.getItem("depni-hatu-ad-seen") === "1"; } catch (_) {}
+  if (!alreadySeen) window.setTimeout(openAd, 1300);
+})();
+</script>
 <script src="/socket.io/socket.io.js"></script><script src="/app.js"></script>
 </body></html>
