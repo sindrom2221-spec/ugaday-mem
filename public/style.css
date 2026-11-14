@@ -1538,3 +1538,16 @@ body[data-theme="pastel"] .tf-body{fill:#f2dff5;stroke:#d69bcf}
 @media(max-width:680px){
   .troll-illustration{width:min(100%,340px);height:100%}
 }
+
+
+/* Дополнительные детали новых выражений */
+.tf-burst{fill:#ffd83b;stroke:#17100c;stroke-width:7;stroke-linejoin:round}
+.tf-cloud{fill:#fff;stroke:#d5e7f9;stroke-width:4}
+.tf-hand-point{fill:#f4f4ef;stroke:#08090b;stroke-width:10;stroke-linejoin:round}
+.trollface-comic .tf-burst{fill:#ffe047;stroke:#17100c}
+.trollface-light .tf-halo{filter:drop-shadow(0 0 9px #ffc93b)}
+.trollface-neon .tf-head{stroke:#2bf2ff;filter:url(#tf-glow)}
+.trollface-vaporwave .tf-sun{filter:drop-shadow(0 0 10px #ff60d5)}
+.trollface-horror .tf-horror-head{filter:drop-shadow(0 0 16px #b10e2a)}
+.trollface-hacker .tf-hood{filter:drop-shadow(0 0 12px #39ff70)}
+.trollface-pastel .tf-heart{filter:drop-shadow(0 2px 4px #ef79bc55)}
