@@ -980,7 +980,8 @@ body[data-theme="dark"]{
   min-width:0;height:350px;margin:-5px -15px -5px 0;
 }
 .troll-illustration{
-  display:block;width:min(100%,455px);height:100%;overflow:visible;
+  display:block;width:min(100%,455px);height:auto;max-height:100%;
+  object-fit:contain;object-position:center bottom;overflow:visible;
   filter:drop-shadow(0 18px 24px #0008);
 }
 .troll-spark{fill:#efefef;opacity:.95}
