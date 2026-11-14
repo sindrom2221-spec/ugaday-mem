@@ -1455,99 +1455,161 @@ body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49a
 }
 
 
-/* Десять отдельных выражений Trollface — рисуются локально, без внешних картинок */
-.troll-illustration{
-  display:block;width:min(100%,455px);height:100%;max-height:100%;
-  overflow:visible;filter:drop-shadow(0 18px 24px #0008);
+
+
+/* Один оригинальный Trollface для всех тем; меняются только накладываемые аксессуары */
+.trollface-stage{
+  position:relative;isolation:isolate;display:flex;align-items:flex-end;justify-content:center;
+  width:min(100%,455px);height:350px;min-width:0;margin:0 auto;overflow:visible;
 }
-.reference-home .reference-home-art{filter:none!important}
-.tf-body{fill:#101114;stroke:#050506;stroke-width:10;stroke-linejoin:round}
-.tf-head{fill:#f5f5f2;stroke:#08090b;stroke-width:11;stroke-linejoin:round}
-.tf-line{fill:none;stroke:#08090b;stroke-width:10;stroke-linecap:round}
-.tf-eye{fill:#08090b;stroke:#08090b;stroke-width:5}
-.tf-mouth{fill:#050506;stroke:#08090b;stroke-width:7;stroke-linejoin:round}
-.tf-teeth{fill:#f5f5f1;stroke:#070707;stroke-width:4;stroke-linejoin:round}
-.tf-brow{fill:none;stroke:#08090b;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
-.tf-eye-wide{fill:#fff;stroke:#08090b;stroke-width:8}
-.tf-pupil{fill:#08090b}
-.tf-teeth-wide{fill:#fff;stroke:#08090b;stroke-width:4;stroke-linejoin:round}
-.tf-tongue{fill:#ed4d64;stroke:#08090b;stroke-width:5}
-.tf-exclaim{fill:#ffcf36;stroke:#08090b;stroke-width:5}
-.tf-crown{fill:#f2c52c;stroke:#070707;stroke-width:7;stroke-linejoin:round}
-.tf-crown-line{fill:none;stroke:#070707;stroke-width:8;stroke-linecap:round}
-.tf-halo{fill:none;stroke:#ffc93b;stroke-width:12;filter:drop-shadow(0 0 7px #ffc93b)}
-.tf-wing{fill:none;stroke:#08090b;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
-.tf-mouth-light{fill:#090909;stroke:#08090b;stroke-width:6}
-.tf-cheek{fill:none;stroke:#e8b4a5;stroke-width:7;stroke-linecap:round}
-.tf-neon-ring{fill:none;stroke:#30eaff;stroke-width:8;filter:url(#tf-glow)}
-.tf-glasses{fill:#19132e;stroke:#33f2ff;stroke-width:8;filter:url(#tf-glow)}
-.tf-glint{fill:none;stroke:#ed85ff;stroke-width:7;stroke-linecap:round}
-.tf-lightning{fill:#ff45d3;stroke:#30eaff;stroke-width:4;filter:url(#tf-glow)}
-.tf-circuit{fill:none;stroke:#33eaff;stroke-width:5}
-.tf-sun{fill:#ff6dd5;opacity:.7}
-.tf-sun-lines{fill:none;stroke:#25153c;stroke-width:7}
-.tf-shades{fill:#261038;stroke:#ff79d6;stroke-width:8}
-.tf-shade-line{fill:none;stroke:#5bf2ed;stroke-width:7}
-.tf-palm{fill:none;stroke:#29143d;stroke-width:5}
-.tf-star{fill:#ffcc59;stroke:#25133b;stroke-width:3}
-.tf-pixel-bg{fill:#f1b52b;stroke:#101010;stroke-width:5}
-.tf-pixel-star{fill:#39e5a0}
-.tf-pixel-head{fill:#f6f6f1;stroke:#080808;stroke-width:8;shape-rendering:crispEdges}
-.tf-pixel-eye{fill:#080808;shape-rendering:crispEdges}
-.tf-pixel-pupil{fill:#fff;shape-rendering:crispEdges}
-.tf-pixel-mouth{fill:#080808;stroke:#080808;stroke-width:6;shape-rendering:crispEdges}
-.tf-pixel-teeth{fill:#fff;shape-rendering:crispEdges}
-.tf-pixel-cap{fill:#e7b92d;stroke:#090909;stroke-width:6;shape-rendering:crispEdges}
-.tf-pixel-body{fill:#101114;stroke:#090909;stroke-width:8;shape-rendering:crispEdges}
-.tf-horror-smoke{fill:#3b1119;stroke:#16070c;stroke-width:6}
-.tf-horror-head{fill:#b6a9a7;stroke:#080509;stroke-width:13;stroke-linejoin:round}
-.tf-horror-brow{fill:none;stroke:#170609;stroke-width:17;stroke-linecap:round}
-.tf-horror-eye{fill:#050204}
-.tf-horror-glow{fill:#ff203d;filter:url(#tf-glow)}
-.tf-horror-mouth{fill:#080306;stroke:#090306;stroke-width:8}
-.tf-fang{fill:#ded8d4;stroke:#080509;stroke-width:4;stroke-linejoin:round}
-.tf-horror-shadow{fill:none;stroke:#650d1c;stroke-width:8;stroke-linecap:round}
-.tf-horror-scratch{fill:none;stroke:#b41229;stroke-width:8;stroke-linecap:round}
-.tf-head-y2k{fill:url(#tf-silver);stroke:#566b8e}
-.tf-chrome{fill:#d7f7ff;stroke:#c080ff;stroke-width:7}
-.tf-y2k-glasses{fill:#192e51;stroke:#f7a5e2;stroke-width:7}
-.tf-star-eyes{fill:#f5d6ff;stroke:#5f57a0;stroke-width:3}
-.tf-y2k-shine{fill:none;stroke:#e5faff;stroke-width:8;stroke-linecap:round}
-.tf-hood{fill:#071b12;stroke:#39ff70;stroke-width:12;stroke-linejoin:round}
-.tf-code{fill:none;stroke:#39ff70;stroke-width:6;stroke-linecap:round}
-.tf-hacker-head{fill:#bde9c7;stroke:#07130a;stroke-width:12}
-.tf-hacker-eye{fill:#061008;stroke:#061008;stroke-width:8}
-.tf-hacker-glow{fill:none;stroke:#39ff70;stroke-width:7;filter:url(#tf-glow)}
-.tf-hacker-mouth{fill:#061008;stroke:#061008;stroke-width:7}
-.tf-hacker-teeth{fill:#aaffb5;stroke:#061008;stroke-width:3}
-.tf-heart{fill:#ff8fc4;stroke:#a94a8b;stroke-width:4}
-.tf-head-pastel{fill:#fff8f5;stroke:#8c688e}
-.tf-heart-eyes{fill:#ff74b7;stroke:#8d587b;stroke-width:3}
-.tf-pastel-mouth{fill:none;stroke:#8d587b;stroke-width:9;stroke-linecap:round}
-.tf-blush{fill:#ff9fc2;opacity:.65}
-.tf-hand{fill:none;stroke:#fff8f5;stroke-width:17;stroke-linecap:round}
-body[data-theme="comic"] .tf-body{fill:#241c16}
-body[data-theme="light"] .tf-body{fill:#d8e9fa}
-body[data-theme="neon"] .tf-body{fill:#111329;stroke:#29ebff;filter:url(#tf-glow)}
-body[data-theme="vaporwave"] .tf-body{fill:#28113a;stroke:#ff7cda}
-body[data-theme="8bit"] .tf-body{fill:#18364a;stroke:#a8ff60}
-body[data-theme="horror"] .tf-body{fill:#100609;stroke:#8f1023}
-body[data-theme="y2k"] .tf-body{fill:#d6eaff;stroke:#a6bde5}
-body[data-theme="hacker"] .tf-body{fill:#07140c;stroke:#39ff70}
-body[data-theme="pastel"] .tf-body{fill:#f2dff5;stroke:#d69bcf}
+.trollface-original{
+  position:relative;z-index:2;display:block;width:auto;height:100%;max-width:100%;
+  object-fit:contain;object-position:center bottom;
+  filter:drop-shadow(0 18px 24px #0008);
+}
+.tf-overlays{position:absolute;inset:0;z-index:3;pointer-events:none}
+.tf-crown,.tf-pixel-crown,.tf-pastel-bow{
+  position:absolute;top:-4%;left:50%;transform:translateX(-50%);
+  color:#f4c52d;font-family:Georgia,serif;font-size:58px;line-height:1;
+  text-shadow:0 3px 0 #6d4700,0 0 18px #f6c83c77;
+}
+.tf-gold-spark,.tf-neon-spark,.tf-chrome-star,.tf-pastel-spark{
+  position:absolute;font-size:27px;font-weight:900
+}
+.tf-spark-a{left:6%;top:34%;color:#edc83c}
+.tf-spark-b{right:8%;top:56%;color:#edc83c}
+.tf-comic-burst{
+  position:absolute;right:1%;top:13%;display:grid;place-items:center;
+  width:86px;height:78px;background:#ffdf37;color:#e72b1f;
+  border:4px solid #17100b;clip-path:polygon(50% 0,61% 25%,88% 8%,79% 37%,100% 50%,77% 62%,91% 91%,60% 76%,49% 100%,38% 75%,8% 91%,22% 61%,0 49%,25% 37%,10% 8%,41% 24%);
+  font-size:19px;font-weight:1000;text-shadow:1px 2px #fff;transform:rotate(12deg)
+}
+.tf-comic-mark{position:absolute;left:4%;top:17%;color:#f22b23;font-size:65px;font-weight:1000;text-shadow:3px 3px #fff,-3px -3px #19110b}
+.tf-comic-star{position:absolute;color:#ffdc30;font-size:34px;text-shadow:2px 2px #15110a}
+.tf-star-a{left:13%;bottom:19%}.tf-star-b{right:12%;bottom:17%}
+.tf-halo{
+  position:absolute;left:50%;top:1%;width:112px;height:31px;transform:translateX(-50%);
+  border:9px solid #f7bd32;border-radius:50%;
+  box-shadow:0 0 12px #ffdc6a,0 0 28px #ffe5a3aa
+}
+.tf-angel-wing{
+  position:absolute;top:35%;width:92px;height:120px;display:grid;place-items:center;
+  color:#fff;font-size:75px;text-shadow:0 0 14px #9ecfff;
+  filter:drop-shadow(0 3px 4px #396c9b55)
+}
+.tf-wing-left{left:-3%;transform:rotate(-24deg)}
+.tf-wing-right{right:-3%;transform:rotate(24deg)}
+.tf-neon-glasses,.tf-vapor-glasses,.tf-y2k-star-glasses{
+  position:absolute;left:20%;top:35%;width:60%;height:13%;
+  display:flex;align-items:center;justify-content:space-between;gap:5%;
+}
+.tf-neon-glasses i,.tf-vapor-glasses i{
+  display:block;width:46%;height:100%;border:5px solid #23efff;
+  border-radius:9px 9px 19px 19px;background:#140d3acb;
+  box-shadow:0 0 8px #18eaff,0 0 20px #b13cff
+}
+.tf-neon-glasses b,.tf-vapor-glasses b,.tf-y2k-star-glasses b{
+  position:absolute;left:45%;top:38%;width:10%;height:5px;
+  background:#35edff;box-shadow:0 0 9px currentColor
+}
+.tf-neon-spark{color:#28edff;text-shadow:0 0 10px #28edff}
+.tf-neon-a{left:4%;top:42%}.tf-neon-b{right:3%;top:27%}
+.tf-vapor-glasses i{
+  border-color:#ff70d9;background:linear-gradient(135deg,#33215fdd,#ed68c6aa);
+  border-radius:18px 18px 12px 12px;box-shadow:0 0 12px #ff70d9
+}
+.tf-vapor-glasses b{background:#70f5ed;color:#70f5ed}
+.tf-vapor-sun{
+  position:absolute;right:0;bottom:5%;width:90px;height:90px;border-radius:50%;
+  background:repeating-linear-gradient(to bottom,#ff7ec9 0 8px,#7a45bb 9px 13px);
+  opacity:.65;z-index:-1;filter:drop-shadow(0 0 14px #ff67c9)
+}
+.tf-vapor-palm{position:absolute;left:2%;bottom:5%;color:#ff72d2;font-size:42px}
+.tf-pixel-crown{
+  color:#ffd23d;font-family:monospace;font-size:62px;
+  text-shadow:3px 3px #080808,6px 6px #1e9b5c;
+  -webkit-text-stroke:2px #080808
+}
+.tf-pixel-coin,.tf-pixel-block{
+  position:absolute;display:grid;place-items:center;
+  width:32px;height:32px;border:3px solid #101010;
+  background:#f7c934;color:#fff;font-family:monospace;font-size:23px;
+  font-weight:1000;box-shadow:4px 4px 0 #101010
+}
+.tf-coin-a{left:4%;top:31%}.tf-coin-b{right:4%;top:54%}
+.tf-pixel-block{right:1%;top:18%;background:#bd742c;color:#fff}
+.tf-horror-aura{
+  position:absolute;inset:7% 8% 2%;z-index:-1;border-radius:48%;
+  background:radial-gradient(ellipse,#b20c242e 0,transparent 68%);
+  filter:blur(10px)
+}
+.tf-horror-eye{
+  position:absolute;top:39%;width:14px;height:7px;border-radius:50%;
+  background:#ff142c;box-shadow:0 0 8px 4px #f00024,0 0 25px 10px #e0002544;
+  opacity:.9
+}
+.tf-horror-eye-left{left:32%}.tf-horror-eye-right{right:32%}
+.tf-horror-scratch{
+  position:absolute;color:#9d0d20;font-size:46px;font-weight:1000;
+  text-shadow:0 0 10px #a9001c;opacity:.85
+}
+.tf-scratch-a{left:3%;top:23%;transform:rotate(-23deg)}
+.tf-scratch-b{right:2%;bottom:22%;transform:rotate(20deg)}
+.tf-y2k-star-glasses i{
+  display:grid;place-items:center;width:44%;height:100%;
+  color:#e6fbff;font-size:44px;line-height:1;
+  -webkit-text-stroke:2px #ae61dd;
+  text-shadow:0 0 8px #70e8ff,0 0 16px #ff8adc
+}
+.tf-y2k-star-glasses b{background:#ec96ec;color:#ec96ec}
+.tf-chrome-star{color:#e7faff;text-shadow:0 0 7px #78dcff,0 0 18px #e9a1ff}
+.tf-chrome-a{left:5%;top:18%}.tf-chrome-b{right:6%;bottom:18%}
+.tf-hacker-hood{
+  position:absolute;z-index:1;left:14%;top:3%;width:72%;height:92%;
+  background:linear-gradient(145deg,#07170e,#0b2517 55%,#020704);
+  clip-path:polygon(50% 0,100% 20%,89% 100%,11% 100%,0 20%);
+  filter:drop-shadow(0 0 12px #38ff7055)
+}
+.tf-hacker-hood:after{
+  content:"";position:absolute;inset:8px;
+  border:3px solid #39ff70;clip-path:polygon(50% 0,100% 20%,89% 100%,11% 100%,0 20%);
+  opacity:.8
+}
+.tf-code-column{
+  position:absolute;top:21%;z-index:4;color:#39ff70;
+  font:700 12px/1.55 ui-monospace,monospace;
+  text-shadow:0 0 8px #39ff70;opacity:.9;text-align:center
+}
+.tf-code-a{left:2%}.tf-code-b{right:2%}
+.tf-hacker-scan{
+  position:absolute;left:21%;right:21%;top:34%;height:2px;
+  background:#39ff70;box-shadow:0 0 12px 3px #39ff70aa;opacity:.45
+}
+.tf-pastel-bow{
+  top:-1%;font-family:system-ui,sans-serif;font-size:52px;
+  color:#ff8dc7;text-shadow:0 3px #fff,0 0 15px #ffb6db
+}
+.tf-pastel-heart{position:absolute;color:#f18abd;font-size:43px;text-shadow:0 3px #fff,0 0 12px #f7b6d9}
+.tf-heart-a{left:3%;top:39%;transform:rotate(-14deg)}
+.tf-heart-b{right:4%;top:26%;transform:rotate(12deg)}
+.tf-pastel-a{left:15%;bottom:12%;color:#a9a1ec}
+.tf-pastel-b{right:15%;bottom:11%;color:#a9a1ec}
+.trollface-stage.trollface-dark .trollface-original{filter:drop-shadow(0 18px 24px #0009)}
+.trollface-stage.trollface-comic .trollface-original{filter:drop-shadow(0 14px 0 #17100b)}
+.trollface-stage.trollface-light .trollface-original{filter:drop-shadow(0 14px 20px #5f94c655)}
+.trollface-stage.trollface-neon .trollface-original{filter:drop-shadow(0 0 17px #25eaffaa)}
+.trollface-stage.trollface-vaporwave .trollface-original{filter:drop-shadow(0 0 14px #ff6bd899)}
+.trollface-stage.trollface-8bit .trollface-original{filter:drop-shadow(5px 5px 0 #101010)}
+.trollface-stage.trollface-horror .trollface-original{filter:drop-shadow(0 0 19px #a9002699)}
+.trollface-stage.trollface-y2k .trollface-original{filter:drop-shadow(0 0 15px #b7dfffaa)}
+.trollface-stage.trollface-hacker .trollface-original{filter:drop-shadow(0 0 17px #39ff7077)}
+.trollface-stage.trollface-pastel .trollface-original{filter:drop-shadow(0 0 16px #e69dcf99)}
 @media(max-width:680px){
-  .troll-illustration{width:min(100%,340px);height:100%}
+  .trollface-stage{height:245px;width:min(100%,340px)}
+  .tf-crown,.tf-pixel-crown{font-size:47px}
+  .tf-halo{width:82px;height:23px;border-width:7px}
+  .tf-comic-burst{width:66px;height:61px;font-size:15px}
+  .tf-neon-glasses,.tf-vapor-glasses,.tf-y2k-star-glasses{top:35%;left:20%;width:60%}
+  .tf-pixel-coin,.tf-pixel-block{width:25px;height:25px;font-size:18px}
+  .tf-code-column{font-size:9px}
 }
-
-
-/* Дополнительные детали новых выражений */
-.tf-burst{fill:#ffd83b;stroke:#17100c;stroke-width:7;stroke-linejoin:round}
-.tf-cloud{fill:#fff;stroke:#d5e7f9;stroke-width:4}
-.tf-hand-point{fill:#f4f4ef;stroke:#08090b;stroke-width:10;stroke-linejoin:round}
-.trollface-comic .tf-burst{fill:#ffe047;stroke:#17100c}
-.trollface-light .tf-halo{filter:drop-shadow(0 0 9px #ffc93b)}
-.trollface-neon .tf-head{stroke:#2bf2ff;filter:url(#tf-glow)}
-.trollface-vaporwave .tf-sun{filter:drop-shadow(0 0 10px #ff60d5)}
-.trollface-horror .tf-horror-head{filter:drop-shadow(0 0 16px #b10e2a)}
-.trollface-hacker .tf-hood{filter:drop-shadow(0 0 12px #39ff70)}
-.trollface-pastel .tf-heart{filter:drop-shadow(0 2px 4px #ef79bc55)}
