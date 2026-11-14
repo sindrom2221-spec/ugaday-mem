@@ -143,23 +143,22 @@ function trollfaceForTheme(theme){
     }
   };
   const v=faces[t]||faces.dark;
-  return \`<svg class="troll-illustration trollface-\${t}" viewBox="0 0 420 340" role="img" aria-label="\${v.label}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="troll-illustration trollface-${t}" viewBox="0 0 420 340" role="img" aria-label="${v.label}" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="tf-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="11" stdDeviation="9" flood-color="#000" flood-opacity=".42"/></filter>
       <filter id="tf-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <linearGradient id="tf-silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".52" stop-color="#e7e9ef"/><stop offset="1" stop-color="#aeb8c5"/></linearGradient>
     </defs>
-    \${v.bg}
+    ${v.bg}
     <g filter="url(#tf-shadow)">
       <path class="tf-body" d="M58 338c7-50 37-80 92-91h117c55 10 89 42 98 91z"/>
-      \${v.extra.includes("tf-hood")?"":""}
-      \${v.head}
-      \${v.eyes}
-      \${v.mouth}
-      \${t==="dark"?'<path class="tf-hand-point" d="M312 265c15-18 32-20 45-8l35 39-17 17-39-27-9 54h-27l4-53-18 17-17-17z"/>':""}
-      \${t==="light"?'<path class="tf-wing" d="M75 178c-44-25-59-9-61 11 21-5 34 4 43 20-21-2-30 12-29 25 21-9 39-2 54 13m260-69c44-25 59-9 61 11-21-5-34 4-43 20 21-2 30 12 29 25-21-9-39-2-54 13"/>':""}
+      ${v.head}
+      ${v.eyes}
+      ${v.mouth}
+      ${t==="dark"?'<path class="tf-hand-point" d="M312 265c15-18 32-20 45-8l35 39-17 17-39-27-9 54h-27l4-53-18 17-17-17z"/>':""}
+      ${t==="light"?'<path class="tf-wing" d="M75 178c-44-25-59-9-61 11 21-5 34 4 43 20-21-2-30 12-29 25 21-9 39-2 54 13m260-69c44-25 59-9 61 11-21-5-34 4-43 20 21-2 30 12 29 25-21-9-39-2-54 13"/>':""}
     </g>
-  </svg>\`;
+  </svg>`;
 }
 
 function home(){
