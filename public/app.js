@@ -58,8 +58,16 @@ function render(token=viewRenderId){
   else if(view==="profile")profilePage(token);
   else if(view==="admin")adminPage(token);
 }
+function themeMascot(theme){
+  const allowed=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"];
+  const key=allowed.includes(theme)?theme:"dark";
+  const labels={dark:"Тёмная маска",comic:"Комиксный кот",light:"Белый котик",neon:"Неоновый кот",vaporwave:"Ретро-статуя","8bit":"Пиксельный кот",horror:"Монстр",y2k:"Хромированный смайлик",hacker:"Хакерская маска",pastel:"Пастельный котик"};
+  return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><svg class="theme-mascot" viewBox="0 0 420 350" role="img" aria-label="${labels[key]}"><use href="/mascots.svg#${key}"></use></svg></div>`;
+}
+
 function home(){
-  app.innerHTML=`<section class="reference-home reference-home-no-art">
+  const activeTheme=me?.theme||"dark";
+  app.innerHTML=`<section class="reference-home reference-home-mascot">
     <div class="reference-home-copy">
       <div class="eyebrow home-eyebrow"><span class="hero-live-dot"></span> МУЛЬТИПЛЕЕРНАЯ ИГРА · 3–8 ИГРОКОВ</div>
       <h1>УГАДАЙ МЕМ</h1>
@@ -69,6 +77,7 @@ function home(){
         ${me?'<button class="reference-logout" id="logout" type="button">Выйти из аккаунта</button>':''}
       </div>
     </div>
+    ${themeMascot(activeTheme)}
   </section>
   <section class="reference-feature-strip" id="how-to-play" aria-label="Особенности игры">
     <div class="reference-feature">
