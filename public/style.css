@@ -1613,3 +1613,211 @@ body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49a
   .tf-pixel-coin,.tf-pixel-block{width:25px;height:25px;font-size:18px}
   .tf-code-column{font-size:9px}
 }
+
+
+/* --- Исправленная посадка аксессуаров: overlay совпадает с фактическим PNG --- */
+.trollface-stage{
+  position:relative!important;isolation:isolate!important;
+  display:block!important;
+  width:min(100%,380px)!important;
+  max-width:380px!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  margin:0 auto!important;
+  overflow:visible!important;
+}
+.trollface-original{
+  position:relative!important;z-index:2!important;
+  display:block!important;width:100%!important;height:auto!important;
+  max-width:none!important;max-height:none!important;
+  object-fit:initial!important;object-position:center!important;
+  filter:drop-shadow(0 18px 22px #0009)!important;
+}
+.tf-overlays{
+  position:absolute!important;inset:0!important;
+  z-index:4!important;pointer-events:none!important;
+}
+.reference-home-art{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-width:0!important;overflow:visible!important;
+}
+.tf-crown{
+  position:absolute;left:50%;top:-3%;transform:translateX(-50%);
+  width:42%;height:17%;z-index:5;
+  color:transparent;font-size:0;
+  background:linear-gradient(180deg,#fff3a7 0%,#f3c43c 34%,#c58113 78%,#7b4809 100%);
+  clip-path:polygon(0 100%,5% 20%,27% 54%,43% 0,59% 54%,79% 16%,100% 100%);
+  filter:drop-shadow(0 5px 2px #160c03);
+}
+.tf-crown:before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:31%;
+  background:linear-gradient(90deg,#9d5c09,#ffe88b 24%,#c78617 60%,#ffe88b 80%,#8a520b);
+  border:2px solid #6e4208;
+}
+.tf-crown i,.tf-crown b{
+  position:absolute;top:5%;width:9%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fffbd5,#ffd84f 45%,#9b5b0c 78%);
+  box-shadow:0 0 0 2px #704209,0 1px 5px #0008
+}
+.tf-crown i{left:22%}.tf-crown b{right:22%}
+.tf-gold-spark{z-index:6;color:#f5ca52;text-shadow:0 0 9px #f5ca52aa}
+.tf-spark-a{left:5%;top:27%}.tf-spark-b{right:5%;top:50%}
+
+/* Комикс — взрывная рамка за неизменённым лицом */
+.trollface-stage.trollface-comic:before{
+  content:"";position:absolute;z-index:0;inset:6% 0 4%;
+  background:repeating-conic-gradient(from 4deg at 50% 48%,#ffdf40 0 5deg,#f6a91a 5deg 9deg);
+  clip-path:polygon(50% 0,59% 14%,73% 2%,76% 20%,96% 11%,89% 31%,100% 47%,86% 56%,98% 77%,75% 75%,72% 98%,55% 86%,39% 100%,34% 82%,11% 91%,17% 67%,0 53%,15% 40%,3% 19%,27% 23%,31% 2%,44% 15%);
+}
+.tf-comic-burst{
+  z-index:6;right:-3%;top:7%;
+  width:24%;height:23%;
+  font-size:clamp(13px,1.8vw,19px);
+  filter:drop-shadow(3px 4px 0 #17100b);
+}
+.tf-comic-mark{z-index:6;left:-3%;top:20%;font-size:clamp(38px,5vw,62px)}
+.tf-comic-star{z-index:6}
+
+/* Светлая — нимб и настоящие перьевые крылья по бокам */
+.tf-halo{
+  top:-2%;width:33%;height:9%;border-width:8px;z-index:6;
+  background:transparent;
+}
+.tf-angel-wing{
+  z-index:1;top:36%;width:22%;height:36%;
+  font-size:0;color:transparent;
+  background:linear-gradient(135deg,#fff 0%,#dcecff 65%,#94c6f4 100%);
+  clip-path:polygon(100% 48%,77% 40%,84% 21%,60% 30%,48% 0,42% 28%,18% 14%,29% 42%,0 45%,28% 59%,10% 83%,42% 70%,54% 100%,66% 71%,92% 83%);
+  filter:drop-shadow(0 2px 5px #6299cf88);
+}
+.tf-wing-left{left:-4%;transform:rotate(-15deg)}
+.tf-wing-right{right:-4%;transform:scaleX(-1) rotate(-15deg)}
+
+/* Неон и Vaporwave — линзы встают на уровень глаз */
+.tf-neon-glasses,.tf-vapor-glasses,.tf-y2k-star-glasses{
+  left:20%!important;top:27%!important;width:60%!important;height:14%!important;
+  z-index:6!important;gap:4%!important;
+}
+.tf-neon-glasses i{
+  width:47%;height:100%;border:4px solid #19eaff;
+  border-radius:8px 8px 20px 20px;
+  background:linear-gradient(145deg,#183b67ed,#130d32ee 70%);
+  box-shadow:0 0 8px #19eaff,0 0 19px #a53bff99,inset 0 0 9px #3cecff77;
+}
+.tf-neon-glasses i:after,.tf-vapor-glasses i:after{
+  content:"";display:block;width:55%;height:3px;margin:20% auto 0;
+  transform:rotate(-24deg);background:#d9ffff;opacity:.75;
+  box-shadow:0 0 7px currentColor
+}
+.tf-neon-glasses b,.tf-vapor-glasses b,.tf-y2k-star-glasses b{
+  top:44%;height:5px;background:#2df7ff;box-shadow:0 0 9px currentColor
+}
+.tf-vapor-glasses i{
+  border:4px solid #ff6cda;
+  background:linear-gradient(145deg,#33225ddd,#f05ac6c9);
+  border-radius:12px 12px 23px 23px;
+  box-shadow:0 0 13px #ff6cda,inset 0 0 12px #ffb8f0
+}
+.tf-vapor-sun{
+  z-index:0;right:-1%;bottom:7%;width:36%;height:36%;
+  background:repeating-linear-gradient(to bottom,#ff84d7 0 8px,#b545bc 9px 14px);
+  opacity:.55
+}
+
+/* 8-bit — пиксельная корона вместо печатного символа */
+.tf-pixel-crown{
+  top:-5%;left:50%;width:36%;height:16%;
+  color:transparent;font-size:0;
+  background:#f5c82b;
+  clip-path:polygon(0 100%,0 22%,22% 52%,30% 0,49% 45%,69% 0,78% 52%,100% 20%,100% 100%);
+  border:3px solid #111;
+  filter:drop-shadow(4px 4px 0 #111)
+}
+.tf-pixel-crown:after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:32%;
+  background:repeating-linear-gradient(90deg,#f8d84c 0 17%,#b97916 17% 21%);
+  border-top:3px solid #101010
+}
+.tf-pixel-coin,.tf-pixel-block{z-index:6}
+.tf-pixel-coin{border-radius:0;background:#f3c82c;color:#fff;border:3px solid #101010}
+.tf-pixel-block{right:-4%;top:15%;width:12%;height:13%;font-size:clamp(16px,2vw,23px)}
+
+/* Хоррор — тень и красный свет ложатся на лицо, не заменяя его */
+.trollface-stage.trollface-horror:before{
+  content:"";position:absolute;z-index:1;inset:4% 4% 3%;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 42%,#9c001d3b 0%,#41000d22 48%,transparent 73%);
+  filter:blur(4px)
+}
+.trollface-stage.trollface-horror .trollface-original{
+  filter:grayscale(.88) contrast(1.18) drop-shadow(0 0 17px #b0002c)!important
+}
+.tf-horror-aura{inset:5% 3% 0;z-index:0;background:radial-gradient(ellipse,#d000333e 0,transparent 70%)}
+.tf-horror-eye{
+  z-index:7;top:29%;width:8%;height:3%;
+  background:#ff001e;border-radius:50%;
+  box-shadow:0 0 6px 3px #f00024,0 0 18px 8px #e0002588;
+  mix-blend-mode:screen
+}
+.tf-horror-eye-left{left:28%}.tf-horror-eye-right{right:28%}
+.tf-horror-scratch{z-index:7;color:#9d0d20;font-size:clamp(25px,4vw,44px)}
+.tf-scratch-a{left:1%;top:26%}.tf-scratch-b{right:0;bottom:20%}
+
+/* Y2K — звёздные линзы, расположенные поверх глаз */
+.tf-y2k-star-glasses{top:27%!important;height:14%!important}
+.tf-y2k-star-glasses i{
+  width:47%;height:100%;display:block;
+  background:linear-gradient(145deg,#dffbff,#8ca9ff 45%,#ffb8ee);
+  clip-path:polygon(50% 0,62% 30%,96% 31%,70% 53%,80% 91%,50% 70%,20% 91%,30% 53%,4% 31%,38% 30%);
+  border:0;color:transparent;
+  filter:drop-shadow(0 0 4px #e6a0ff)
+}
+.tf-y2k-star-glasses i:after{
+  content:"";display:block;height:2px;background:#fff;margin-top:45%;transform:rotate(-20deg)
+}
+
+/* Hacker — капюшон обрамляет голову, не закрывает её */
+.tf-hacker-hood{
+  z-index:1;left:8%;top:1%;width:84%;height:99%;
+  background:linear-gradient(145deg,#07170e,#0b2517 55%,#020704);
+  clip-path:polygon(50% 0,87% 15%,100% 45%,91% 100%,9% 100%,0 45%,13% 15%);
+  filter:drop-shadow(0 0 14px #39ff7088)
+}
+.tf-hacker-hood:after{inset:3%;border-width:3px}
+.tf-code-column{z-index:7;top:18%;font-size:clamp(9px,1.1vw,12px)}
+.tf-code-a{left:-2%}.tf-code-b{right:-2%}
+.tf-hacker-scan{z-index:7;left:23%;right:23%;top:29%}
+
+/* Пастель — бантик из двух лент и центрального узла */
+.tf-pastel-bow{
+  top:-5%;left:50%;width:28%;height:17%;
+  color:transparent;font-size:0;text-shadow:none
+}
+.tf-pastel-bow:before,.tf-pastel-bow:after{
+  content:"";position:absolute;top:18%;width:43%;height:55%;
+  border:4px solid #9b5c95;
+  background:linear-gradient(135deg,#ffd2e9,#ff85c0);
+  border-radius:65% 65% 20% 65%;
+  box-shadow:0 2px 5px #b75c9a66
+}
+.tf-pastel-bow:before{left:2%;transform:rotate(27deg)}
+.tf-pastel-bow:after{right:2%;transform:scaleX(-1) rotate(27deg)}
+.tf-pastel-bow i{
+  position:absolute;z-index:2;left:43%;top:31%;width:16%;height:30%;
+  border:3px solid #9b5c95;border-radius:5px;
+  background:#ffb5dc
+}
+.tf-pastel-heart{z-index:6;font-size:clamp(25px,3vw,42px)}
+.tf-heart-a{left:0;top:39%}.tf-heart-b{right:1%;top:28%}
+
+/* Общая компоновка на телефоне: картинка и слои остаются совпадающими */
+@media(max-width:680px){
+  .reference-home-art{height:245px!important;min-height:0!important}
+  .trollface-stage{width:min(100%,245px)!important;max-width:245px!important;height:auto!important}
+  .trollface-original{width:100%!important;height:auto!important}
+  .tf-crown{top:-3%;width:43%;height:17%}
+  .tf-halo{top:-1%;width:32%;height:9%}
+  .tf-neon-glasses,.tf-vapor-glasses,.tf-y2k-star-glasses{top:27%!important}
+  .tf-hacker-hood{width:84%;left:8%}
+  .tf-code-column{font-size:8px}
+}
