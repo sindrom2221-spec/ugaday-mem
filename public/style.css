@@ -1560,3 +1560,25 @@ body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49a
   .reference-home-mascot .reference-home-art{margin:5px auto 0;width:100%}
   .theme-mascot-image{width:min(100%,360px);margin:0 auto}
 }
+
+
+/* Четыре постоянных талисмана: один и тот же состав героев во всех десяти темах */
+.reference-home-art{filter:none!important}
+.theme-mascot-image{
+  display:block;width:auto;height:100%;max-width:100%;aspect-ratio:16 / 21;
+  border:0!important;border-radius:15px;box-shadow:none!important;
+  background-image:none;background-size:500% 200%;background-repeat:no-repeat;
+  background-color:transparent;
+}
+.mascot-image-dark{background-position:0% 0%}
+.mascot-image-comic{background-position:25% 0%}
+.mascot-image-light{background-position:50% 0%}
+.mascot-image-neon{background-position:75% 0%}
+.mascot-image-vaporwave{background-position:100% 0%}
+.mascot-image-8bit{background-position:0% 100%}
+.mascot-image-horror{background-position:25% 100%}
+.mascot-image-y2k{background-position:50% 100%}
+.mascot-image-hacker{background-position:75% 100%}
+.mascot-image-pastel{background-position:100% 100%}
+@media(max-width:680px){.theme-mascot-image{height:245px;width:auto;max-width:100%}}
+@media(max-width:390px){.theme-mascot-image{height:215px}}

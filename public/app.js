@@ -61,11 +61,32 @@ function render(token=viewRenderId){
 function themeMascot(theme){
   const allowed=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"];
   const key=allowed.includes(theme)?theme:"dark";
-  const labels={dark:"Тёмный персонаж",comic:"Комиксный гусь",light:"Белый котик",neon:"Неоновый кот",vaporwave:"Ретро-статуя","8bit":"Пиксельный пёс",horror:"Хоррор-медведь",y2k:"Инопланетянин",hacker:"Хакерская маска",pastel:"Аксолотль"};
-  if(key==="light"){
-    return `<div class="reference-home-art mascot-light" aria-hidden="true"><svg class="theme-mascot" viewBox="0 0 420 350" role="img" aria-label="${labels.light}"><use href="/mascots.svg#light"></use></svg></div>`;
+  const themeNames={dark:"тёмной темы",comic:"комикса",light:"светлой темы",neon:"неона",vaporwave:"vaporwave","8bit":"8-bit",horror:"хоррора",y2k:"Y2K",hacker:"хакерской темы",pastel:"пастельной темы"};
+  const label=`Кот, Pepe, Doge и белый мем-персонаж — ${themeNames[key]}`;
+  return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><div class="theme-mascot-image mascot-image-${key}" role="img" aria-label="${label}"></div></div>`;
+}
+let mascotAtlasPromise=null;
+let mascotAtlasData=null;
+function loadMascotAtlas(){
+  const apply=()=>document.querySelectorAll(".theme-mascot-image").forEach(el=>{
+    el.style.backgroundImage=`url("data:image/webp;base64,${mascotAtlasData}")`;
+  });
+  if(mascotAtlasData){apply();return Promise.resolve();}
+  if(!mascotAtlasPromise){
+    const files=["01","02","03","04"].map(n=>`/mascots-atlas/part-${n}.txt`);
+    mascotAtlasPromise=Promise.all(files.map(async url=>{
+      const response=await fetch(url,{cache:"force-cache"});
+      if(!response.ok)throw new Error(`Не удалось загрузить ${url}`);
+      return (await response.text()).trim();
+    })).then(parts=>{
+      mascotAtlasData=parts.join("");
+      apply();
+    }).catch(error=>{
+      mascotAtlasPromise=null;
+      console.warn("Не удалось загрузить набор талисманов",error);
+    });
   }
-  return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><div class="theme-mascot-image mascot-image-${key}" role="img" aria-label="${labels[key]}"></div></div>`;
+  return mascotAtlasPromise;
 }
 
 function home(){
@@ -96,6 +117,7 @@ function home(){
       <span>Рейтинги и награды</span>
     </div>
   </section>`;
+  loadMascotAtlas();
   $("#go-game")?.addEventListener("click",()=>setView("game"));
   $("#go-register")?.addEventListener("click",()=>setView("register"));
   $("#logout")?.addEventListener("click",async()=>{await api("/api/logout",{method:"POST"});if(socket)socket.disconnect();me=null;room=null;setView("home")});
