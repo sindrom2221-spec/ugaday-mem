@@ -65,30 +65,6 @@ function themeMascot(theme){
   const label=`Кот, Pepe, Doge и белый мем-персонаж — ${themeNames[key]}`;
   return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><div class="theme-mascot-image mascot-image-${key}" role="img" aria-label="${label}"></div></div>`;
 }
-let mascotAtlasPromise=null;
-let mascotAtlasData=null;
-function loadMascotAtlas(){
-  const apply=()=>document.querySelectorAll(".theme-mascot-image").forEach(el=>{
-    el.style.backgroundImage=`url("data:image/webp;base64,${mascotAtlasData}")`;
-  });
-  if(mascotAtlasData){apply();return Promise.resolve();}
-  if(!mascotAtlasPromise){
-    const files=["01","02","03","04"].map(n=>`/mascots-atlas/part-${n}.txt`);
-    mascotAtlasPromise=Promise.all(files.map(async url=>{
-      const response=await fetch(url,{cache:"force-cache"});
-      if(!response.ok)throw new Error(`Не удалось загрузить ${url}`);
-      return (await response.text()).trim();
-    })).then(parts=>{
-      mascotAtlasData=parts.join("");
-      apply();
-    }).catch(error=>{
-      mascotAtlasPromise=null;
-      console.warn("Не удалось загрузить набор талисманов",error);
-    });
-  }
-  return mascotAtlasPromise;
-}
-
 function home(){
   const activeTheme=me?.theme||"dark";
   app.innerHTML=`<section class="reference-home reference-home-mascot">
@@ -117,7 +93,7 @@ function home(){
       <span>Рейтинги и награды</span>
     </div>
   </section>`;
-  loadMascotAtlas();
+
   $("#go-game")?.addEventListener("click",()=>setView("game"));
   $("#go-register")?.addEventListener("click",()=>setView("register"));
   $("#logout")?.addEventListener("click",async()=>{await api("/api/logout",{method:"POST"});if(socket)socket.disconnect();me=null;room=null;setView("home")});
