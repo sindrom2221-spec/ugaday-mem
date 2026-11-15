@@ -1518,3 +1518,45 @@ body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49a
   .reference-home-mascot .reference-home-copy h1{font-size:38px}
   .reference-home-art{height:215px}
 }
+
+
+/* Обновлённые реалистичные талисманы: Light остаётся прежним */
+.reference-home-mascot .reference-home-art{height:auto;min-height:0;margin:0 -8px 0 0;align-self:center}
+.theme-mascot-image{
+  width:min(100%,455px);
+  aspect-ratio:3/2;
+  border-radius:18px;
+  background-image:url('/mascots-atlas.webp');
+  background-size:300% 300%;
+  background-repeat:no-repeat;
+  filter:saturate(.86) brightness(.97) contrast(1.025);
+  box-shadow:0 18px 34px #0005;
+  border:1px solid #ffffff16;
+}
+.mascot-image-dark{background-position:0 0}
+.mascot-image-comic{background-position:50% 0}
+.mascot-image-neon{background-position:100% 0}
+.mascot-image-vaporwave{background-position:0 50%}
+.mascot-image-8bit{background-position:50% 50%}
+.mascot-image-horror{background-position:100% 50%}
+.mascot-image-y2k{background-position:0 100%}
+.mascot-image-hacker{background-position:50% 100%}
+.mascot-image-pastel{background-position:100% 100%}
+.mascot-dark .theme-mascot-image,
+.mascot-comic .theme-mascot-image,
+.mascot-neon .theme-mascot-image,
+.mascot-vaporwave .theme-mascot-image,
+.mascot-8bit .theme-mascot-image,
+.mascot-horror .theme-mascot-image,
+.mascot-y2k .theme-mascot-image,
+.mascot-hacker .theme-mascot-image,
+.mascot-pastel .theme-mascot-image{animation:mascot-soft-in .32s ease-out both}
+@keyframes mascot-soft-in{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){
+  .reference-home-mascot .reference-home-art{height:auto}
+  .theme-mascot-image{width:min(100%,390px)}
+}
+@media(max-width:680px){
+  .reference-home-mascot .reference-home-art{margin:5px auto 0;width:100%}
+  .theme-mascot-image{width:min(100%,360px);margin:0 auto}
+}

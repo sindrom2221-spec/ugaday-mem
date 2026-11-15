@@ -61,8 +61,11 @@ function render(token=viewRenderId){
 function themeMascot(theme){
   const allowed=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"];
   const key=allowed.includes(theme)?theme:"dark";
-  const labels={dark:"Тёмная маска",comic:"Комиксный кот",light:"Белый котик",neon:"Неоновый кот",vaporwave:"Ретро-статуя","8bit":"Пиксельный кот",horror:"Монстр",y2k:"Хромированный смайлик",hacker:"Хакерская маска",pastel:"Пастельный котик"};
-  return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><svg class="theme-mascot" viewBox="0 0 420 350" role="img" aria-label="${labels[key]}"><use href="/mascots.svg#${key}"></use></svg></div>`;
+  const labels={dark:"Тёмный персонаж",comic:"Комиксный гусь",light:"Белый котик",neon:"Неоновый кот",vaporwave:"Ретро-статуя","8bit":"Пиксельный пёс",horror:"Хоррор-медведь",y2k:"Инопланетянин",hacker:"Хакерская маска",pastel:"Аксолотль"};
+  if(key==="light"){
+    return `<div class="reference-home-art mascot-light" aria-hidden="true"><svg class="theme-mascot" viewBox="0 0 420 350" role="img" aria-label="${labels.light}"><use href="/mascots.svg#light"></use></svg></div>`;
+  }
+  return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><div class="theme-mascot-image mascot-image-${key}" role="img" aria-label="${labels[key]}"></div></div>`;
 }
 
 function home(){
