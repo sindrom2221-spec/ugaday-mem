@@ -61,8 +61,8 @@ function render(token=viewRenderId){
 function themeMascot(theme){
   const allowed=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"];
   const key=allowed.includes(theme)?theme:"dark";
-  const labels={dark:"четыре талисмана в тёмной стилистике",comic:"четыре талисмана в стиле комикса",light:"четыре талисмана в светлой стилистике",neon:"четыре талисмана в неоновой стилистике",vaporwave:"четыре талисмана в стиле Vaporwave","8bit":"четыре пиксельных талисмана",horror:"четыре талисмана в стилистике хоррора",y2k:"четыре талисмана в стиле Y2K",hacker:"четыре талисмана в хакерской стилистике",pastel:"четыре талисмана в пастельной стилистике"};
-  return `<div class="reference-home-art mascot-${key}"><svg class="theme-mascot" viewBox="0 0 680 480" role="img" aria-label="${labels[key]}"><use href="/mascots.svg#${key}" x="0" y="0" width="680" height="480"></use></svg></div>`;
+  const labels={dark:"Четыре талисмана в тёмной стилистике",comic:"Четыре талисмана в стиле комикса",light:"Четыре талисмана в светлой стилистике",neon:"Четыре талисмана в неоновой стилистике",vaporwave:"Четыре талисмана в стиле Vaporwave","8bit":"Четыре пиксельных талисмана",horror:"Четыре талисмана в стилистике хоррора",y2k:"Четыре талисмана в стиле Y2K",hacker:"Четыре талисмана в хакерской стилистике",pastel:"Четыре талисмана в пастельной стилистике"};
+  return `<div class="reference-home-art mascot-${key}"><img class="theme-mascot" src="/mascots/mascot-${key}.webp" alt="${labels[key]}" width="307" height="411" loading="eager" decoding="async" draggable="false"></div>`;
 }
 function home(){
   const activeTheme=me?.theme||"dark";
