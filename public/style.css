@@ -1562,26 +1562,29 @@ body[data-theme="pastel"] .theme-card.theme-selected{box-shadow:0 8px 22px #c49a
 }
 
 
-/* Четыре постоянных талисмана: один и тот же состав героев во всех десяти темах */
-.reference-home-art{filter:none!important}
-.theme-mascot-image{
-  display:block;flex:0 1 auto;
-  width:min(100%,267px);
-  height:auto;aspect-ratio:144 / 189;
-  border:0!important;border-radius:15px;box-shadow:none!important;
-  background-image:url('/mascots-atlas.webp');
-  background-size:500% 200%;background-repeat:no-repeat;
-  background-color:transparent;
+/* Векторные тематические талисманы: прозрачные иллюстрации без карточной подложки */
+.reference-home-art{
+  position:relative;z-index:1;display:flex;align-items:center;justify-content:center;
+  min-width:0;height:350px;margin:-5px -15px -5px 0;overflow:visible;
+  filter:none!important;background:transparent!important;border:0!important;box-shadow:none!important;
 }
-.mascot-image-dark{background-position:0% 0%}
-.mascot-image-comic{background-position:25% 0%}
-.mascot-image-light{background-position:50% 0%}
-.mascot-image-neon{background-position:75% 0%}
-.mascot-image-vaporwave{background-position:100% 0%}
-.mascot-image-8bit{background-position:0% 100%}
-.mascot-image-horror{background-position:25% 100%}
-.mascot-image-y2k{background-position:50% 100%}
-.mascot-image-hacker{background-position:75% 100%}
-.mascot-image-pastel{background-position:100% 100%}
-@media(max-width:680px){.theme-mascot-image{width:min(100%,187px)}}
-@media(max-width:390px){.theme-mascot-image{width:min(100%,164px)}}
+.theme-mascot{
+  display:block;width:min(100%,455px);height:100%;max-height:100%;
+  overflow:visible;object-fit:contain;
+  animation:mascot-float 5s ease-in-out infinite;
+}
+.mascot-comic .theme-mascot{filter:drop-shadow(6px 7px 0 #211b16)}
+.mascot-light .theme-mascot{filter:drop-shadow(0 14px 20px #5277a522)}
+.mascot-neon .theme-mascot{filter:drop-shadow(0 0 18px #35f4ed66)}
+.mascot-vaporwave .theme-mascot{filter:drop-shadow(0 12px 18px #ff8bd855)}
+.mascot-8bit .theme-mascot{image-rendering:pixelated;filter:drop-shadow(5px 6px 0 #07131b)}
+.mascot-horror .theme-mascot{filter:drop-shadow(0 10px 18px #a0002544)}
+.mascot-y2k .theme-mascot{filter:drop-shadow(0 12px 18px #7e8dc755)}
+.mascot-hacker .theme-mascot{filter:drop-shadow(0 0 18px #39ff7044)}
+.mascot-pastel .theme-mascot{filter:drop-shadow(0 12px 18px #d6a4ed55)}
+@media(max-width:900px){.reference-home-art{height:300px}}
+@media(max-width:680px){
+  .reference-home-art{height:270px;margin:5px auto 0;width:100%}
+  .theme-mascot{width:min(100%,420px)}
+}
+@media(max-width:390px){.reference-home-art{height:235px}}

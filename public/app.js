@@ -61,9 +61,8 @@ function render(token=viewRenderId){
 function themeMascot(theme){
   const allowed=["dark","comic","light","neon","vaporwave","8bit","horror","y2k","hacker","pastel"];
   const key=allowed.includes(theme)?theme:"dark";
-  const themeNames={dark:"тёмной темы",comic:"комикса",light:"светлой темы",neon:"неона",vaporwave:"vaporwave","8bit":"8-bit",horror:"хоррора",y2k:"Y2K",hacker:"хакерской темы",pastel:"пастельной темы"};
-  const label=`Кот, Pepe, Doge и белый мем-персонаж — ${themeNames[key]}`;
-  return `<div class="reference-home-art mascot-${key}" aria-hidden="true"><div class="theme-mascot-image mascot-image-${key}" role="img" aria-label="${label}"></div></div>`;
+  const labels={dark:"четыре талисмана в тёмной стилистике",comic:"четыре талисмана в стиле комикса",light:"четыре талисмана в светлой стилистике",neon:"четыре талисмана в неоновой стилистике",vaporwave:"четыре талисмана в стиле Vaporwave","8bit":"четыре пиксельных талисмана",horror:"четыре талисмана в стилистике хоррора",y2k:"четыре талисмана в стиле Y2K",hacker:"четыре талисмана в хакерской стилистике",pastel:"четыре талисмана в пастельной стилистике"};
+  return `<div class="reference-home-art mascot-${key}"><svg class="theme-mascot" viewBox="0 0 680 480" role="img" aria-label="${labels[key]}"><use href="/mascots.svg#${key}" x="0" y="0" width="680" height="480"></use></svg></div>`;
 }
 function home(){
   const activeTheme=me?.theme||"dark";
