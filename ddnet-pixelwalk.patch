@@ -1,0 +1,41 @@
+--- a/src/engine/shared/config_variables.h
++++ b/src/engine/shared/config_variables.h
+@@ -260,1 +260,2 @@
+ MACRO_CONFIG_INT(ClDummyCopyMoves, cl_dummy_copy_moves, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether dummy should copy your moves")
++MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Send movement input every other tick for precise pixel walking")
+
+--- a/src/game/client/components/controls.h
++++ b/src/game/client/components/controls.h
+@@ -42,1 +42,2 @@
+ 	int m_aShowHookColl[NUM_DUMMIES];
++	int m_PixelWalkTick;
+
+--- a/src/game/client/components/controls.cpp
++++ b/src/game/client/components/controls.cpp
+@@ -25,3 +25,4 @@
+ CControls::CControls()
+ {
++	m_PixelWalkTick = 0;
+ 	mem_zero(&m_aLastData, sizeof(m_aLastData));
+ 	std::fill(std::begin(m_aMouseOnAction), std::end(m_aMouseOnAction), false);
+@@ -35,3 +36,4 @@
+ void CControls::OnReset()
+ {
++	m_PixelWalkTick = 0;
+ 	ResetInput(0);
+ 	ResetInput(1);
+@@ -371,3 +373,11 @@
+ 		}
+ 
++		// PixelWalk: while a direction is held, send movement on alternating ticks.
++		// Other inputs (jump, hook, fire) are left untouched.
++		if(g_Config.m_ClPixelWalk && m_aInputData[g_Config.m_ClDummy].m_Direction != 0)
++		{
++			m_PixelWalkTick ^= 1;
++			if(m_PixelWalkTick == 0)
++				m_aInputData[g_Config.m_ClDummy].m_Direction = 0;
++		}
++		else
++			m_PixelWalkTick = 0;
++
+ 		// check if we need to send input
