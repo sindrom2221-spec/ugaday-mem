@@ -23,7 +23,7 @@ MACRO_CONFIG_INT(ClDummyHammerWSpeed, cl_dummy_hammer_w_speed, 10, 1, 25, CFGFLA
 MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Enable PixelWalk while the +pixelwalk bind is held")
 MACRO_CONFIG_INT(ClPixelWalkSpeed, cl_pixelwalk_speed, 5, 1, 10, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "PixelWalk movement speed")
 MACRO_CONFIG_INT(ClAvoidFreeze, cl_avoid_freeze, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid moving into nearby freeze tiles")
-MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 4, 1, 8, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze detection range in tiles")''',
+MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 1, 1, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze stopping distance, in 20-pixel steps")''',
     "configuration variables",
 )
 
@@ -170,7 +170,7 @@ replace_once(
 				const auto &Character = GameClient()->m_Snap.m_aCharacters[LocalId].m_Cur;
 				const vec2 PlayerPos(Character.m_X, Character.m_Y);
 				const int Direction = m_aInputData[g_Config.m_ClDummy].m_Direction;
-				const int Range = std::clamp(g_Config.m_ClAvoidFreezeRange, 1, 8) * 32;
+				const int Range = std::clamp(g_Config.m_ClAvoidFreezeRange, 1, 4) * 20;
 				if(!IsAvoidFreezeAt(*Collision(), PlayerPos) &&
 					IsAvoidFreezeAhead(*Collision(), PlayerPos, Direction, Range))
 				{
@@ -228,8 +228,8 @@ replace_once(
 			Ui()->DoToolTip(&g_Config.m_ClAvoidFreeze, &Button, Localize("Stop before freeze tiles; hold Avoid Freeze Override to enter intentionally"));
 			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
 			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
-			Ui()->DoScrollbarOption(&g_Config.m_ClAvoidFreezeRange, &g_Config.m_ClAvoidFreezeRange, &Button, Localize("Avoidance Range"), 1, 8);
-			Ui()->DoToolTip(&g_Config.m_ClAvoidFreezeRange, &Button, Localize("How far ahead to check for freeze tiles, in tiles"));
+			Ui()->DoScrollbarOption(&g_Config.m_ClAvoidFreezeRange, &g_Config.m_ClAvoidFreezeRange, &Button, Localize("Stop Distance"), 1, 4);
+			Ui()->DoToolTip(&g_Config.m_ClAvoidFreezeRange, &Button, Localize("Default is a close approach; increase only if you need more braking distance"));
 		});
 	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));''',
     "Controls menu settings blocks",
