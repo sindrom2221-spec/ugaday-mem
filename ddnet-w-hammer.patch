@@ -1,0 +1,45 @@
+--- a/src/engine/shared/config_variables.h
++++ b/src/engine/shared/config_variables.h
+@@ -255,6 +255,8 @@
+ MACRO_CONFIG_INT(ClDummyDefaultEyes, dummy_default_eyes, 0, 0, 5, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Dummy eyes when joining server (0 = normal, 1 = pain, 2 = happy, 3 = surprise, 4 = angry, 5 = blink)")
+ MACRO_CONFIG_INT(ClDummy, cl_dummy, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether you control your player (0) or your dummy (1)")
+ MACRO_CONFIG_INT(ClDummyHammer, cl_dummy_hammer, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether dummy is hammering for a hammerfly")
++MACRO_CONFIG_INT(ClDummyHammerOnW, cl_dummy_hammer_on_w, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Whether dummy hammers while holding W")
++MACRO_CONFIG_INT(ClDummyHammerWInterval, cl_dummy_hammer_w_interval, 1, 1, 25, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Dummy hammer interval in ticks while holding W (lower is faster)")
+ MACRO_CONFIG_INT(ClDummyResetOnSwitch, cl_dummy_resetonswitch, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Whether dummy or player should stop pressing keys when you switch (0 = off, 1 = dummy, 2 = player)")
+ MACRO_CONFIG_INT(ClDummyRestoreWeapon, cl_dummy_restore_weapon, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Whether dummy should switch to last weapon after hammerfly")
+ MACRO_CONFIG_INT(ClDummyCopyMoves, cl_dummy_copy_moves, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether dummy should copy your moves")
+--- a/src/game/client/gameclient.cpp
++++ b/src/game/client/gameclient.cpp
+@@ -534,7 +534,16 @@
+ 		return 0;
+ 	}
+ 
+-	if(!g_Config.m_ClDummyHammer)
++	// Detect the physical W key directly instead of changing its bind. This lets
++	// the player's existing pseudo-fly bind continue to work unchanged.
++	const bool DummyHammerOnW = g_Config.m_ClDummyHammerOnW &&
++		Input()->KeyIsPressed(KEY_W) &&
++		Client()->State() == IClient::STATE_ONLINE &&
++		!m_Menus.IsActive() && !m_Chat.IsActive() && !m_GameConsole.IsActive() &&
++		!m_Motd.IsActive() && !m_KeyBinder.IsActive();
++	const bool UseDummyHammer = g_Config.m_ClDummyHammer || DummyHammerOnW;
++
++	if(!UseDummyHammer)
+ 	{
+ 		if(m_DummyFire != 0)
+ 		{
+@@ -552,7 +561,12 @@
+ 	}
+ 	else
+ 	{
+-		if(m_DummyFire % 25 != 0)
++		// The normal hammerfly keeps its original 25-tick cadence. The W-triggered
++		// mode can attempt a hammer hit more frequently; the server still enforces
++		// the weapon's actual reload time.
++		const unsigned int HammerInterval = DummyHammerOnW ?
++			(unsigned int)g_Config.m_ClDummyHammerWInterval : 25U;
++		if(m_DummyFire % HammerInterval != 0)
+ 		{
+ 			m_DummyFire++;
+ 			return 0;
