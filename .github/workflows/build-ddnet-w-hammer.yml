@@ -1,4 +1,4 @@
-name: Build DDNet PixelWalk + W Hammer + Speed Menu (Windows x64)
+name: Build DDNet S1ndrom MRX-style FOV cone (Windows x64)
 
 on:
   push:
@@ -80,7 +80,7 @@ jobs:
                       candidates.append((archive, z.read(name)))
           if not candidates:
               raise SystemExit("Packaged DDNet.exe not found inside build ZIPs")
-          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed", b"cl_avoid_freeze", b"cl_avoid_freeze_range", b"Enable Avoid Freeze", b"Stop Distance", b"+avoidfreeze_override", b"Dummy Hammer (W)", b"Freeze Override", b"cl_hook_aim", b"cl_hook_aim_fov", b"cl_hook_aim_show_fov", b"Enable Hook Aim", b"Hook Aim FOV", b"Show FOV", b"Hook Aim", b"S1ndrom", b"Aim hook toward the closest player in FOV only while the hook key is held", b"Only guides your hook while you hold the hook key."]
+          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed", b"cl_avoid_freeze", b"cl_avoid_freeze_range", b"Enable Avoid Freeze", b"Stop Distance", b"+avoidfreeze_override", b"Dummy Hammer (W)", b"Freeze Override", b"cl_hook_aim", b"cl_hook_aim_fov", b"cl_hook_aim_show_fov", b"Enable Hook Aim", b"Hook Aim FOV", b"Hook Aim FOV (degrees)", b"Hook Aim FOV angle in degrees", b"Show FOV", b"Hook Aim", b"S1ndrom", b"Aim hook toward the closest player in FOV only while the hook key is held", b"Hold hook to aim. Two lines show the angular FOV from your tee."]
           for archive, binary in candidates:
               missing = [token.decode("ascii") for token in required if token not in binary]
               if missing:
@@ -91,7 +91,7 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: DDNet-S1ndrom-HoldToHookAim-Windows-x64
+          name: DDNet-S1ndrom-MRX-FOV-HoldToHookAim-Windows-x64
           path: build/*.zip
           if-no-files-found: error
           retention-days: 14

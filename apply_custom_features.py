@@ -26,7 +26,7 @@ MACRO_CONFIG_INT(ClAvoidFreeze, cl_avoid_freeze, 0, 0, 1, CFGFLAG_CLIENT | CFGFL
 MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 1, 1, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze stopping distance, in 20-pixel steps")
 MACRO_CONFIG_INT(ClHookAim, cl_hook_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Aim hook toward the closest player in FOV only while the hook key is held")
 MACRO_CONFIG_INT(ClHookAimFov, cl_hook_aim_fov, 64, 1, 180, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Hook Aim FOV angle in degrees")
-MACRO_CONFIG_INT(ClHookAimShowFov, cl_hook_aim_show_fov, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Show the Hook Aim FOV circle")''',
+MACRO_CONFIG_INT(ClHookAimShowFov, cl_hook_aim_show_fov, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Show the Hook Aim FOV angle guides")''',
     "configuration variables",
 )
 
@@ -59,6 +59,13 @@ replace_once(
     "#include <base/dbg.h>\n",
     "#include <base/color.h>\n#include <base/dbg.h>\n",
     "FOV circle color include",
+)
+
+replace_once(
+    "src/game/client/components/hud.cpp",
+    '#include "hud.h"\\n',
+    '#include "hud.h"\\n\\n#include <algorithm>\\n',
+    "HUD algorithm include",
 )
 
 # PixelWalk state and key-held command.
@@ -335,7 +342,7 @@ replace_once(
 \tCheck(LeftColumn, &g_Config.m_ClHookAimShowFov, Localize("Show FOV"));
 \tCUIRect HookAimNote;
 \tLeftColumn.HSplitTop(42.0f, &HookAimNote, &LeftColumn);
-\tUi()->DoLabel(&HookAimNote, Localize("Only guides your hook while you hold the hook key. FOV is an angle shown by two lines from your tee."), 10.0f, TEXTALIGN_ML);
+\tUi()->DoLabel(&HookAimNote, Localize("Hold hook to aim. Two lines show the angular FOV from your tee."), 10.0f, TEXTALIGN_ML);
 
 \tLeftColumn.HSplitTop(18.0f, nullptr, &LeftColumn);
 \tSection(LeftColumn, Localize("Avoid Freeze"));
@@ -540,7 +547,7 @@ checks = {
     ],
     "src/game/client/components/menus_settings.cpp": [
         'Localize("S1ndrom")', "RenderSettingsS1ndrom",
-        "Only guides your hook while you hold the hook key.",
+        "Hold hook to aim. Two lines show the angular FOV from your tee.",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localizable("PixelWalk")', 'Localizable("Avoid Freeze Override")',
