@@ -23,7 +23,10 @@ MACRO_CONFIG_INT(ClDummyHammerWSpeed, cl_dummy_hammer_w_speed, 10, 1, 25, CFGFLA
 MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Enable PixelWalk while the +pixelwalk bind is held")
 MACRO_CONFIG_INT(ClPixelWalkSpeed, cl_pixelwalk_speed, 5, 1, 10, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "PixelWalk movement speed")
 MACRO_CONFIG_INT(ClAvoidFreeze, cl_avoid_freeze, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid moving into nearby freeze tiles")
-MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 1, 1, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze stopping distance, in 20-pixel steps")''',
+MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 1, 1, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze stopping distance, in 20-pixel steps")
+MACRO_CONFIG_INT(ClHookAim, cl_hook_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Automatically hook players inside the cursor FOV")
+MACRO_CONFIG_INT(ClHookAimFov, cl_hook_aim_fov, 96, 16, 256, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Hook Aim FOV radius in world units")
+MACRO_CONFIG_INT(ClHookAimShowFov, cl_hook_aim_show_fov, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Show the Hook Aim FOV circle")''',
     "configuration variables",
 )
 
@@ -319,6 +322,23 @@ replace_once(
 			Ui()->DoScrollbarOption(&g_Config.m_ClAvoidFreezeRange, &g_Config.m_ClAvoidFreezeRange, &Button, Localize("Stop Distance"), 1, 4);
 			Ui()->DoToolTip(&g_Config.m_ClAvoidFreezeRange, &Button, Localize("Default is a close approach; increase only if you need more braking distance"));
 		});
+	RenderSettingsBlock(3.0f * BUTTON_HEIGHT + 2.0f * BUTTON_SPACING, &RightColumn, Localize("Hook Aim"), nullptr, nullptr,
+		[&](CUIRect Rect) {
+			CUIRect Button;
+			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
+			if(GameClient()->m_Menus.DoButton_CheckBox(&g_Config.m_ClHookAim, Localize("Enable Hook Aim"), g_Config.m_ClHookAim, &Button))
+				g_Config.m_ClHookAim ^= 1;
+			Ui()->DoToolTip(&g_Config.m_ClHookAim, &Button, Localize("Automatically hook the closest player inside the cursor FOV"));
+			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
+			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
+			Ui()->DoScrollbarOption(&g_Config.m_ClHookAimFov, &g_Config.m_ClHookAimFov, &Button, Localize("Hook Aim FOV"), 16, 256);
+			Ui()->DoToolTip(&g_Config.m_ClHookAimFov, &Button, Localize("Radius of the FOV circle around your cursor, in game units"));
+			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
+			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
+			if(GameClient()->m_Menus.DoButton_CheckBox(&g_Config.m_ClHookAimShowFov, Localize("Show FOV"), g_Config.m_ClHookAimShowFov, &Button))
+				g_Config.m_ClHookAimShowFov ^= 1;
+			Ui()->DoToolTip(&g_Config.m_ClHookAimShowFov, &Button, Localize("Draw the FOV circle around your cursor"));
+		});
 	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));''',
     "Controls menu settings blocks",
 )
@@ -341,7 +361,7 @@ replace_once(
     "void CHud::OnNewSnapshot()\n{",
     '''void CHud::RenderCustomFeatureStatus()
 {
-\tconst char *apEnabledFeatures[4];
+\tconst char *apEnabledFeatures[5];
 \tint NumFeatures = 0;
 \tif(g_Config.m_ClAvoidFreeze)
 \t\tapEnabledFeatures[NumFeatures++] = Localize("Avoid Freeze");
@@ -349,6 +369,8 @@ replace_once(
 \t\tapEnabledFeatures[NumFeatures++] = Localize("PixelWalk");
 \tif(g_Config.m_ClDummyHammerOnW)
 \t\tapEnabledFeatures[NumFeatures++] = Localize("Dummy Hammer (W)");
+\tif(g_Config.m_ClHookAim)
+\t\tapEnabledFeatures[NumFeatures++] = Localize("Hook Aim");
 \tif(g_Config.m_ClAvoidFreeze && GameClient()->m_Controls.m_aAvoidFreezeOverride[g_Config.m_ClDummy])
 \t\tapEnabledFeatures[NumFeatures++] = Localize("Freeze Override");
 
@@ -384,9 +406,11 @@ checks = {
     "src/engine/shared/config_variables.h": [
         "cl_pixelwalk", "cl_pixelwalk_speed", "cl_dummy_hammer_w_speed",
         "cl_avoid_freeze", "cl_avoid_freeze_range",
+        "cl_hook_aim", "cl_hook_aim_fov", "cl_hook_aim_show_fov",
     ],
     "src/game/client/components/controls.cpp": [
-        'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze",
+        'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze", "m_aManualHook", "m_ClHookAim",
+        "CursorWorldPos()", "Target.m_Predicted.m_Pos",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localize("PixelWalk")', 'Localize("Dummy Hammer")', 'Localize("Avoid Freeze")',
@@ -396,10 +420,13 @@ checks = {
     ],
     "src/game/client/components/hud.cpp": [
         "RenderCustomFeatureStatus", 'Localize("Avoid Freeze")',
-        'Localize("PixelWalk")', 'Localize("Dummy Hammer (W)")', "m_aAvoidFreezeOverride",
+        'Localize("PixelWalk")', 'Localize("Dummy Hammer (W)")', 'Localize("Hook Aim")', "m_aAvoidFreezeOverride",
     ],
     "src/game/client/components/hud.h": [
         "RenderCustomFeatureStatus",
+    ],
+    "src/game/client/components/menus_settings_controls.cpp": [
+        'Localize("Enable Hook Aim")', 'Localize("Hook Aim FOV")', 'Localize("Show FOV")',
     ],
 }
 for relative_path, needles in checks.items():
