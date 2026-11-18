@@ -43,3 +43,4 @@
  		{
  			m_DummyFire++;
  			return 0;
+ 		}
