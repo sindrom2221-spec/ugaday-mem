@@ -33,16 +33,26 @@ jobs:
       - name: Apply W Hammer, PixelWalk, and menu patches
         shell: pwsh
         run: |
-          git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-w-hammer.patch"
-          git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-w-hammer.patch"
-          git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-pixelwalk.patch"
-          git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-pixelwalk.patch"
-          git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-pixelwalk-menu.patch"
-          git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-pixelwalk-menu.patch"
-          git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-dummy-hammer-speed-menu.patch"
-          git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-dummy-hammer-speed-menu.patch"
+          $ErrorActionPreference = 'Stop'
+          function Apply-DDNetPatch([string]$PatchName) {
+            $PatchPath = Join-Path $env:GITHUB_WORKSPACE $PatchName
+            git -C ddnet apply --check $PatchPath
+            if ($LASTEXITCODE -ne 0) { throw "Patch check failed: $PatchName" }
+            git -C ddnet apply $PatchPath
+            if ($LASTEXITCODE -ne 0) { throw "Patch apply failed: $PatchName" }
+          }
+          Apply-DDNetPatch 'ddnet-w-hammer.patch'
+          Apply-DDNetPatch 'ddnet-pixelwalk.patch'
+          Apply-DDNetPatch 'ddnet-pixelwalk-menu.patch'
+          Apply-DDNetPatch 'ddnet-dummy-hammer-speed-menu.patch'
+          $ControlsSource = Get-Content 'ddnet/src/game/client/components/controls.cpp' -Raw
+          if (-not $ControlsSource.Contains('Console()->Register("+pixelwalk"')) { throw 'PixelWalk command was not added to controls.cpp' }
+          $MenuSource = Get-Content 'ddnet/src/game/client/components/menus_settings_controls.cpp' -Raw
+          if (-not $MenuSource.Contains('Localize("PixelWalk")')) { throw 'PixelWalk settings block was not added to Controls menu' }
+          if (-not $MenuSource.Contains('Enable PixelWalk')) { throw 'PixelWalk enable control was not added to Controls menu' }
           Push-Location ddnet
           python scripts/check_config_variables.py
+          if ($LASTEXITCODE -ne 0) { throw 'Config variable validation failed' }
           Pop-Location
 
       - name: Configure Windows x64 Release
@@ -67,10 +77,35 @@ jobs:
         shell: pwsh
         run: cmake --build build --config Release --target package_default --parallel 4
 
+      - name: Verify packaged executable contains custom features
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          from zipfile import ZipFile
+          archives = list(Path("build").glob("*.zip"))
+          if not archives:
+              raise SystemExit("No packaged ZIP found in build/")
+          candidates = []
+          for archive in archives:
+              with ZipFile(archive) as z:
+                  exe_names = [n for n in z.namelist() if n.replace("\\", "/").lower().endswith("ddnet.exe")]
+                  for name in exe_names:
+                      candidates.append((archive, z.read(name)))
+          if not candidates:
+              raise SystemExit("Packaged DDNet.exe not found inside build ZIPs")
+          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed"]
+          for archive, binary in candidates:
+              missing = [token.decode("ascii") for token in required if token not in binary]
+              if missing:
+                  raise SystemExit(f"{archive}: missing custom executable strings: {missing}")
+              print(f"Verified custom features in {archive}")
+          '@ | python -
+
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: DDNet-PixelWalk-W-Hammer-Speed-Menu-Windows-x64
+          name: DDNet-PixelWalk-W-Hammer-Speed-Menu-Windows-x64-Verified
           path: build/*.zip
           if-no-files-found: error
           retention-days: 14
