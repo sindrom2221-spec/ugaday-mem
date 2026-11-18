@@ -161,7 +161,7 @@ replace_once(
 replace_once(
     "src/game/client/components/controls.cpp",
     "else\n\t{\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetX = (int)m_aMousePos[g_Config.m_ClDummy].x;\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetY = (int)m_aMousePos[g_Config.m_ClDummy].y;",
-    "\t\tm_aInputData[g_Config.m_ClDummy].m_Hook = m_aManualHook[g_Config.m_ClDummy];\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetX = (int)m_aMousePos[g_Config.m_ClDummy].x;\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetY = (int)m_aMousePos[g_Config.m_ClDummy].y;",
+    "else\n\t{\n\t\tm_aInputData[g_Config.m_ClDummy].m_Hook = m_aManualHook[g_Config.m_ClDummy];\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetX = (int)m_aMousePos[g_Config.m_ClDummy].x;\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetY = (int)m_aMousePos[g_Config.m_ClDummy].y;",
     "manual hook state before dummy input copy",
 )
 
