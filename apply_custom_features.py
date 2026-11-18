@@ -154,7 +154,7 @@ replace_once(
 		else
 			m_PixelWalkTick = 0;
 
-		// Avoid Freeze: steer away from a freeze tile in the current horizontal path.
+		// Avoid Freeze: release horizontal movement before entering a freeze tile.
 		if(g_Config.m_ClAvoidFreeze &&
 			(m_aInputData[g_Config.m_ClDummy].m_PlayerFlags & PLAYERFLAG_PLAYING) &&
 			m_aInputData[g_Config.m_ClDummy].m_Direction != 0 &&
@@ -170,11 +170,7 @@ replace_once(
 				if(!IsAvoidFreezeAt(*Collision(), PlayerPos) &&
 					IsAvoidFreezeAhead(*Collision(), PlayerPos, Direction, Range))
 				{
-					const int EscapeDirection = -Direction;
-					if(!IsAvoidFreezeAhead(*Collision(), PlayerPos, EscapeDirection, Range))
-						m_aInputData[g_Config.m_ClDummy].m_Direction = EscapeDirection;
-					else
-						m_aInputData[g_Config.m_ClDummy].m_Direction = 0;
+					m_aInputData[g_Config.m_ClDummy].m_Direction = 0;
 				}
 			}
 		}
@@ -225,7 +221,7 @@ replace_once(
 			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
 			if(GameClient()->m_Menus.DoButton_CheckBox(&g_Config.m_ClAvoidFreeze, Localize("Enable Avoid Freeze"), g_Config.m_ClAvoidFreeze, &Button))
 				g_Config.m_ClAvoidFreeze ^= 1;
-			Ui()->DoToolTip(&g_Config.m_ClAvoidFreeze, &Button, Localize("Steer away from nearby freeze tiles while moving horizontally"));
+			Ui()->DoToolTip(&g_Config.m_ClAvoidFreeze, &Button, Localize("Stop horizontal movement before nearby freeze tiles"));
 			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
 			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
 			Ui()->DoScrollbarOption(&g_Config.m_ClAvoidFreezeRange, &g_Config.m_ClAvoidFreezeRange, &Button, Localize("Avoidance Range"), 1, 8);
