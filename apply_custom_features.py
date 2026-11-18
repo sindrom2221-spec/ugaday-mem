@@ -24,7 +24,7 @@ MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SA
 MACRO_CONFIG_INT(ClPixelWalkSpeed, cl_pixelwalk_speed, 5, 1, 10, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "PixelWalk movement speed")
 MACRO_CONFIG_INT(ClAvoidFreeze, cl_avoid_freeze, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid moving into nearby freeze tiles")
 MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 1, 1, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze stopping distance, in 20-pixel steps")
-MACRO_CONFIG_INT(ClHookAim, cl_hook_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Automatically hook players inside the cursor FOV")
+MACRO_CONFIG_INT(ClHookAim, cl_hook_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Aim hook toward the closest player in FOV only while the hook key is held")
 MACRO_CONFIG_INT(ClHookAimFov, cl_hook_aim_fov, 64, 16, 256, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Hook Aim FOV radius in world units")
 MACRO_CONFIG_INT(ClHookAimShowFov, cl_hook_aim_show_fov, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Show the Hook Aim FOV circle")''',
     "configuration variables",
@@ -202,10 +202,10 @@ replace_once(
 			}
 		}
 
-		// Hook Aim: automatically hook the closest eligible player inside the cursor-centered FOV.
+		// Hook Aim: when the user holds the normal hook key, adjust its direction toward the closest eligible player inside FOV.
 		const int ActiveDummy = g_Config.m_ClDummy;
 		m_aInputData[ActiveDummy].m_Hook = m_aManualHook[ActiveDummy];
-		if(g_Config.m_ClHookAim && !m_aManualHook[ActiveDummy] &&
+		if(g_Config.m_ClHookAim && m_aManualHook[ActiveDummy] &&
 			(m_aInputData[ActiveDummy].m_PlayerFlags & PLAYERFLAG_PLAYING) &&
 			!GameClient()->m_Snap.m_SpecInfo.m_Active)
 		{
@@ -498,7 +498,7 @@ checks = {
     ],
     "src/game/client/components/controls.cpp": [
         'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze", "m_aManualHook", "m_ClHookAim",
-        "CursorWorldPos()", "Target.m_RenderPos",
+        "CursorWorldPos()", "Target.m_RenderPos", "m_ClHookAim && m_aManualHook[ActiveDummy]",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localize("PixelWalk")', 'Localize("Dummy Hammer")', 'Localize("Avoid Freeze")',
