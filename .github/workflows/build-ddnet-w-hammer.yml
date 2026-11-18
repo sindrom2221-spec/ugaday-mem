@@ -91,7 +91,7 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: DDNet-PixelWalk-W-Hammer-AvoidFreeze-Windows-x64
+          name: DDNet-S1ndrom-HoldToHookAim-Windows-x64
           path: build/*.zip
           if-no-files-found: error
           retention-days: 14
