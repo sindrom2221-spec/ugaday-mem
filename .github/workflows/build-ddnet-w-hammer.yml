@@ -30,26 +30,12 @@ jobs:
         shell: pwsh
         run: git clone --depth 1 --recurse-submodules https://github.com/ddnet/ddnet.git ddnet
 
-      - name: Apply W Hammer, PixelWalk, and menu patches
+      - name: Apply and verify custom DDNet features
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          function Apply-DDNetPatch([string]$PatchName) {
-            $PatchPath = Join-Path $env:GITHUB_WORKSPACE $PatchName
-            git -C ddnet apply --check $PatchPath
-            if ($LASTEXITCODE -ne 0) { throw "Patch check failed: $PatchName" }
-            git -C ddnet apply $PatchPath
-            if ($LASTEXITCODE -ne 0) { throw "Patch apply failed: $PatchName" }
-          }
-          Apply-DDNetPatch 'ddnet-w-hammer.patch'
-          Apply-DDNetPatch 'ddnet-pixelwalk.patch'
-          Apply-DDNetPatch 'ddnet-pixelwalk-menu.patch'
-          Apply-DDNetPatch 'ddnet-dummy-hammer-speed-menu.patch'
-          $ControlsSource = Get-Content 'ddnet/src/game/client/components/controls.cpp' -Raw
-          if (-not $ControlsSource.Contains('Console()->Register("+pixelwalk"')) { throw 'PixelWalk command was not added to controls.cpp' }
-          $MenuSource = Get-Content 'ddnet/src/game/client/components/menus_settings_controls.cpp' -Raw
-          if (-not $MenuSource.Contains('Localize("PixelWalk")')) { throw 'PixelWalk settings block was not added to Controls menu' }
-          if (-not $MenuSource.Contains('Enable PixelWalk')) { throw 'PixelWalk enable control was not added to Controls menu' }
+          python apply_custom_features.py ddnet
+          if ($LASTEXITCODE -ne 0) { throw 'Custom feature installer failed' }
           Push-Location ddnet
           python scripts/check_config_variables.py
           if ($LASTEXITCODE -ne 0) { throw 'Config variable validation failed' }
@@ -94,7 +80,7 @@ jobs:
                       candidates.append((archive, z.read(name)))
           if not candidates:
               raise SystemExit("Packaged DDNet.exe not found inside build ZIPs")
-          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed"]
+          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed", b"cl_avoid_freeze", b"cl_avoid_freeze_range", b"Enable Avoid Freeze", b"Avoidance Range"]
           for archive, binary in candidates:
               missing = [token.decode("ascii") for token in required if token not in binary]
               if missing:
@@ -105,7 +91,7 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: DDNet-PixelWalk-W-Hammer-Speed-Menu-Windows-x64-Verified
+          name: DDNet-PixelWalk-W-Hammer-AvoidFreeze-Windows-x64
           path: build/*.zip
           if-no-files-found: error
           retention-days: 14
