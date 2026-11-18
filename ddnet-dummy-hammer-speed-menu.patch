@@ -1,19 +1,27 @@
 --- a/src/engine/shared/config_variables.h
 +++ b/src/engine/shared/config_variables.h
-@@ -256,1 +256,1 @@
+@@ -257,5 +257,5 @@
+ MACRO_CONFIG_INT(ClDummy, cl_dummy, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether you control your player (0) or your dummy (1)")
+ MACRO_CONFIG_INT(ClDummyHammer, cl_dummy_hammer, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether dummy is hammering for a hammerfly")
+ MACRO_CONFIG_INT(ClDummyHammerOnW, cl_dummy_hammer_on_w, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Whether dummy hammers while holding W")
 -MACRO_CONFIG_INT(ClDummyHammerWInterval, cl_dummy_hammer_w_interval, 1, 1, 25, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Dummy hammer interval in ticks while holding W (lower is faster)")
 +MACRO_CONFIG_INT(ClDummyHammerWSpeed, cl_dummy_hammer_w_speed, 10, 1, 25, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Dummy hammer attempt speed while holding W")
+ MACRO_CONFIG_INT(ClDummyResetOnSwitch, cl_dummy_resetonswitch, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Whether dummy or player should stop pressing keys when you switch (0 = off, 1 = dummy, 2 = player)")
 
 --- a/src/game/client/gameclient.cpp
 +++ b/src/game/client/gameclient.cpp
-@@ -565,2 +565,2 @@
+@@ -561,5 +561,5 @@
+ 		// the weapon's actual reload time.
  		const unsigned int HammerInterval = DummyHammerOnW ?
 -			(unsigned int)g_Config.m_ClDummyHammerWInterval : 25U;
 +			(unsigned int)(26 - g_Config.m_ClDummyHammerWSpeed) : 25U;
+ 		if(m_DummyFire % HammerInterval != 0)
+ 		{
+ 			m_DummyFire++;
 
 --- a/src/game/client/components/menus_settings_controls.cpp
 +++ b/src/game/client/components/menus_settings_controls.cpp
-@@ -222,1 +222,16 @@
+@@ -211,1 +211,15 @@
 +	RenderSettingsBlock(2.0f * BUTTON_HEIGHT + BUTTON_SPACING, &RightColumn, Localize("Dummy Hammer"), nullptr, nullptr,
 +		[&](CUIRect Rect) {
 +			CUIRect Button;
@@ -27,5 +35,4 @@
 +			Ui()->DoScrollbarOption(&g_Config.m_ClDummyHammerWSpeed, &g_Config.m_ClDummyHammerWSpeed, &Button, Localize("Dummy Hammer Speed"), 1, 25);
 +			Ui()->DoToolTip(&g_Config.m_ClDummyHammerWSpeed, &Button, Localize("Higher values send hammer attempts more frequently; actual hit speed is limited by server reload"));
 +		});
-+
- 	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));
++	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));
