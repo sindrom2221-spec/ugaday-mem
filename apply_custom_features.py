@@ -321,6 +321,9 @@ replace_once(
 \tCheck(LeftColumn, &g_Config.m_ClHookAim, Localize("Enable Hook Aim"));
 \tSlider(LeftColumn, &g_Config.m_ClHookAimFov, Localize("Hook Aim FOV"), 16, 256);
 \tCheck(LeftColumn, &g_Config.m_ClHookAimShowFov, Localize("Show FOV"));
+\tCUIRect HookAimNote;
+\tLeftColumn.HSplitTop(30.0f, &HookAimNote, &LeftColumn);
+\tUi()->DoLabel(&HookAimNote, Localize("Only guides your hook while you hold the hook key."), 10.0f, TEXTALIGN_ML);
 
 \tLeftColumn.HSplitTop(18.0f, nullptr, &LeftColumn);
 \tSection(LeftColumn, Localize("Avoid Freeze"));
