@@ -1,0 +1,1 @@
+Trigger a validated Windows build after patch newline fixes.
