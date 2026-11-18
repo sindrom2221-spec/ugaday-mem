@@ -521,6 +521,7 @@ checks = {
     ],
     "src/game/client/components/menus_settings.cpp": [
         'Localize("S1ndrom")', "RenderSettingsS1ndrom",
+        "Only guides your hook while you hold the hook key.",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localizable("PixelWalk")', 'Localizable("Avoid Freeze Override")',
@@ -532,4 +533,4 @@ for relative_path, needles in checks.items():
     if missing:
         raise SystemExit(f"Feature verification failed in {relative_path}: missing {missing}")
 
-print("Applied and verified: W Dummy Hammer, PixelWalk, Avoid Freeze, and Hook Aim.")
+print("Applied and verified: W Dummy Hammer, PixelWalk, Avoid Freeze, and hold-to-hook Aim Assist.")
