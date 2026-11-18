@@ -1,9 +1,9 @@
-name: Build DDNet PixelWalk + W Hammer + Menu (Windows x64)
+name: Build DDNet PixelWalk + W Hammer + Speed Menu (Windows x64)
 
 on:
   push:
     branches:
-      - ddnet-pixelwalk-menu-20261118
+      - ddnet-dummy-hammer-speed-menu-20261118
   workflow_dispatch:
 
 permissions:
@@ -39,6 +39,8 @@ jobs:
           git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-pixelwalk.patch"
           git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-pixelwalk-menu.patch"
           git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-pixelwalk-menu.patch"
+          git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-dummy-hammer-speed-menu.patch"
+          git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-dummy-hammer-speed-menu.patch"
           Push-Location ddnet
           python scripts/check_config_variables.py
           Pop-Location
@@ -68,7 +70,7 @@ jobs:
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: DDNet-PixelWalk-W-Hammer-Menu-Windows-x64
+          name: DDNet-PixelWalk-W-Hammer-Speed-Menu-Windows-x64
           path: build/*.zip
           if-no-files-found: error
           retention-days: 14
