@@ -410,7 +410,7 @@ checks = {
     ],
     "src/game/client/components/controls.cpp": [
         'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze", "m_aManualHook", "m_ClHookAim",
-        "CursorWorldPos()", "Target.m_Predicted.m_Pos",
+        "CursorWorldPos()", "Target.m_Predicted.m_Pos", "LinesDraw(aFovLines, SEGMENTS)",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localize("PixelWalk")', 'Localize("Dummy Hammer")', 'Localize("Avoid Freeze")',
@@ -435,4 +435,4 @@ for relative_path, needles in checks.items():
     if missing:
         raise SystemExit(f"Feature verification failed in {relative_path}: missing {missing}")
 
-print("Applied and verified: W Dummy Hammer, PixelWalk, and Avoid Freeze.")
+print("Applied and verified: W Dummy Hammer, PixelWalk, Avoid Freeze, and Hook Aim.")
