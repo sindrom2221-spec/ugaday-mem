@@ -45,3 +45,4 @@
 +			Ui()->DoToolTip(&g_Config.m_ClPixelWalkSpeed, &Button, Localize("Higher values make PixelWalk movement faster"));
 +		});
  	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));
+
