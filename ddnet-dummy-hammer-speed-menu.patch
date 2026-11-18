@@ -21,7 +21,7 @@
 
 --- a/src/game/client/components/menus_settings_controls.cpp
 +++ b/src/game/client/components/menus_settings_controls.cpp
-@@ -211,1 +211,15 @@
+@@ -211,1 +211,14 @@
 +	RenderSettingsBlock(2.0f * BUTTON_HEIGHT + BUTTON_SPACING, &RightColumn, Localize("Dummy Hammer"), nullptr, nullptr,
 +		[&](CUIRect Rect) {
 +			CUIRect Button;
