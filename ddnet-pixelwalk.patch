@@ -3,37 +3,35 @@
 @@ -260,1 +260,2 @@
  MACRO_CONFIG_INT(ClDummyCopyMoves, cl_dummy_copy_moves, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether dummy should copy your moves")
 +MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Enable PixelWalk while the +pixelwalk bind is held")
-
 --- a/src/game/client/components/controls.h
 +++ b/src/game/client/components/controls.h
-@@ -42,1 +42,2 @@
+@@ -42,1 +42,3 @@
  	int m_aShowHookColl[NUM_DUMMIES];
 +	int m_aPixelWalk[NUM_DUMMIES];
 +	int m_PixelWalkTick;
-
 --- a/src/game/client/components/controls.cpp
 +++ b/src/game/client/components/controls.cpp
-@@ -25,3 +25,5 @@
+@@ -25,4 +25,6 @@
  CControls::CControls()
  {
 +	m_PixelWalkTick = 0;
 +	mem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));
  	mem_zero(&m_aLastData, sizeof(m_aLastData));
  	std::fill(std::begin(m_aMouseOnAction), std::end(m_aMouseOnAction), false);
-@@ -35,3 +37,4 @@
+@@ -35,4 +37,5 @@
  void CControls::OnReset()
  {
 +	m_PixelWalkTick = 0;
  	ResetInput(0);
  	ResetInput(1);
-@@ -48,6 +51,7 @@
+@@ -48,5 +51,6 @@
  void CControls::ResetInput(int Dummy)
  {
 +	m_aPixelWalk[Dummy] = 0;
  	m_aLastData[Dummy].m_Direction = 0;
  	// simulate releasing the fire button
  	if((m_aLastData[Dummy].m_Fire & 1) != 0)
-@@ -151,3 +155,7 @@
+@@ -151,4 +155,8 @@
  		static CInputState s_State = {this, {&m_aShowHookColl[0], &m_aShowHookColl[1]}, false};
  		Console()->Register("+showhookcoll", "", CFGFLAG_CLIENT, ConKeyInputState, &s_State, "Show Hook Collision");
  	}
@@ -42,7 +40,7 @@
 +		Console()->Register("+pixelwalk", "", CFGFLAG_CLIENT, ConKeyInputState, &s_PixelWalk, "PixelWalk while held");
 +	}
  
-@@ -371,3 +379,12 @@
+@@ -371,3 +379,14 @@
  		}
  
 +		// PixelWalk is a hold action: +pixelwalk activates it and key release clears it.
