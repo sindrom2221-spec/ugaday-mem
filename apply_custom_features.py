@@ -235,6 +235,62 @@ replace_once(
     "Controls menu settings blocks",
 )
 
+# HUD overlay: list only custom features whose enable switches are on.
+replace_once(
+    "src/game/client/components/hud.h",
+    "\tvoid RenderLocalTime(float x);",
+    "\tvoid RenderLocalTime(float x);\n\tvoid RenderCustomFeatureStatus();",
+    "HUD feature status declaration",
+)
+replace_once(
+    "src/game/client/components/hud.cpp",
+    "\t\tRenderLocalTime((m_Width / 7) * 3);",
+    "\t\tRenderLocalTime((m_Width / 7) * 3);\n\t\tRenderCustomFeatureStatus();",
+    "HUD feature status render call",
+)
+replace_once(
+    "src/game/client/components/hud.cpp",
+    "void CHud::OnNewSnapshot()\n{",
+    '''void CHud::RenderCustomFeatureStatus()
+{
+\tconst char *apEnabledFeatures[4];
+\tint NumFeatures = 0;
+\tif(g_Config.m_ClAvoidFreeze)
+\t\tapEnabledFeatures[NumFeatures++] = Localize("Avoid Freeze");
+\tif(g_Config.m_ClPixelWalk)
+\t\tapEnabledFeatures[NumFeatures++] = Localize("PixelWalk");
+\tif(g_Config.m_ClDummyHammerOnW)
+\t\tapEnabledFeatures[NumFeatures++] = Localize("Dummy Hammer (W)");
+\tif(g_Config.m_ClAvoidFreeze && GameClient()->m_Controls.m_aAvoidFreezeOverride[g_Config.m_ClDummy])
+\t\tapEnabledFeatures[NumFeatures++] = Localize("Freeze Override");
+
+\tif(NumFeatures == 0)
+\t\treturn;
+
+\tconst float FontSize = 7.0f;
+\tconst float LineHeight = 9.0f;
+\tconst float Padding = 5.0f;
+\tfloat TextWidth = 0.0f;
+\tfor(int i = 0; i < NumFeatures; ++i)
+\t\tTextWidth = std::max(TextWidth, TextRender()->TextWidth(FontSize, apEnabledFeatures[i], -1, -1.0f));
+
+\tconst float BoxWidth = TextWidth + Padding * 2.0f;
+\tconst float BoxHeight = NumFeatures * LineHeight + Padding * 2.0f;
+\tconst float X = m_Width - BoxWidth - 5.0f;
+\tconst float Y = 16.0f;
+\tGraphics()->DrawRect(X, Y, BoxWidth, BoxHeight, ColorRGBA(0.0f, 0.0f, 0.0f, 0.45f), IGraphics::CORNER_ALL, 4.0f);
+
+\tTextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+\tfor(int i = 0; i < NumFeatures; ++i)
+\t\tTextRender()->Text(X + Padding, Y + Padding + i * LineHeight, FontSize, apEnabledFeatures[i], -1.0f);
+\tTextRender()->TextColor(TextRender()->DefaultTextColor());
+}
+
+void CHud::OnNewSnapshot()
+{''',
+    "HUD feature status implementation",
+)
+
 # Final source checks prevent silently producing a client without one of the requested features.
 checks = {
     "src/engine/shared/config_variables.h": [
@@ -249,6 +305,13 @@ checks = {
     ],
     "src/game/client/gameclient.cpp": [
         "ClDummyHammerOnW", "ClDummyHammerWSpeed",
+    ],
+    "src/game/client/components/hud.cpp": [
+        "RenderCustomFeatureStatus", 'Localize("Avoid Freeze")',
+        'Localize("PixelWalk")', 'Localize("Dummy Hammer (W)")', "m_aAvoidFreezeOverride",
+    ],
+    "src/game/client/components/hud.h": [
+        "RenderCustomFeatureStatus",
     ],
 }
 for relative_path, needles in checks.items():
