@@ -25,7 +25,7 @@ MACRO_CONFIG_INT(ClPixelWalkSpeed, cl_pixelwalk_speed, 5, 1, 10, CFGFLAG_CLIENT 
 MACRO_CONFIG_INT(ClAvoidFreeze, cl_avoid_freeze, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid moving into nearby freeze tiles")
 MACRO_CONFIG_INT(ClAvoidFreezeRange, cl_avoid_freeze_range, 1, 1, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Avoid Freeze stopping distance, in 20-pixel steps")
 MACRO_CONFIG_INT(ClHookAim, cl_hook_aim, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Aim hook toward the closest player in FOV only while the hook key is held")
-MACRO_CONFIG_INT(ClHookAimFov, cl_hook_aim_fov, 64, 16, 256, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Hook Aim FOV radius in world units")
+MACRO_CONFIG_INT(ClHookAimFov, cl_hook_aim_fov, 64, 1, 180, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Hook Aim FOV angle in degrees")
 MACRO_CONFIG_INT(ClHookAimShowFov, cl_hook_aim_show_fov, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Show the Hook Aim FOV circle")''',
     "configuration variables",
 )
@@ -78,6 +78,7 @@ replace_once(
     "src/game/client/components/controls.cpp",
     "#include <algorithm>\n",
     '''#include <algorithm>
+#include <cmath>
 
 static bool IsAvoidFreezeTile(int Tile)
 {
@@ -213,9 +214,15 @@ replace_once(
 			if(LocalId >= 0 && LocalId < MAX_CLIENTS && GameClient()->m_Snap.m_aCharacters[LocalId].m_Active)
 			{
 				const vec2 CursorPosition = CursorWorldPos();
-				const float FovRadius = (float)std::clamp(g_Config.m_ClHookAimFov, 16, 256);
-				int BestTarget = -1;
-				float BestDistance = FovRadius;
+				const vec2 TeePosition = GameClient()->m_LocalCharacterPos;
+				vec2 CursorDirection = CursorPosition - TeePosition;
+				if(length(CursorDirection) > 0.001f)
+				{
+					CursorDirection = normalize(CursorDirection);
+					const float HalfFov = std::clamp((float)g_Config.m_ClHookAimFov, 1.0f, 180.0f) * pi / 360.0f;
+					const float MinimumDot = std::cos(HalfFov);
+					int BestTarget = -1;
+					float BestDot = MinimumDot;
 				for(int ClientId = 0; ClientId < MAX_CLIENTS; ++ClientId)
 				{
 					const auto &Target = GameClient()->m_aClients[ClientId];
@@ -223,10 +230,14 @@ replace_once(
 						Target.m_Spec || Target.m_Paused || Target.m_HookHitDisabled ||
 						!GameClient()->m_Snap.m_aCharacters[ClientId].m_Active)
 						continue;
-					const float DistanceToCursor = length(Target.m_RenderPos - CursorPosition);
-					if(DistanceToCursor <= BestDistance)
+					vec2 TargetDirection = Target.m_RenderPos - TeePosition;
+					if(length(TargetDirection) <= 0.001f)
+						continue;
+					TargetDirection = normalize(TargetDirection);
+					const float AimDot = dot(CursorDirection, TargetDirection);
+					if(AimDot >= BestDot)
 					{
-						BestDistance = DistanceToCursor;
+						BestDot = AimDot;
 						BestTarget = ClientId;
 					}
 				}
@@ -239,6 +250,7 @@ replace_once(
 						m_aInputData[ActiveDummy].m_TargetY = round_to_int(HookDirection.y);
 						m_aInputData[ActiveDummy].m_Hook = 1;
 					}
+				}
 				}
 			}
 		}
@@ -319,11 +331,11 @@ replace_once(
 
 \tSection(LeftColumn, Localize("Hook Aim"));
 \tCheck(LeftColumn, &g_Config.m_ClHookAim, Localize("Enable Hook Aim"));
-\tSlider(LeftColumn, &g_Config.m_ClHookAimFov, Localize("Hook Aim FOV"), 16, 256);
+\tSlider(LeftColumn, &g_Config.m_ClHookAimFov, Localize("Hook Aim FOV (degrees)"), 1, 180);
 \tCheck(LeftColumn, &g_Config.m_ClHookAimShowFov, Localize("Show FOV"));
 \tCUIRect HookAimNote;
-\tLeftColumn.HSplitTop(30.0f, &HookAimNote, &LeftColumn);
-\tUi()->DoLabel(&HookAimNote, Localize("Only guides your hook while you hold the hook key."), 10.0f, TEXTALIGN_ML);
+\tLeftColumn.HSplitTop(42.0f, &HookAimNote, &LeftColumn);
+\tUi()->DoLabel(&HookAimNote, Localize("Only guides your hook while you hold the hook key. FOV is an angle shown by two lines from your tee."), 10.0f, TEXTALIGN_ML);
 
 \tLeftColumn.HSplitTop(18.0f, nullptr, &LeftColumn);
 \tSection(LeftColumn, Localize("Avoid Freeze"));
@@ -410,41 +422,48 @@ replace_once(
     "void CHud::OnNewSnapshot()\n{",
     """void CHud::RenderHookAimFov()
 {
-\tif(!g_Config.m_ClHookAimShowFov ||
-\t\t(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK) ||
-\t\tGameClient()->m_Menus.IsActive() || GameClient()->m_Chat.IsActive() || GameClient()->m_GameConsole.IsActive() ||
-\t\t!GameClient()->m_Snap.m_pGameInfoObj)
-\t\treturn;
+	if(!g_Config.m_ClHookAimShowFov ||
+		(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK) ||
+		GameClient()->m_Menus.IsActive() || GameClient()->m_Chat.IsActive() || GameClient()->m_GameConsole.IsActive() ||
+		!GameClient()->m_Snap.m_pGameInfoObj)
+		return;
 
-\tconst float Zoom = std::max(GameClient()->m_Camera.m_Zoom, 0.001f);
-\tconst vec2 CameraCenter = GameClient()->m_Camera.m_Center;
-\tconst vec2 Cursor = GameClient()->m_Controls.m_aTargetPos[g_Config.m_ClDummy];
-\tconst vec2 ScreenCenter(m_Width / 2.0f, m_Height / 2.0f);
-\tconst vec2 ScreenCursor = ScreenCenter + (Cursor - CameraCenter) / Zoom;
-\tconst float Radius = std::clamp((float)g_Config.m_ClHookAimFov / Zoom, 2.0f, 256.0f);
+	const int LocalId = GameClient()->m_aLocalIds[g_Config.m_ClDummy];
+	if(LocalId < 0 || LocalId >= MAX_CLIENTS || !GameClient()->m_Snap.m_aCharacters[LocalId].m_Active)
+		return;
 
-\tconstexpr int SEGMENTS = 96;
-\tIGraphics::CLineItem aFovLines[SEGMENTS];
-\tfor(int i = 0; i < SEGMENTS; ++i)
-\t{
-\t\tconst float Angle0 = 2.0f * pi * (float)i / SEGMENTS;
-\t\tconst float Angle1 = 2.0f * pi * (float)(i + 1) / SEGMENTS;
-\t\taFovLines[i] = IGraphics::CLineItem(
-\t\t\tScreenCursor + direction(Angle0) * Radius,
-\t\t\tScreenCursor + direction(Angle1) * Radius);
-\t}
+	const vec2 TeePosition = GameClient()->m_LocalCharacterPos;
+	const vec2 CursorPosition = GameClient()->m_Controls.m_aTargetPos[g_Config.m_ClDummy];
+	const vec2 CursorDirection = CursorPosition - TeePosition;
+	if(length(CursorDirection) <= 0.001f)
+		return;
 
-\tGraphics()->TextureClear();
-\tGraphics()->SetColor(ColorRGBA(0.15f, 0.85f, 1.0f, 0.95f));
-\tGraphics()->LinesBegin();
-\tGraphics()->LinesDraw(aFovLines, SEGMENTS);
-\tGraphics()->LinesEnd();
-\tGraphics()->SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+	const float Zoom = std::max(GameClient()->m_Camera.m_Zoom, 0.001f);
+	const vec2 CameraCenter = GameClient()->m_Camera.m_Center;
+	const vec2 ScreenCenter(m_Width / 2.0f, m_Height / 2.0f);
+	const vec2 ScreenTee = ScreenCenter + (TeePosition - CameraCenter) / Zoom;
+	const float HalfFov = std::clamp((float)g_Config.m_ClHookAimFov, 1.0f, 180.0f) * pi / 360.0f;
+	const float CursorAngle = angle(CursorDirection);
+	const vec2 LeftDirection = direction(CursorAngle - HalfFov);
+	const vec2 RightDirection = direction(CursorAngle + HalfFov);
+	const float RayLength = (m_Width + m_Height) * 1.5f;
+
+	IGraphics::CLineItem aFovLines[2] = {
+		IGraphics::CLineItem(ScreenTee, ScreenTee + LeftDirection * RayLength),
+		IGraphics::CLineItem(ScreenTee, ScreenTee + RightDirection * RayLength),
+	};
+
+	Graphics()->TextureClear();
+	Graphics()->SetColor(ColorRGBA(0.15f, 0.85f, 1.0f, 0.95f));
+	Graphics()->LinesBegin();
+	Graphics()->LinesDraw(aFovLines, 2);
+	Graphics()->LinesEnd();
+	Graphics()->SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
 void CHud::OnNewSnapshot()
 {""",
-    "HUD FOV circle implementation",
+    "HUD angular FOV cone implementation",
 )
 
 replace_once(
@@ -497,11 +516,11 @@ checks = {
     "src/engine/shared/config_variables.h": [
         "cl_pixelwalk", "cl_pixelwalk_speed", "cl_dummy_hammer_w_speed",
         "cl_avoid_freeze", "cl_avoid_freeze_range",
-        "cl_hook_aim", "cl_hook_aim_fov", "cl_hook_aim_show_fov",
+        "cl_hook_aim", "cl_hook_aim_fov", "cl_hook_aim_show_fov", "Hook Aim FOV angle in degrees",
     ],
     "src/game/client/components/controls.cpp": [
         'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze", "m_aManualHook", "m_ClHookAim",
-        "CursorWorldPos()", "Target.m_RenderPos", "m_ClHookAim && m_aManualHook[ActiveDummy]",
+        "CursorWorldPos()", "Target.m_RenderPos", "m_ClHookAim && m_aManualHook[ActiveDummy]", "HalfFov", "std::cos(HalfFov)",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localize("PixelWalk")', 'Localize("Dummy Hammer")', 'Localize("Avoid Freeze")',
@@ -510,7 +529,7 @@ checks = {
         "ClDummyHammerOnW", "ClDummyHammerWSpeed",
     ],
     "src/game/client/components/hud.cpp": [
-        "RenderCustomFeatureStatus", 'Localize("Avoid Freeze")',
+        "RenderCustomFeatureStatus", "RenderHookAimFov", "LeftDirection", "RightDirection", "CursorAngle", 'Localize("Avoid Freeze")',
         'Localize("PixelWalk")', 'Localize("Dummy Hammer (W)")', 'Localize("Hook Aim")', "m_aAvoidFreezeOverride",
     ],
     "src/game/client/components/hud.h": [
