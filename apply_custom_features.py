@@ -248,7 +248,7 @@ checks = {
         'Localize("PixelWalk")', 'Localize("Dummy Hammer")', 'Localize("Avoid Freeze")',
     ],
     "src/game/client/gameclient.cpp": [
-        "cl_dummy_hammer_on_w", "ClDummyHammerWSpeed",
+        "ClDummyHammerOnW", "ClDummyHammerWSpeed",
     ],
 }
 for relative_path, needles in checks.items():
