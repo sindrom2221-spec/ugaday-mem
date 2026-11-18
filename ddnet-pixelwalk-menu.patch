@@ -3,7 +3,6 @@
 @@ -261,1 +261,2 @@
  MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Enable PixelWalk while the +pixelwalk bind is held")
 +MACRO_CONFIG_INT(ClPixelWalkSpeed, cl_pixelwalk_speed, 5, 1, 10, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "PixelWalk movement speed")
-
 --- a/src/game/client/components/controls.cpp
 +++ b/src/game/client/components/controls.cpp
 @@ -385,10 +385,12 @@
@@ -22,15 +21,14 @@
  		}
  		else
  			m_PixelWalkTick = 0;
-
 --- a/src/game/client/components/menus_settings_controls.cpp
 +++ b/src/game/client/components/menus_settings_controls.cpp
-@@ -55,6 +55,7 @@
+@@ -55,3 +55,4 @@
  		{EBindOptionGroup::MOVEMENT, Localizable("Toggle dyncam"), "toggle cl_dyncam 0 1"},
  		{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},
 +		{EBindOptionGroup::MOVEMENT, Localizable("PixelWalk"), "+pixelwalk"},
  		{EBindOptionGroup::WEAPON, Localizable("Hammer"), "+weapon1"},
-@@ -205,6 +206,21 @@
+@@ -205,3 +206,16 @@
  	RenderSettingsBindsBlock(EBindOptionGroup::DUMMY, &RightColumn, Localize("Dummy"));
  	RenderSettingsBindsBlock(EBindOptionGroup::PRACTICE, &RightColumn, Localize("Practice"));
 +	RenderSettingsBlock(2.0f * BUTTON_HEIGHT + BUTTON_SPACING, &RightColumn, Localize("PixelWalk"), nullptr, nullptr,
