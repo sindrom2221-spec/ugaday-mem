@@ -1,0 +1,68 @@
+name: Build DDNet W Hammer (Windows x64)
+
+on:
+  push:
+    branches:
+      - ddnet-w-hammer-build-20261118
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout build recipe
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Clone DDNet and bundled libraries
+        shell: pwsh
+        run: git clone --depth 1 --recurse-submodules https://github.com/ddnet/ddnet.git ddnet
+
+      - name: Apply and validate W hammer patch
+        shell: pwsh
+        run: |
+          git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-w-hammer.patch"
+          git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-w-hammer.patch"
+          python ddnet/scripts/check_config_variables.py
+
+      - name: Configure Windows x64 Release
+        shell: pwsh
+        run: >
+          cmake -S ddnet -B build -A x64
+          -DCMAKE_BUILD_TYPE=Release
+          -DPREFER_BUNDLED_LIBS=ON
+          -DVULKAN=OFF
+          -DVIDEORECORDER=OFF
+          -DWEBSOCKETS=OFF
+          -DUPNP=OFF
+          -DANTIBOT=OFF
+          -DSTEAM=OFF
+          -DDOWNLOAD_GTEST=OFF
+
+      - name: Build DDNet
+        shell: pwsh
+        run: cmake --build build --config Release --target everything --parallel 4
+
+      - name: Package Windows client
+        shell: pwsh
+        run: cmake --build build --config Release --target package_default --parallel 4
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: DDNet-W-Hammer-Windows-x64
+          path: build/*.zip
+          if-no-files-found: error
+          retention-days: 14
