@@ -63,8 +63,8 @@ replace_once(
 
 replace_once(
     "src/game/client/components/hud.cpp",
-    '#include "hud.h"\\n',
-    '#include "hud.h"\\n\\n#include <algorithm>\\n',
+    '#include "hud.h"\n',
+    '#include "hud.h"\n\n#include <algorithm>\n',
     "HUD algorithm include",
 )
 
