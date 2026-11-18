@@ -35,7 +35,9 @@ jobs:
         run: |
           git -C ddnet apply --check "$env:GITHUB_WORKSPACE/ddnet-w-hammer.patch"
           git -C ddnet apply "$env:GITHUB_WORKSPACE/ddnet-w-hammer.patch"
-          python ddnet/scripts/check_config_variables.py
+          Push-Location ddnet
+          python scripts/check_config_variables.py
+          Pop-Location
 
       - name: Configure Windows x64 Release
         shell: pwsh
