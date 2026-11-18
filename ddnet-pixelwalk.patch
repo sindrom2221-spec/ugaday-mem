@@ -2,12 +2,13 @@
 +++ b/src/engine/shared/config_variables.h
 @@ -260,1 +260,2 @@
  MACRO_CONFIG_INT(ClDummyCopyMoves, cl_dummy_copy_moves, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_INSENSITIVE, "Whether dummy should copy your moves")
-+MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Send movement input every other tick for precise pixel walking")
++MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Enable PixelWalk while the +pixelwalk bind is held")
 
 --- a/src/game/client/components/controls.h
 +++ b/src/game/client/components/controls.h
 @@ -42,1 +42,2 @@
  	int m_aShowHookColl[NUM_DUMMIES];
++	int m_aPixelWalk[NUM_DUMMIES];
 +	int m_PixelWalkTick;
 
 --- a/src/game/client/components/controls.cpp
@@ -15,7 +16,7 @@
 @@ -25,3 +25,4 @@
  CControls::CControls()
  {
-+	m_PixelWalkTick = 0;
++	mem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));
  	mem_zero(&m_aLastData, sizeof(m_aLastData));
  	std::fill(std::begin(m_aMouseOnAction), std::end(m_aMouseOnAction), false);
 @@ -35,3 +36,4 @@
@@ -24,12 +25,28 @@
 +	m_PixelWalkTick = 0;
  	ResetInput(0);
  	ResetInput(1);
-@@ -371,3 +373,11 @@
+@@ -48,6 +50,7 @@
+ void CControls::ResetInput(int Dummy)
+ {
++	m_aPixelWalk[Dummy] = 0;
+ 	m_aLastData[Dummy].m_Direction = 0;
+ 	// simulate releasing the fire button
+ 	if((m_aLastData[Dummy].m_Fire & 1) != 0)
+@@ -151,3 +154,7 @@
+ 		static CInputState s_State = {this, {&m_aShowHookColl[0], &m_aShowHookColl[1]}, false};
+ 		Console()->Register("+showhookcoll", "", CFGFLAG_CLIENT, ConKeyInputState, &s_State, "Show Hook Collision");
+ 	}
++	{
++		static CInputState s_PixelWalk = {this, {&m_aPixelWalk[0], &m_aPixelWalk[1]}, false};
++		Console()->Register("+pixelwalk", "", CFGFLAG_CLIENT, ConKeyInputState, &s_PixelWalk, "PixelWalk while held");
++	}
+ 
+@@ -371,3 +378,12 @@
  		}
  
-+		// PixelWalk: while a direction is held, send movement on alternating ticks.
-+		// Other inputs (jump, hook, fire) are left untouched.
-+		if(g_Config.m_ClPixelWalk && m_aInputData[g_Config.m_ClDummy].m_Direction != 0)
++		// PixelWalk is a hold action: +pixelwalk activates it and key release clears it.
++		// Alternate movement-on/movement-off input ticks for more granular stepping.
++		if(g_Config.m_ClPixelWalk && m_aPixelWalk[g_Config.m_ClDummy] && m_aInputData[g_Config.m_ClDummy].m_Direction != 0)
 +		{
 +			m_PixelWalkTick ^= 1;
 +			if(m_PixelWalkTick == 0)
