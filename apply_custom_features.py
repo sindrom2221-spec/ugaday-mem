@@ -65,7 +65,7 @@ replace_once(
 replace_once(
     "src/game/client/components/controls.h",
     "\tint m_aShowHookColl[NUM_DUMMIES];",
-    "\tint m_aShowHookColl[NUM_DUMMIES];\n\tint m_aPixelWalk[NUM_DUMMIES];\n\tint m_aAvoidFreezeOverride[NUM_DUMMIES];\n\tint m_PixelWalkTick;",
+    "\tint m_aShowHookColl[NUM_DUMMIES];\n\tint m_aManualHook[NUM_DUMMIES];\n\tint m_aPixelWalk[NUM_DUMMIES];\n\tint m_aAvoidFreezeOverride[NUM_DUMMIES];\n\tint m_PixelWalkTick;",
     "PixelWalk controls state",
 )
 replace_once(
@@ -114,7 +114,7 @@ static bool IsAvoidFreezeAhead(const CCollision &Collision, vec2 Pos, int Direct
 replace_once(
     "src/game/client/components/controls.cpp",
     "CControls::CControls()\n{\n",
-    "CControls::CControls()\n{\n\tm_PixelWalkTick = 0;\n\tmem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));\n\tmem_zero(&m_aAvoidFreezeOverride, sizeof(m_aAvoidFreezeOverride));\n",
+    "CControls::CControls()\n{\n\tmem_zero(&m_aManualHook, sizeof(m_aManualHook));\n\tm_PixelWalkTick = 0;\n\tmem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));\n\tmem_zero(&m_aAvoidFreezeOverride, sizeof(m_aAvoidFreezeOverride));\n",
     "PixelWalk constructor initialization",
 )
 replace_once(
@@ -126,7 +126,7 @@ replace_once(
 replace_once(
     "src/game/client/components/controls.cpp",
     "void CControls::ResetInput(int Dummy)\n{\n\tm_aLastData[Dummy].m_Direction = 0;",
-    "void CControls::ResetInput(int Dummy)\n{\n\tm_aPixelWalk[Dummy] = 0;\n\tm_aAvoidFreezeOverride[Dummy] = 0;\n\tm_aLastData[Dummy].m_Direction = 0;",
+    "void CControls::ResetInput(int Dummy)\n{\n\tm_aManualHook[Dummy] = 0;\n\tm_aPixelWalk[Dummy] = 0;\n\tm_aAvoidFreezeOverride[Dummy] = 0;\n\tm_aLastData[Dummy].m_Direction = 0;",
     "PixelWalk input reset",
 )
 replace_once(
@@ -150,6 +150,19 @@ replace_once(
 	{
 		static CInputSet''',
     "PixelWalk bind command",
+)
+
+replace_once(
+    "src/game/client/components/controls.cpp",
+    "static CInputState s_State = {this, {&m_aInputData[0].m_Hook, &m_aInputData[1].m_Hook}, true};",
+    "static CInputState s_State = {this, {&m_aManualHook[0], &m_aManualHook[1]}, true};",
+    "manual hook state binding",
+)
+replace_once(
+    "src/game/client/components/controls.cpp",
+    "\t\tm_aInputData[g_Config.m_ClDummy].m_TargetX = (int)m_aMousePos[g_Config.m_ClDummy].x;\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetY = (int)m_aMousePos[g_Config.m_ClDummy].y;",
+    "\t\tm_aInputData[g_Config.m_ClDummy].m_Hook = m_aManualHook[g_Config.m_ClDummy];\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetX = (int)m_aMousePos[g_Config.m_ClDummy].x;\n\t\tm_aInputData[g_Config.m_ClDummy].m_TargetY = (int)m_aMousePos[g_Config.m_ClDummy].y;",
+    "manual hook state before dummy input copy",
 )
 
 # Movement assists are applied after normal and dummy input processing, before sending the packet.
@@ -191,7 +204,8 @@ replace_once(
 
 		// Hook Aim: automatically hook the closest eligible player inside the cursor-centered FOV.
 		const int ActiveDummy = g_Config.m_ClDummy;
-		if(g_Config.m_ClHookAim && m_aInputData[ActiveDummy].m_Hook == 0 &&
+		m_aInputData[ActiveDummy].m_Hook = m_aManualHook[ActiveDummy];
+		if(g_Config.m_ClHookAim && !m_aManualHook[ActiveDummy] &&
 			(m_aInputData[ActiveDummy].m_PlayerFlags & PLAYERFLAG_PLAYING) &&
 			!GameClient()->m_Snap.m_SpecInfo.m_Active)
 		{
@@ -472,7 +486,7 @@ checks = {
         "cl_hook_aim", "cl_hook_aim_fov", "cl_hook_aim_show_fov",
     ],
     "src/game/client/components/controls.cpp": [
-        'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze", "m_ClHookAim",
+        'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze", "m_aManualHook", "m_ClHookAim",
         "CursorWorldPos()", "Target.m_RenderPos",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
