@@ -1,0 +1,31 @@
+--- a/src/engine/shared/config_variables.h
++++ b/src/engine/shared/config_variables.h
+@@ -256,1 +256,1 @@
+-MACRO_CONFIG_INT(ClDummyHammerWInterval, cl_dummy_hammer_w_interval, 1, 1, 25, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Dummy hammer interval in ticks while holding W (lower is faster)")
++MACRO_CONFIG_INT(ClDummyHammerWSpeed, cl_dummy_hammer_w_speed, 10, 1, 25, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Dummy hammer attempt speed while holding W")
+
+--- a/src/game/client/gameclient.cpp
++++ b/src/game/client/gameclient.cpp
+@@ -565,2 +565,2 @@
+ 		const unsigned int HammerInterval = DummyHammerOnW ?
+-			(unsigned int)g_Config.m_ClDummyHammerWInterval : 25U;
++			(unsigned int)(26 - g_Config.m_ClDummyHammerWSpeed) : 25U;
+
+--- a/src/game/client/components/menus_settings_controls.cpp
++++ b/src/game/client/components/menus_settings_controls.cpp
+@@ -222,1 +222,16 @@
++	RenderSettingsBlock(2.0f * BUTTON_HEIGHT + BUTTON_SPACING, &RightColumn, Localize("Dummy Hammer"), nullptr, nullptr,
++		[&](CUIRect Rect) {
++			CUIRect Button;
++			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
++			if(GameClient()->m_Menus.DoButton_CheckBox(&g_Config.m_ClDummyHammerOnW, Localize("Enable Dummy Hammer on W"), g_Config.m_ClDummyHammerOnW, &Button))
++				g_Config.m_ClDummyHammerOnW ^= 1;
++			Ui()->DoToolTip(&g_Config.m_ClDummyHammerOnW, &Button, Localize("Automatically hammer with Dummy while holding W"));
++
++			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
++			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
++			Ui()->DoScrollbarOption(&g_Config.m_ClDummyHammerWSpeed, &g_Config.m_ClDummyHammerWSpeed, &Button, Localize("Dummy Hammer Speed"), 1, 25);
++			Ui()->DoToolTip(&g_Config.m_ClDummyHammerWSpeed, &Button, Localize("Higher values send hammer attempts more frequently; actual hit speed is limited by server reload"));
++		});
++
+ 	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));
