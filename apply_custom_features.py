@@ -346,6 +346,13 @@ bool CMenus::RenderHslaScrollbars(CUIRect *pRect, unsigned int *pColor, bool Alp
     "S1ndrom settings page UI",
 )
 
+replace_once(
+    "src/game/client/components/menus_settings_controls.cpp",
+    '{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},',
+    '{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},\n\t\t{EBindOptionGroup::MOVEMENT, Localizable("PixelWalk"), "+pixelwalk"},\n\t\t{EBindOptionGroup::MOVEMENT, Localizable("Avoid Freeze Override"), "+avoidfreeze_override"},',
+    "PixelWalk and Avoid Freeze bind options",
+)
+
 # Controls menu: make PixelWalk bindable and expose the three assist settings.
 replace_once(
     "src/game/client/components/menus_settings_controls.cpp",
