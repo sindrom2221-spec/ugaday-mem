@@ -80,7 +80,7 @@ jobs:
                       candidates.append((archive, z.read(name)))
           if not candidates:
               raise SystemExit("Packaged DDNet.exe not found inside build ZIPs")
-          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed", b"cl_avoid_freeze", b"cl_avoid_freeze_range", b"Enable Avoid Freeze", b"Stop Distance", b"+avoidfreeze_override", b"Dummy Hammer (W)", b"Freeze Override", b"cl_hook_aim", b"cl_hook_aim_fov", b"cl_hook_aim_show_fov", b"Enable Hook Aim", b"Hook Aim FOV", b"Show FOV", b"Hook Aim"]
+          required = [b"cl_pixelwalk", b"cl_pixelwalk_speed", b"+pixelwalk", b"Enable PixelWalk", b"Dummy Hammer Speed", b"cl_dummy_hammer_w_speed", b"cl_avoid_freeze", b"cl_avoid_freeze_range", b"Enable Avoid Freeze", b"Stop Distance", b"+avoidfreeze_override", b"Dummy Hammer (W)", b"Freeze Override", b"cl_hook_aim", b"cl_hook_aim_fov", b"cl_hook_aim_show_fov", b"Enable Hook Aim", b"Hook Aim FOV", b"Show FOV", b"Hook Aim", b"S1ndrom"]
           for archive, binary in candidates:
               missing = [token.decode("ascii") for token in required if token not in binary]
               if missing:
