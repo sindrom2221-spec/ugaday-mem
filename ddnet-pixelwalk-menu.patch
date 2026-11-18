@@ -1,0 +1,49 @@
+--- a/src/engine/shared/config_variables.h
++++ b/src/engine/shared/config_variables.h
+@@ -261,1 +261,2 @@
+ MACRO_CONFIG_INT(ClPixelWalk, cl_pixelwalk, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "Enable PixelWalk while the +pixelwalk bind is held")
++MACRO_CONFIG_INT(ClPixelWalkSpeed, cl_pixelwalk_speed, 5, 1, 10, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_INSENSITIVE, "PixelWalk movement speed")
+
+--- a/src/game/client/components/controls.cpp
++++ b/src/game/client/components/controls.cpp
+@@ -385,10 +385,12 @@
+ 		// PixelWalk is a hold action: +pixelwalk activates it and key release clears it.
+-		// Alternate movement-on/movement-off input ticks for more granular stepping.
++		// The speed setting controls how often a movement tick is sent.
+ 		if(g_Config.m_ClPixelWalk && m_aPixelWalk[g_Config.m_ClDummy] && m_aInputData[g_Config.m_ClDummy].m_Direction != 0)
+ 		{
+-			m_PixelWalkTick ^= 1;
+-			if(m_PixelWalkTick == 0)
++			const int PixelWalkSpeed = std::clamp(g_Config.m_ClPixelWalkSpeed, 1, 10);
++			const int PixelWalkInterval = (10 + PixelWalkSpeed - 1) / PixelWalkSpeed;
++			m_PixelWalkTick = (m_PixelWalkTick + 1) % PixelWalkInterval;
++			if(m_PixelWalkTick != 0)
+ 				m_aInputData[g_Config.m_ClDummy].m_Direction = 0;
+ 		}
+ 		else
+ 			m_PixelWalkTick = 0;
+
+--- a/src/game/client/components/menus_settings_controls.cpp
++++ b/src/game/client/components/menus_settings_controls.cpp
+@@ -55,6 +55,7 @@
+ 		{EBindOptionGroup::MOVEMENT, Localizable("Toggle dyncam"), "toggle cl_dyncam 0 1"},
+ 		{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},
++		{EBindOptionGroup::MOVEMENT, Localizable("PixelWalk"), "+pixelwalk"},
+ 		{EBindOptionGroup::WEAPON, Localizable("Hammer"), "+weapon1"},
+@@ -205,6 +206,21 @@
+ 	RenderSettingsBindsBlock(EBindOptionGroup::DUMMY, &RightColumn, Localize("Dummy"));
+ 	RenderSettingsBindsBlock(EBindOptionGroup::PRACTICE, &RightColumn, Localize("Practice"));
++	RenderSettingsBlock(2.0f * BUTTON_HEIGHT + BUTTON_SPACING, &RightColumn, Localize("PixelWalk"), nullptr, nullptr,
++		[&](CUIRect Rect) {
++			CUIRect Button;
++			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
++			if(GameClient()->m_Menus.DoButton_CheckBox(&g_Config.m_ClPixelWalk, Localize("Enable PixelWalk"), g_Config.m_ClPixelWalk, &Button))
++				g_Config.m_ClPixelWalk ^= 1;
++			Ui()->DoToolTip(&g_Config.m_ClPixelWalk, &Button, Localize("Enable PixelWalk while holding its bind"));
++
++			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
++			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
++			Ui()->DoScrollbarOption(&g_Config.m_ClPixelWalkSpeed, &g_Config.m_ClPixelWalkSpeed, &Button, Localize("Speed"), 1, 10);
++			Ui()->DoToolTip(&g_Config.m_ClPixelWalkSpeed, &Button, Localize("Higher values make PixelWalk movement faster"));
++		});
+ 	RenderSettingsBindsBlock(EBindOptionGroup::MISCELLANEOUS, &RightColumn, Localize("Miscellaneous"));
