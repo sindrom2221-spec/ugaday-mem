@@ -51,11 +51,18 @@ replace_once(
     "W hammer speed",
 )
 
+replace_once(
+    "src/game/client/components/controls.cpp",
+    "#include <base/dbg.h>\n",
+    "#include <base/color.h>\n#include <base/dbg.h>\n",
+    "FOV circle color include",
+)
+
 # PixelWalk state and key-held command.
 replace_once(
     "src/game/client/components/controls.h",
     "\tint m_aShowHookColl[NUM_DUMMIES];",
-    "\tint m_aShowHookColl[NUM_DUMMIES];\n\tint m_aPixelWalk[NUM_DUMMIES];\n\tint m_aAvoidFreezeOverride[NUM_DUMMIES];\n\tint m_PixelWalkTick;",
+    "\tint m_aShowHookColl[NUM_DUMMIES];\n\tint m_aManualHook[NUM_DUMMIES];\n\tint m_aPixelWalk[NUM_DUMMIES];\n\tint m_aAvoidFreezeOverride[NUM_DUMMIES];\n\tint m_PixelWalkTick;",
     "PixelWalk controls state",
 )
 replace_once(
@@ -104,7 +111,7 @@ static bool IsAvoidFreezeAhead(const CCollision &Collision, vec2 Pos, int Direct
 replace_once(
     "src/game/client/components/controls.cpp",
     "CControls::CControls()\n{\n",
-    "CControls::CControls()\n{\n\tm_PixelWalkTick = 0;\n\tmem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));\n\tmem_zero(&m_aAvoidFreezeOverride, sizeof(m_aAvoidFreezeOverride));\n",
+    "CControls::CControls()\n{\n\tmem_zero(&m_aManualHook, sizeof(m_aManualHook));\n\tm_PixelWalkTick = 0;\n\tmem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));\n\tmem_zero(&m_aAvoidFreezeOverride, sizeof(m_aAvoidFreezeOverride));\n",
     "PixelWalk constructor initialization",
 )
 replace_once(
@@ -116,7 +123,7 @@ replace_once(
 replace_once(
     "src/game/client/components/controls.cpp",
     "void CControls::ResetInput(int Dummy)\n{\n\tm_aLastData[Dummy].m_Direction = 0;",
-    "void CControls::ResetInput(int Dummy)\n{\n\tm_aPixelWalk[Dummy] = 0;\n\tm_aAvoidFreezeOverride[Dummy] = 0;\n\tm_aLastData[Dummy].m_Direction = 0;",
+    "void CControls::ResetInput(int Dummy)\n{\n\tm_aManualHook[Dummy] = 0;\n\tm_aPixelWalk[Dummy] = 0;\n\tm_aAvoidFreezeOverride[Dummy] = 0;\n\tm_aLastData[Dummy].m_Direction = 0;",
     "PixelWalk input reset",
 )
 replace_once(
@@ -140,6 +147,13 @@ replace_once(
 	{
 		static CInputSet''',
     "PixelWalk bind command",
+)
+
+replace_once(
+    "src/game/client/components/controls.cpp",
+    "static CInputState s_State = {this, {&m_aInputData[0].m_Hook, &m_aInputData[1].m_Hook}, true};",
+    "static CInputState s_State = {this, {&m_aManualHook[0], &m_aManualHook[1]}, true};",
+    "manual hook state binding",
 )
 
 # Movement assists are applied after normal and dummy input processing, before sending the packet.
@@ -179,8 +193,82 @@ replace_once(
 			}
 		}
 
+		// Hook Aim: automatically hook the closest eligible player inside the cursor-centered FOV.
+		const int ActiveDummy = g_Config.m_ClDummy;
+		m_aInputData[ActiveDummy].m_Hook = m_aManualHook[ActiveDummy] != 0;
+		if(g_Config.m_ClHookAim && !m_aManualHook[ActiveDummy] &&
+			(m_aInputData[ActiveDummy].m_PlayerFlags & PLAYERFLAG_PLAYING) &&
+			!GameClient()->m_Snap.m_SpecInfo.m_Active)
+		{
+			const int LocalId = GameClient()->m_aLocalIds[ActiveDummy];
+			if(LocalId >= 0 && LocalId < MAX_CLIENTS && GameClient()->m_Snap.m_aCharacters[LocalId].m_Active)
+			{
+				const vec2 CursorPosition = CursorWorldPos();
+				const float FovRadius = (float)std::clamp(g_Config.m_ClHookAimFov, 16, 256);
+				int BestTarget = -1;
+				float BestDistance = FovRadius;
+				for(int ClientId = 0; ClientId < MAX_CLIENTS; ++ClientId)
+				{
+					const auto &Target = GameClient()->m_aClients[ClientId];
+					if(ClientId == LocalId || !Target.m_Active || Target.m_Team == TEAM_SPECTATORS ||
+						Target.m_Spec || Target.m_Paused || Target.m_HookHitDisabled ||
+						!GameClient()->m_Snap.m_aCharacters[ClientId].m_Active)
+						continue;
+					const float DistanceToCursor = length(Target.m_Predicted.m_Pos - CursorPosition);
+					if(DistanceToCursor <= BestDistance)
+					{
+						BestDistance = DistanceToCursor;
+						BestTarget = ClientId;
+					}
+				}
+				if(BestTarget >= 0)
+				{
+					const vec2 HookDirection = GameClient()->m_aClients[BestTarget].m_Predicted.m_Pos - GameClient()->m_LocalCharacterPos;
+					if(length(HookDirection) > 0.001f)
+					{
+						m_aInputData[ActiveDummy].m_TargetX = round_to_int(HookDirection.x);
+						m_aInputData[ActiveDummy].m_TargetY = round_to_int(HookDirection.y);
+						m_aInputData[ActiveDummy].m_Hook = 1;
+					}
+				}
+			}
+		}
+
 		// check if we need to send input''',
     "PixelWalk and Avoid Freeze steering",
+)
+
+replace_once(
+    "src/game/client/components/controls.cpp",
+    "\t\tm_aTargetPos[g_Config.m_ClDummy] = m_aMousePos[g_Config.m_ClDummy];\n\t}\n}\n\nbool CControls::OnCursorMove",
+    """\t\tm_aTargetPos[g_Config.m_ClDummy] = m_aMousePos[g_Config.m_ClDummy];
+\t}
+
+\tif(g_Config.m_ClHookAim && g_Config.m_ClHookAimShowFov)
+\t{
+\t\tconst vec2 Center = CursorWorldPos();
+\t\tconst float Radius = (float)std::clamp(g_Config.m_ClHookAimFov, 16, 256);
+\t\tconstexpr int SEGMENTS = 64;
+\t\tIGraphics::CLineItem aFovLines[SEGMENTS];
+\t\tfor(int i = 0; i < SEGMENTS; ++i)
+\t\t{
+\t\t\tconst float Angle0 = 2.0f * pi * (float)i / SEGMENTS;
+\t\t\tconst float Angle1 = 2.0f * pi * (float)(i + 1) / SEGMENTS;
+\t\t\tconst vec2 From = Center + direction(Angle0) * Radius;
+\t\t\tconst vec2 To = Center + direction(Angle1) * Radius;
+\t\t\taFovLines[i] = IGraphics::CLineItem(From, To);
+\t\t}
+\t\tGraphics()->TextureClear();
+\t\tGraphics()->SetColor(ColorRGBA(0.2f, 0.85f, 1.0f, 0.8f));
+\t\tGraphics()->LinesBegin();
+\t\tGraphics()->LinesDraw(aFovLines, SEGMENTS);
+\t\tGraphics()->LinesEnd();
+\t\tGraphics()->SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+\t}
+}
+
+bool CControls::OnCursorMove""",
+    "Hook Aim FOV drawing",
 )
 
 # Controls menu: make PixelWalk bindable and expose the three assist settings.
