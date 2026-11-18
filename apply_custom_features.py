@@ -410,7 +410,7 @@ replace_once(
 \tconst vec2 CameraCenter = GameClient()->m_Camera.m_Center;
 \tconst vec2 Cursor = GameClient()->m_Controls.m_aTargetPos[g_Config.m_ClDummy];
 \tconst vec2 ScreenCenter(m_Width / 2.0f, m_Height / 2.0f);
-\tconst vec2 ScreenCursor = ScreenCenter + (Cursor - CameraCenter);
+\tconst vec2 ScreenCursor = ScreenCenter + (Cursor - CameraCenter) / Zoom;
 \tconst float Radius = std::clamp((float)g_Config.m_ClHookAimFov / Zoom, 2.0f, 256.0f);
 
 \tconstexpr int SEGMENTS = 96;
