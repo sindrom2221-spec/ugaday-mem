@@ -55,7 +55,7 @@ replace_once(
 replace_once(
     "src/game/client/components/controls.h",
     "\tint m_aShowHookColl[NUM_DUMMIES];",
-    "\tint m_aShowHookColl[NUM_DUMMIES];\n\tint m_aPixelWalk[NUM_DUMMIES];\n\tint m_PixelWalkTick;",
+    "\tint m_aShowHookColl[NUM_DUMMIES];\n\tint m_aPixelWalk[NUM_DUMMIES];\n\tint m_aAvoidFreezeOverride[NUM_DUMMIES];\n\tint m_PixelWalkTick;",
     "PixelWalk controls state",
 )
 replace_once(
@@ -104,7 +104,7 @@ static bool IsAvoidFreezeAhead(const CCollision &Collision, vec2 Pos, int Direct
 replace_once(
     "src/game/client/components/controls.cpp",
     "CControls::CControls()\n{\n",
-    "CControls::CControls()\n{\n\tm_PixelWalkTick = 0;\n\tmem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));\n",
+    "CControls::CControls()\n{\n\tm_PixelWalkTick = 0;\n\tmem_zero(&m_aPixelWalk, sizeof(m_aPixelWalk));\n\tmem_zero(&m_aAvoidFreezeOverride, sizeof(m_aAvoidFreezeOverride));\n",
     "PixelWalk constructor initialization",
 )
 replace_once(
@@ -116,7 +116,7 @@ replace_once(
 replace_once(
     "src/game/client/components/controls.cpp",
     "void CControls::ResetInput(int Dummy)\n{\n\tm_aLastData[Dummy].m_Direction = 0;",
-    "void CControls::ResetInput(int Dummy)\n{\n\tm_aPixelWalk[Dummy] = 0;\n\tm_aLastData[Dummy].m_Direction = 0;",
+    "void CControls::ResetInput(int Dummy)\n{\n\tm_aPixelWalk[Dummy] = 0;\n\tm_aAvoidFreezeOverride[Dummy] = 0;\n\tm_aLastData[Dummy].m_Direction = 0;",
     "PixelWalk input reset",
 )
 replace_once(
@@ -131,6 +131,10 @@ replace_once(
 	{
 		static CInputState s_PixelWalk = {this, {&m_aPixelWalk[0], &m_aPixelWalk[1]}, false};
 		Console()->Register("+pixelwalk", "", CFGFLAG_CLIENT, ConKeyInputState, &s_PixelWalk, "PixelWalk while held");
+	}
+	{
+		static CInputState s_AvoidFreezeOverride = {this, {&m_aAvoidFreezeOverride[0], &m_aAvoidFreezeOverride[1]}, false};
+		Console()->Register("+avoidfreeze_override", "", CFGFLAG_CLIENT, ConKeyInputState, &s_AvoidFreezeOverride, "Temporarily bypass Avoid Freeze while held");
 	}
 
 	{
@@ -155,7 +159,7 @@ replace_once(
 			m_PixelWalkTick = 0;
 
 		// Avoid Freeze: release horizontal movement before entering a freeze tile.
-		if(g_Config.m_ClAvoidFreeze &&
+		if(g_Config.m_ClAvoidFreeze && !m_aAvoidFreezeOverride[g_Config.m_ClDummy] &&
 			(m_aInputData[g_Config.m_ClDummy].m_PlayerFlags & PLAYERFLAG_PLAYING) &&
 			m_aInputData[g_Config.m_ClDummy].m_Direction != 0 &&
 			!GameClient()->m_Snap.m_SpecInfo.m_Active)
@@ -183,7 +187,7 @@ replace_once(
 replace_once(
     "src/game/client/components/menus_settings_controls.cpp",
     '{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},',
-    '{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},\n\t\t{EBindOptionGroup::MOVEMENT, Localizable("PixelWalk"), "+pixelwalk"},',
+    '{EBindOptionGroup::MOVEMENT, Localizable("Toggle ghost"), "toggle cl_race_show_ghost 0 1"},\n\t\t{EBindOptionGroup::MOVEMENT, Localizable("PixelWalk"), "+pixelwalk"},\n\t\t{EBindOptionGroup::MOVEMENT, Localizable("Avoid Freeze Override"), "+avoidfreeze_override"},',
     "PixelWalk bind option",
 )
 replace_once(
@@ -221,7 +225,7 @@ replace_once(
 			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
 			if(GameClient()->m_Menus.DoButton_CheckBox(&g_Config.m_ClAvoidFreeze, Localize("Enable Avoid Freeze"), g_Config.m_ClAvoidFreeze, &Button))
 				g_Config.m_ClAvoidFreeze ^= 1;
-			Ui()->DoToolTip(&g_Config.m_ClAvoidFreeze, &Button, Localize("Stop horizontal movement before nearby freeze tiles"));
+			Ui()->DoToolTip(&g_Config.m_ClAvoidFreeze, &Button, Localize("Stop before freeze tiles; hold Avoid Freeze Override to enter intentionally"));
 			Rect.HSplitTop(BUTTON_SPACING, nullptr, &Rect);
 			Rect.HSplitTop(BUTTON_HEIGHT, &Button, &Rect);
 			Ui()->DoScrollbarOption(&g_Config.m_ClAvoidFreezeRange, &g_Config.m_ClAvoidFreezeRange, &Button, Localize("Avoidance Range"), 1, 8);
@@ -238,7 +242,7 @@ checks = {
         "cl_avoid_freeze", "cl_avoid_freeze_range",
     ],
     "src/game/client/components/controls.cpp": [
-        'Console()->Register("+pixelwalk"', "IsAvoidFreezeAhead", "m_ClAvoidFreeze",
+        'Console()->Register("+pixelwalk"', 'Console()->Register("+avoidfreeze_override"', "IsAvoidFreezeAhead", "m_aAvoidFreezeOverride", "m_ClAvoidFreeze",
     ],
     "src/game/client/components/menus_settings_controls.cpp": [
         'Localize("PixelWalk")', 'Localize("Dummy Hammer")', 'Localize("Avoid Freeze")',
